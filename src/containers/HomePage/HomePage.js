@@ -2,8 +2,8 @@ import React, { Component } from "react";
 import { connect } from "react-redux";
 import HomeHeader from "./HomeHeader";
 import HomeFooter from "./HomeFooter";
-import "./HomeHeader.scss";
-import "./HomePage.scss";
+import "../../styles/HomeHeader.scss";
+import "../../styles/HomePage.scss";
 
 class HomePage extends Component {
   constructor(props) {

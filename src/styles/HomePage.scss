@@ -16,7 +16,7 @@ html, body {
     margin-top: 60px;
     scroll-snap-align: start;
     position: relative;
-    background: url('../../assets/images/banner.jpg') center center no-repeat;
+    background: url('../assets/images/banner.jpg') center center no-repeat;
     background-size: cover;
     display: flex;
     flex-direction: column;
@@ -299,17 +299,17 @@ html, body {
         background-position: center;
 
         &.img1 {
-          background: url("../../assets/images/giaohuu1.jpg") center center no-repeat;
+          background: url("../assets/images/giaohuu1.jpg") center center no-repeat;
           background-size: cover;
         }
 
         &.img2 {
-          background: url("../../assets/images/giaohuu2.jpeg") center center no-repeat;
+          background: url("../assets/images/giaohuu2.jpeg") center center no-repeat;
           background-size: cover;
         }
 
         &.img3 {
-          background: url("../../assets/images/giaohuu3.jpg") center center no-repeat;
+          background: url("../assets/images/giaohuu3.jpg") center center no-repeat;
           background-size: cover;
         }
       }
@@ -418,7 +418,7 @@ html, body {
         height: 100%;
         min-height: 345px;
         aspect-ratio: 2 / 1;
-        background: url('../../assets/images/pic_giaohuu.png') center center no-repeat;
+        background: url('../assets/images/pic_giaohuu.png') center center no-repeat;
         background-size: cover;
         background-position: center;
         border-radius: 10px;

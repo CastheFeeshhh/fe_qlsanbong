@@ -1,6 +1,6 @@
 import React, { Component } from "react";
 import { connect } from "react-redux";
-import "./HomeHeader.scss";
+import "../../styles/HomeHeader.scss";
 
 class HomeHeader extends Component {
   HomeHeader = () => {};
