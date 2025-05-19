@@ -1,0 +1,17 @@
+html, body {
+    height: auto;
+    overflow: auto;
+    margin: 0;
+    padding: 0;
+}
+
+.book-wrapper {
+    text-align: center;
+    padding: 0 0 40px 0;
+    width: 100%;
+    margin-top: 60px;
+    overflow-y: auto;
+    scroll-behavior: smooth; 
+    display: flex;
+    flex-direction: column;
+}

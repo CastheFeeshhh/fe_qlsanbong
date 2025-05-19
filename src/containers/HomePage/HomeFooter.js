@@ -1,6 +1,6 @@
 import React, { Component } from "react";
 import { connect } from "react-redux";
-import "../../styles/HomeFooter.scss";
+import "../../styles/homeFooter.scss";
 
 const HomeFooter = () => {
   return (

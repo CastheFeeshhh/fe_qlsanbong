@@ -12,12 +12,19 @@ import {
 
 import { path } from "../utils";
 
-import Home from "../routes/Home";
+import Home from "../routes/home";
 import Login from "./Auth/Login";
 import System from "../routes/System";
 
 import { CustomToastCloseButton } from "../components/CustomToast";
-import HomePage from "./HomePage/HomePage";
+import HomePage from "./HomePage/homePage";
+import information from "../routes/information";
+import fieldList from "../routes/fieldList";
+import service from "../routes/service";
+import fieldMap from "../routes/fieldMap";
+import fieldBooking from "../routes/fieldBooking";
+import fieldSchedule from "../routes/fieldSchedule";
+
 class App extends Component {
   handlePersistorState = () => {
     const { persistor } = this.props;
@@ -49,6 +56,7 @@ class App extends Component {
                 <Route path={path.HOME} exact component={Home} />
                 <Route
                   path={path.LOGIN}
+                  s
                   component={userIsNotAuthenticated(Login)}
                 />
                 <Route
@@ -56,6 +64,12 @@ class App extends Component {
                   component={userIsAuthenticated(System)}
                 />
                 <Route path={path.HOMEPAGE} component={HomePage} />
+                <Route path={path.INFORMATION} component={information} />
+                <Route path={path.FIELDLIST} component={fieldList} />
+                <Route path={path.SERVICE} component={service} />
+                <Route path={path.FIELDMAP} component={fieldMap} />
+                <Route path={path.FIELDBOOKING} component={fieldBooking} />
+                <Route path={path.FIELDSCHEDULE} component={fieldSchedule} />
               </Switch>
             </span>
 

@@ -3,7 +3,7 @@ html, body {
 }
 
 
-.home-header-container {
+.header-container {
     position: fixed; 
     top: 0;
     width: 100%;
@@ -13,7 +13,7 @@ html, body {
     box-shadow: 0 3px 8px rgba(0, 0, 0, 0.2);
     margin-bottom: 40px;
     
-    .home-header-content {
+    .header-content {
         width: 100%;
         height: 100%;
         display: flex;
@@ -27,6 +27,56 @@ html, body {
                 height: 100%;
                 width: 100%;
                 background-size: 66%;
+            }
+        }
+
+        .center-content {
+            width: 60%;
+            display: flex;
+            align-items: center;
+            font-size: 15px;
+            font-weight: 700;
+            color: #344054;
+            line-height: 14px;
+            font-family: "Inter", sans-serif;
+        }
+
+        .right-content {
+            width: 20%;
+            display: flex;
+
+            .owner-show {
+                width: 70%;
+                padding-top: 6px;
+                .owner-name {
+                    font-size: 17px;
+                    font-weight: 600;
+                    color: #333;
+                    padding-left: 28px;
+                }
+
+                .owner-role {
+                    display: flex;
+                    align-items: center;
+                    font-size: 13px;
+                    color: #666;
+                    padding-left: 28px;
+
+                    i {
+                    margin-right: 6px;
+                    color: #007bff;
+                    }
+                }
+            }
+            .btn-logout {
+                width: 30%;
+                text-align: center;
+                color: #07b307;
+                
+                i   {
+                    padding-top: 20px;
+                    font-size: 22px;
+                }
             }
         }
     }

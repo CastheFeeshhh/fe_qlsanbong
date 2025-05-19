@@ -126,6 +126,11 @@ html, body {
                     }
                 }
             }
+
+            .child-content.active {
+                color: #ff8e03;
+                font-weight: bold;
+            }
         }
   
         .right-content {
@@ -151,10 +156,6 @@ html, body {
         }
     }
 }
-
-
-
-
 
 
 

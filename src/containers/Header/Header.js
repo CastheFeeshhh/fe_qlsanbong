@@ -3,7 +3,6 @@ import { connect } from "react-redux";
 
 import * as actions from "../../store/actions";
 import Navigator from "../../components/Navigator";
-import { adminMenu } from "./menuApp";
 import "./Header.scss";
 
 class Header extends Component {
@@ -11,14 +10,27 @@ class Header extends Component {
     const { processLogout } = this.props;
 
     return (
-      <div className="home-header-container">
-        <div className="home-header-content">
+      <div className="header-container">
+        <div className="header-content">
           <div className="left-content">
             <div className="header-logo"></div>
           </div>
           <div className="center-content"></div>
           <div className="right-content">
-            <div></div>
+            <div className="owner-show">
+              <div className="owner-name">Lê Danh Khải</div>
+              <div className="owner-role">
+                <i className="fas fa-user-tie"></i>
+                <span>Chủ sân</span>
+              </div>
+            </div>
+            <div
+              className="btn btn-logout"
+              onClick={processLogout}
+              title="Đăng xuất"
+            >
+              <i className="fas fa-sign-out-alt"></i>
+            </div>
           </div>
         </div>
       </div>

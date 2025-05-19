@@ -1,0 +1,93 @@
+.service-wrapper {
+  text-align: center;
+  display: flex;
+  flex-wrap: wrap;
+  width: 100%;
+  margin-top: 60px;
+  gap: 40px;
+  padding: 40px 80px;
+  justify-content: center; 
+  background-color: rgb(236, 242, 213);
+
+  .service-item {
+    flex: 0 0 calc(45%);
+    max-width: 45%;      
+    display: flex;
+    background-color: rgb(213, 224, 173);
+    color: #604747;
+    border-radius: 12px;
+    padding: 20px 30px;
+    gap: 20px;
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.08);
+    transition: all 0.3s;
+    margin-bottom: 10px;
+
+    &:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+    }
+
+    .service-image-frame {
+      flex: 0 0 100px;
+      width: 100px;
+      height: 100px;
+      background-color: #fff;
+      padding: 10px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+
+      .service-image {
+        width: 80px;
+        height: 80px;
+        border-radius: 50%;
+        background-size: cover;
+        background-position: center;
+      }
+
+      
+    }
+
+    .img1-service {
+        background: url("../assets/images/service_ao-pitch.jpg");
+    }
+    .img2-service {
+        background: url("../assets/images/service_bong.jpg");
+    }
+    .img3-service {
+        background: url("../assets/images/service_giaybd.jpg");
+    }
+    .img4-service {
+        background: url("../assets/images/service_tat.jpg");
+    }
+    .img5-service {
+        background: url("../assets/images/service_gang.jpg");
+    }
+    .img6-service {
+        background: url("../assets/images/service_op.jpg");
+    }
+    .img7-service {
+        background: url("../assets/images/service_nuoc.jpg");
+    }
+    .img8-service {
+        background: url("../assets/images/service_khan.jpg");
+    }
+
+    .service-content {
+      flex: 1;
+      padding-top: 5px;
+
+      h3 {
+        font-size: 20px;
+        margin-bottom: 10px;
+      }
+
+      p {
+        font-size: 15px;
+        margin: 5px 0;
+      }
+    }
+  }
+}

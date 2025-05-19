@@ -1,15 +1,28 @@
 import React, { Component } from "react";
 import { connect } from "react-redux";
-import "../../styles/HomeHeader.scss";
+import "../../styles/homeHeader.scss";
+import {
+  Redirect,
+  withRouter,
+} from "react-router-dom/cjs/react-router-dom.min";
 
 class HomeHeader extends Component {
   HomeHeader = () => {};
 
-  scrollToTop = () => {
-    window.scrollTo({ top: 0, behavior: "smooth" });
+  handleGoHome = () => {
+    this.props.history.push("/home");
+  };
+
+  handleGoNews = () => {
+    this.props.history.push("/news");
+  };
+
+  handleGoContact = () => {
+    this.props.history.push("/contact");
   };
 
   render() {
+    const { activeTab } = this.props;
     return (
       <React.Fragment>
         <div className="home-header-container">
@@ -18,35 +31,62 @@ class HomeHeader extends Component {
               <div className="header-logo"></div>
             </div>
             <div className="center-content">
-              <div className="child-content" onClick={this.scrollToTop}>
-                <i class="fas fa-home"></i>Trang chủ
+              <div
+                className={`child-content ${
+                  activeTab === "home" ? "active" : ""
+                }`}
+                onClick={this.handleGoHome}
+              >
+                <i className="fas fa-home"></i> Trang chủ
               </div>
-              <div className="child-content child-dropdown">
+              <div
+                className={`child-content child-dropdown ${
+                  activeTab === "about" ? "active" : ""
+                }`}
+              >
                 <div className="nav-link">
                   Giới thiệu
                   <i class="fas fa-angle-down"></i>
                 </div>
 
                 <div className="dropdown-menu">
-                  <a href="/gioi-thieu/tong-quan">Thông tin chung</a>
-                  <a href="/gioi-thieu/danh-sach-san">Danh sách sân</a>
-                  <a href="/gioi-thieu/ban-do">Bản đồ</a>
-                  <a href="/gioi-thieu/lich-su">Lịch sử</a>
+                  <a href="/information">Thông tin chung</a>
+                  <a href="/field-list">Danh sách sân</a>
+                  <a href="/service">Dịch vụ</a>
+                  <a href="/field-map">Bản đồ</a>
                 </div>
               </div>
 
-              <div className="child-content child-dropdown">
+              <div
+                className={`child-content child-dropdown ${
+                  activeTab === "book" ? "active" : ""
+                }`}
+              >
                 <div className="nav-link">
                   Đặt sân
                   <i class="fas fa-angle-down"></i>
                 </div>
                 <div className="dropdown-menu">
-                  <a href="/gioi-thieu/thue-san">Đăng ký sân</a>
-                  <a href="/gioi-thieu/lich-dat">Lịch thuê sân</a>
+                  <a href="/field-booking">Đăng ký sân</a>
+                  <a href="/field-schedule">Lịch thuê sân</a>
                 </div>
               </div>
-              <div className="child-content">Tin tức</div>
-              <div className="child-content">Liên hệ</div>
+              <div
+                className={`child-content ${
+                  activeTab === "news" ? "active" : ""
+                }`}
+                onClick={this.handleGoNews}
+              >
+                Tin tức
+              </div>
+              <div
+                className={`child-content ${
+                  activeTab === "contact" ? "active" : ""
+                }`}
+                onClick={this.handleGoContact}
+              >
+                Liên hệ
+              </div>
             </div>
             <div className="right-content">
               <button>Đăng nhập / Đăng ký</button>
@@ -68,4 +108,7 @@ const mapDispatchToProps = (dispatch) => {
   return {};
 };
 
-export default connect(mapStateToProps, mapDispatchToProps)(HomeHeader);
+export default connect(
+  mapStateToProps,
+  mapDispatchToProps
+)(withRouter(HomeHeader));

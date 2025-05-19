@@ -1,0 +1,85 @@
+html, body {
+    height: auto;
+    overflow: auto;
+    margin: 0;
+    padding: 0;
+}
+
+.info-wrapper {
+    text-align: center;
+    padding: 0 0 40px 0;
+    width: 100%;
+    margin-top: 60px;
+    overflow-y: auto;
+    scroll-behavior: smooth; 
+    display: flex;
+    flex-direction: column;
+
+  .info-section {
+    width: 100%;
+    padding: 40px 100px;
+    display: flex;
+    align-items: center;
+    gap: 50px;
+
+    &.image-left {
+      flex-direction: row;
+      background-color: rgb(236, 242, 213);
+      color: #604747;
+    }
+
+    &.image-right {
+      flex-direction: row-reverse;
+      background-color: rgb(225, 244, 247);
+      color: #121469;
+    }
+
+    .info-frame {
+        flex: 0 0 40%;
+        padding: 16px;
+        background-color: #fff;
+        border-radius: 14px;
+        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        height: 320px;
+
+        .info-image {
+            aspect-ratio: 7/4;
+            width: 100%;
+            height: 100%;
+            background-size: cover;
+            background-position: center;
+            border-radius: 8px;
+        }
+    }
+
+
+    .img1-field {
+        background: url('../assets/images/5x5.jpg') center center no-repeat;
+    }
+
+    .img2-field {
+        background: url('../assets/images/7x7.jpg') center center no-repeat;
+    }
+
+    .img3-field {
+        background: url('../assets/images/9x9.jpg') center center no-repeat;
+    }
+
+    .info-text {
+      width: 800px;
+
+      h2 {
+        font-size: 30px;
+        margin-bottom: 16px;
+      }
+
+      p {
+        font-size: 17px;
+        line-height: 1.6;
+      }
+    }
+  }
+}

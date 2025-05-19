@@ -2,8 +2,7 @@ import React, { Component } from "react";
 import { connect } from "react-redux";
 import HomeHeader from "./HomeHeader";
 import HomeFooter from "./HomeFooter";
-import "../../styles/HomeHeader.scss";
-import "../../styles/HomePage.scss";
+import "../../styles/homePage.scss";
 
 class HomePage extends Component {
   constructor(props) {
@@ -16,9 +15,10 @@ class HomePage extends Component {
   };
 
   render() {
+    this.scrollToTop();
     return (
       <div className="home-page-wrapper">
-        <HomeHeader />
+        <HomeHeader activeTab="home" />
 
         <div
           className="home-scroll-container"

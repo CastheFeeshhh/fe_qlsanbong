@@ -1,0 +1,164 @@
+.book-wrapper {
+  max-width: 800px;
+  margin: 60px auto 40px;
+  padding: 20px;
+  background: #fff;
+  border-radius: 8px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+
+  h2 {
+    text-align: center;
+    color: #07b307;
+    margin-bottom: 30px;
+  }
+
+  .booking-form {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+
+      label {
+        font-weight: 600;
+        color: #333;
+
+        .required {
+          color: #e74c3c;
+        }
+      }
+
+      input, select, textarea {
+        padding: 10px 15px;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+        font-size: 16px;
+
+        &:focus {
+          outline: none;
+          border-color: #07b307;
+          box-shadow: 0 0 0 2px rgba(7, 179, 7, 0.2);
+        }
+      }
+
+      textarea {
+        resize: vertical;
+      }
+    }
+
+    .date-group, .time-group {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+
+      .date-picker-container {
+        position: relative;
+
+        .date-input {
+          width: 100%;
+          padding: 10px 15px;
+          border: 1px solid #ddd;
+          border-radius: 4px;
+          font-size: 16px;
+        }
+
+        .calendar-icon {
+          position: absolute;
+          right: 15px;
+          top: 50%;
+          transform: translateY(-50%);
+          color: #07b307;
+        }
+      }
+
+      .time-inputs {
+        display: flex;
+        gap: 10px;
+        align-items: center;
+
+        select {
+          flex: 1;
+        }
+      }
+
+      button {
+        padding: 10px 15px;
+        background: #f39c12;
+        color: white;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        transition: background 0.3s;
+
+        &:hover {
+          background: #e67e22;
+        }
+
+        &:disabled {
+          background: #95a5a6;
+          cursor: not-allowed;
+        }
+      }
+    }
+
+    .services-group {
+      .services-list {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 15px;
+
+        .service-item {
+          display: flex;
+          align-items: center;
+          gap: 5px;
+
+          input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+            accent-color: #07b307;
+          }
+        }
+      }
+    }
+
+    .submit-btn {
+      padding: 12px 20px;
+      background: #07b307;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      font-size: 18px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.3s;
+      margin-top: 20px;
+
+      &:hover {
+        background: #059c05;
+      }
+    }
+  }
+}
+
+// Responsive
+@media (max-width: 768px) {
+  .book-wrapper {
+    margin: 20px 10px;
+    padding: 15px;
+
+    .booking-form {
+      .time-group {
+        .time-inputs {
+          flex-direction: column;
+
+          select, button {
+            width: 100%;
+          }
+        }
+      }
+    }
+  }
+}
