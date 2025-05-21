@@ -14,7 +14,7 @@ class HomeHeader extends Component {
   };
 
   handleGoNews = () => {
-    this.props.history.push("/news");
+    this.props.history.push("/field-news");
   };
 
   handleGoContact = () => {
@@ -73,7 +73,7 @@ class HomeHeader extends Component {
               </div>
               <div
                 className={`child-content ${
-                  activeTab === "news" ? "active" : ""
+                  activeTab === "field-news" ? "active" : ""
                 }`}
                 onClick={this.handleGoNews}
               >

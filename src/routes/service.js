@@ -4,7 +4,7 @@ import HomeHeader from "../containers/HomePage/HomeHeader";
 import HomeFooter from "../containers/HomePage/HomeFooter";
 import "../styles/service.scss";
 
-class Service extends Component {
+class service extends Component {
   scrollToTop = () => {
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
@@ -25,7 +25,7 @@ class Service extends Component {
         title: "⚽ Bóng",
         details: [
           "Bóng đá tiêu chuẩn số 4 - 5, chất liệu bền.",
-          "Cho thuê: 30.000đ / quả",
+          "Cho thuê: 40.000đ / quả",
         ],
         imageClass: "img2-service",
       },
@@ -49,7 +49,7 @@ class Service extends Component {
         title: "🧤 Găng tay",
         details: [
           "Găng tay thủ môn chất lượng cao, chống trượt, tăng độ bám.",
-          "Cho thuê: 25.000đ / đôi",
+          "Cho thuê: 30.000đ / đôi",
         ],
         imageClass: "img5-service",
       },
@@ -57,7 +57,7 @@ class Service extends Component {
         title: "🦿 Ốp bảo vệ",
         details: [
           "Bảo vệ ống đồng khi thi đấu, chất liệu nhẹ và bền.",
-          "Cho thuê: 10.000đ / cặp",
+          "Cho thuê: 15.000đ / cặp",
         ],
         imageClass: "img6-service",
       },
@@ -114,4 +114,4 @@ const mapStateToProps = (state) => ({
   isLoggedIn: state.user.isLoggedIn,
 });
 
-export default connect(mapStateToProps)(Service);
+export default connect(mapStateToProps)(service);

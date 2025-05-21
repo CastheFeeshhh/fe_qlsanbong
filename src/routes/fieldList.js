@@ -4,7 +4,7 @@ import HomeHeader from "../containers/HomePage/HomeHeader";
 import HomeFooter from "../containers/HomePage/HomeFooter";
 import "../styles/fieldList.scss";
 
-class information extends Component {
+class fieldList extends Component {
   scrollToTop = () => {
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
@@ -83,4 +83,4 @@ const mapDispatchToProps = (dispatch) => {
   return {};
 };
 
-export default connect(mapStateToProps, mapDispatchToProps)(information);
+export default connect(mapStateToProps, mapDispatchToProps)(fieldList);

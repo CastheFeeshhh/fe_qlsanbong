@@ -24,6 +24,8 @@ import service from "../routes/service";
 import fieldMap from "../routes/fieldMap";
 import fieldBooking from "../routes/fieldBooking";
 import fieldSchedule from "../routes/fieldSchedule";
+import fieldNews from "../routes/fieldNews";
+import contact from "../routes/contact";
 
 class App extends Component {
   handlePersistorState = () => {
@@ -70,6 +72,8 @@ class App extends Component {
                 <Route path={path.FIELDMAP} component={fieldMap} />
                 <Route path={path.FIELDBOOKING} component={fieldBooking} />
                 <Route path={path.FIELDSCHEDULE} component={fieldSchedule} />
+                <Route path={path.FIELDNEWS} component={fieldNews} />
+                <Route path={path.CONTACT} component={contact} />
               </Switch>
             </span>
 

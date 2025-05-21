@@ -2,9 +2,9 @@ import React, { Component } from "react";
 import { connect } from "react-redux";
 import HomeHeader from "../containers/HomePage/HomeHeader";
 import HomeFooter from "../containers/HomePage/HomeFooter";
-import "../styles/fieldMap.scss";
+import "../styles/fieldNews.scss";
 
-class fieldMap extends Component {
+class fieldNews extends Component {
   scrollToTop = () => {
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
@@ -14,10 +14,8 @@ class fieldMap extends Component {
 
     return (
       <div className="info-page-wrapper">
-        <HomeHeader activeTab="about" />
-        <div className="info-wrapper">
-          <h1 className="map-about">Chức năng sẽ được mở trong tương lai !!</h1>
-        </div>
+        <HomeHeader activeTab="field-news" />
+
         <HomeFooter />
       </div>
     );
@@ -34,4 +32,4 @@ const mapDispatchToProps = (dispatch) => {
   return {};
 };
 
-export default connect(mapStateToProps, mapDispatchToProps)(fieldMap);
+export default connect(mapStateToProps, mapDispatchToProps)(fieldNews);
