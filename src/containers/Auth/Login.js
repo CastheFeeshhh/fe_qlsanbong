@@ -6,7 +6,6 @@ import { push } from "connected-react-router";
 import * as actions from "../../store/actions";
 
 import "./Login.scss";
-import { FormattedMessage } from "react-intl";
 import { handleLoginApi } from "../../services/userService";
 
 class Login extends Component {
@@ -137,15 +136,12 @@ class Login extends Component {
 }
 
 const mapStateToProps = (state) => {
-  return {
-    language: state.app.language,
-  };
+  return {};
 };
 
 const mapDispatchToProps = (dispatch) => {
   return {
     navigate: (path) => dispatch(push(path)),
-    // userLoginFail: () => dispatch(actions.adminLoginFail()),
     userLoginSuccess: (userInfor) =>
       dispatch(actions.userLoginSuccess(userInfor)),
   };

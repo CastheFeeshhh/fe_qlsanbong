@@ -20,18 +20,15 @@ export const fetchAllServices = () => {
       dispatch({ type: actionTypes.FETCH_ALL_SERVICES_START });
 
       let res = await getAllServicesData();
-      console.log("Action: getAllServicesData response:", res); // THÊM DÒNG NÀY ĐỂ XÁC NHẬN CẤU TRÚC RESPONSE CỦA SERVICES
+      console.log("Action: getAllServicesData response:", res);
 
-      // SỬA ĐIỀU KIỆN KIỂM TRA VÀ CÁCH LẤY DỮ LIỆU TẠI ĐÂY
-      // Nếu API trả về trực tiếp mảng, thì res chính là mảng đó.
       if (res && Array.isArray(res) && res.length > 0) {
-        // ĐÃ SỬA
         console.log(
           "Action: Dispatching FETCH_ALL_SERVICES_SUCCESS with data."
         );
         dispatch({
           type: actionTypes.FETCH_ALL_SERVICES_SUCCESS,
-          data: res, // ĐÃ SỬA: data là chính res
+          data: res,
         });
       } else {
         console.warn(
@@ -53,16 +50,13 @@ export const fetchAllFields = () => {
       dispatch({ type: actionTypes.FETCH_ALL_FIELDS_START });
 
       let res = await getAllFieldsData();
-      console.log("Action: getAllFieldsData response:", res); // Bạn đã có log này rồi
+      console.log("Action: getAllFieldsData response:", res);
 
-      // SỬA ĐIỀU KIỆN KIỂM TRA VÀ CÁCH LẤY DỮ LIỆU TẠI ĐÂY
-      // Nếu API trả về trực tiếp mảng, thì res chính là mảng đó.
       if (res && Array.isArray(res) && res.length > 0) {
-        // ĐÃ SỬA
         console.log("Action: Dispatching FETCH_ALL_FIELDS_SUCCESS with data.");
         dispatch({
           type: actionTypes.FETCH_ALL_FIELDS_SUCCESS,
-          data: res, // ĐÃ SỬA: data là chính res
+          data: res,
         });
       } else {
         console.warn(

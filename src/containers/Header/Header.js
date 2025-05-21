@@ -2,7 +2,6 @@ import React, { Component } from "react";
 import { connect } from "react-redux";
 
 import * as actions from "../../store/actions";
-import Navigator from "../../components/Navigator";
 import "./Header.scss";
 
 class Header extends Component {

@@ -14,48 +14,48 @@ const initialState = {
   contentOfConfirmModal: {
     ...initContentOfConfirmModal,
   },
-  isLoadingServices: false, // Cờ này sẽ là true khi đang fetch, false khi hoàn thành
-  services: [], // Mảng này sẽ chứa danh sách các dịch vụ (sau khi fetch thành công)
-  isLoadingFields: false, // Cờ này sẽ là true khi đang fetch, false khi hoàn thành
-  fieldPrices: [], // Mảng này sẽ chứa danh sách các sân và giá của chúng
+  isLoadingServices: false,
+  services: [],
+  isLoadingFields: false,
+  fieldPrices: [],
 };
 const appReducer = (state = initialState, action) => {
   switch (action.type) {
     // ...
-    case actionTypes.FETCH_ALL_SERVICES_START: // SỬA ĐÂY
+    case actionTypes.FETCH_ALL_SERVICES_START:
       return {
         ...state,
         isLoadingServices: true,
       };
 
-    case actionTypes.FETCH_ALL_SERVICES_SUCCESS: // SỬA ĐÂY
+    case actionTypes.FETCH_ALL_SERVICES_SUCCESS:
       return {
         ...state,
         isLoadingServices: false,
         services: action.data,
       };
 
-    case actionTypes.FETCH_ALL_SERVICES_FAILED: // SỬA ĐÂY
+    case actionTypes.FETCH_ALL_SERVICES_FAILED:
       return {
         ...state,
         isLoadingServices: false,
         services: [],
       };
 
-    case actionTypes.FETCH_ALL_FIELDS_START: // SỬA ĐÂY (tùy chọn)
+    case actionTypes.FETCH_ALL_FIELDS_START:
       return {
         ...state,
         isLoadingFields: true,
       };
 
-    case actionTypes.FETCH_ALL_FIELDS_SUCCESS: // SỬA ĐÂY (tùy chọn)
+    case actionTypes.FETCH_ALL_FIELDS_SUCCESS:
       return {
         ...state,
         isLoadingFields: false,
         fieldPrices: action.data,
       };
 
-    case actionTypes.FETCH_ALL_FIELDS_FAILED: // SỬA ĐÂY (tùy chọn)
+    case actionTypes.FETCH_ALL_FIELDS_FAILED:
       return {
         ...state,
         isLoadingFields: false,
