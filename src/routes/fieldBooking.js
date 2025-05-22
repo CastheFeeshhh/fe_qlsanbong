@@ -1,10 +1,27 @@
 import React, { Component } from "react";
 import { connect } from "react-redux";
+import moment from "moment";
 import HomeHeader from "../containers/HomePage/HomeHeader";
 import HomeFooter from "../containers/HomePage/HomeFooter";
 import "../styles/fieldBooking.scss";
 import { fetchAllServices, fetchAllFields } from "../store/actions/appActions";
-import { createBookingService } from "../services/userService";
+import {
+  calculateTotalPrice,
+  validateBookingData,
+  getBookingPriceDetails,
+} from "../helpers/bookingCalculations";
+import {
+  sendBookingsToBackend,
+  removeBookingItem,
+  addBookingItem,
+} from "../helpers/bookingActions";
+import {
+  formatSelectedServices,
+  renderServiceSection,
+} from "../helpers/serviceUtils";
+import { renderBookingItemRow } from "../helpers/bookingRendering";
+import * as appApiService from "../services/bookingService";
+import CalendarModal from "../component/CalendarModal";
 
 class fieldBooking extends Component {
   constructor(props) {
@@ -25,7 +42,30 @@ class fieldBooking extends Component {
       bookings: [],
       totalPrice: 0,
       finalTotalPrice: 0,
+      errorMessage: "",
+      formErrors: {},
+      isFormValid: false,
+
+      isCalendarModalOpen: false,
+      fieldBookingsData: null,
+      isLoadingCalendarData: false,
+      calendarError: "",
+      calendarButtonError: "",
     };
+    this.handleInputChange = this.handleInputChange.bind(this);
+    this.handleTimeChange = this.handleTimeChange.bind(this);
+    this.handleServiceQuantityChange =
+      this.handleServiceQuantityChange.bind(this);
+    this.handleServiceCheckboxChange =
+      this.handleServiceCheckboxChange.bind(this);
+    this.resetBookingForm = this.resetBookingForm.bind(this);
+    this.handleRemoveBookingItemClick =
+      this.handleRemoveBookingItemClick.bind(this);
+    this.validateAndSetFormState = this.validateAndSetFormState.bind(this);
+    this.handleOpenCalendarModal = this.handleOpenCalendarModal.bind(this);
+    this.handleCloseCalendarModal = this.handleCloseCalendarModal.bind(this);
+    this.handleDatePickerChange = this.handleDatePickerChange.bind(this);
+    this.handleFieldChange = this.handleFieldChange.bind(this);
   }
 
   handleInputChange = (event) => {
@@ -36,20 +76,17 @@ class fieldBooking extends Component {
         [name]: value,
       };
 
-      const newTotalPrice = this.calculateTotalPrice(
-        updatedCurrentBooking.selectedField,
-        updatedCurrentBooking.startTimeHour,
-        updatedCurrentBooking.startTimeMinute,
-        updatedCurrentBooking.endTimeHour,
-        updatedCurrentBooking.endTimeMinute,
-        updatedCurrentBooking.selectedServices
+      const { updatedBooking, newTotalPrice } = getBookingPriceDetails(
+        updatedCurrentBooking,
+        this.props.fieldPrices,
+        this.props.services
       );
 
       return {
-        currentBooking: updatedCurrentBooking,
+        currentBooking: updatedBooking,
         totalPrice: newTotalPrice,
       };
-    });
+    }, this.validateAndSetFormState);
   };
 
   handleTimeChange = (event) => {
@@ -60,20 +97,17 @@ class fieldBooking extends Component {
         [name]: value,
       };
 
-      const newTotalPrice = this.calculateTotalPrice(
-        updatedCurrentBooking.selectedField,
-        updatedCurrentBooking.startTimeHour,
-        updatedCurrentBooking.startTimeMinute,
-        updatedCurrentBooking.endTimeHour,
-        updatedCurrentBooking.endTimeMinute,
-        updatedCurrentBooking.selectedServices
+      const { updatedBooking, newTotalPrice } = getBookingPriceDetails(
+        updatedCurrentBooking,
+        this.props.fieldPrices,
+        this.props.services
       );
 
       return {
-        currentBooking: updatedCurrentBooking,
+        currentBooking: updatedBooking,
         totalPrice: newTotalPrice,
       };
-    });
+    }, this.validateAndSetFormState);
   };
 
   handleServiceQuantityChange = (event) => {
@@ -89,23 +123,22 @@ class fieldBooking extends Component {
         delete updatedSelectedServices[serviceId];
       }
 
-      const newTotalPrice = this.calculateTotalPrice(
-        prevState.currentBooking.selectedField,
-        prevState.currentBooking.startTimeHour,
-        prevState.currentBooking.startTimeMinute,
-        prevState.currentBooking.endTimeHour,
-        prevState.currentBooking.endTimeMinute,
-        updatedSelectedServices
+      const updatedCurrentBooking = {
+        ...prevState.currentBooking,
+        selectedServices: updatedSelectedServices,
+      };
+
+      const { updatedBooking, newTotalPrice } = getBookingPriceDetails(
+        updatedCurrentBooking,
+        this.props.fieldPrices,
+        this.props.services
       );
 
       return {
-        currentBooking: {
-          ...prevState.currentBooking,
-          selectedServices: updatedSelectedServices,
-        },
+        currentBooking: updatedBooking,
         totalPrice: newTotalPrice,
       };
-    });
+    }, this.validateAndSetFormState);
   };
 
   handleServiceCheckboxChange = (event) => {
@@ -122,568 +155,301 @@ class fieldBooking extends Component {
         delete updatedSelectedServices[serviceId];
       }
 
-      const newTotalPrice = this.calculateTotalPrice(
-        prevState.currentBooking.selectedField,
-        prevState.currentBooking.startTimeHour,
-        prevState.currentBooking.startTimeMinute,
-        prevState.currentBooking.endTimeHour,
-        prevState.currentBooking.endTimeMinute,
-        updatedSelectedServices
+      const updatedCurrentBooking = {
+        ...prevState.currentBooking,
+        selectedServices: updatedSelectedServices,
+      };
+
+      const { updatedBooking, newTotalPrice } = getBookingPriceDetails(
+        updatedCurrentBooking,
+        this.props.fieldPrices,
+        this.props.services
       );
 
       return {
-        currentBooking: {
-          ...prevState.currentBooking,
-          selectedServices: updatedSelectedServices,
-        },
+        currentBooking: updatedBooking,
         totalPrice: newTotalPrice,
       };
-    });
+    }, this.validateAndSetFormState);
   };
 
-  handleCheckAvailability = () => {
-    const {
+  resetBookingForm = () => {
+    this.setState({
+      bookings: [],
       currentBooking: {
-        bookingDate,
-        selectedField,
-        startTimeHour,
-        startTimeMinute,
-        endTimeHour,
-        endTimeMinute,
+        teamName: "",
+        captainName: "",
+        phoneNumber: "",
+        bookingDate: "",
+        selectedField: "",
+        startTimeHour: "18",
+        startTimeMinute: "00",
+        endTimeHour: "19",
+        endTimeMinute: "00",
+        selectedServices: {},
       },
-    } = this.state;
-    const startTime = `${startTimeHour}:${startTimeMinute}`;
-    const endTime = `${endTimeHour}:${endTimeMinute}`;
-    console.log(
-      "Kiểm tra lịch đặt cho:",
-      bookingDate,
-      selectedField,
-      startTime,
-      endTime
-    );
-    // Sau này sẽ gọi API để kiểm tra lịch ở đây
-  };
-
-  validateCurrentBooking = () => {
-    const {
-      teamName,
-      captainName,
-      phoneNumber,
-      bookingDate,
-      selectedField,
-      startTimeHour,
-      startTimeMinute,
-      endTimeHour,
-      endTimeMinute,
-    } = this.state.currentBooking;
-
-    if (
-      !teamName ||
-      !captainName ||
-      !phoneNumber ||
-      !bookingDate ||
-      !selectedField ||
-      !startTimeHour ||
-      !startTimeMinute ||
-      !endTimeHour ||
-      !endTimeMinute
-    ) {
-      return false;
-    }
-    return true;
-  };
-
-  handleAddBookingItem = () => {
-    if (this.validateCurrentBooking()) {
-      this.setState((prevState) => {
-        const updatedBookings = [
-          ...prevState.bookings,
-          prevState.currentBooking,
-        ];
-
-        const priceOfAddedBooking = this.calculateTotalPrice(
-          prevState.currentBooking.selectedField,
-          prevState.currentBooking.startTimeHour,
-          prevState.currentBooking.startTimeMinute,
-          prevState.currentBooking.endTimeHour,
-          prevState.currentBooking.endTimeMinute,
-          prevState.currentBooking.selectedServices
-        );
-
-        return {
-          bookings: updatedBookings,
-          currentBooking: {
-            teamName: "",
-            captainName: "",
-            phoneNumber: "",
-            bookingDate: "",
-            selectedField: "",
-            startTimeHour: "18",
-            startTimeMinute: "00",
-            endTimeHour: "19",
-            endTimeMinute: "00",
-            selectedServices: {},
-          },
-          totalPrice: 0,
-          finalTotalPrice: prevState.finalTotalPrice + priceOfAddedBooking,
-        };
-      });
-      alert("Đã thêm hóa đơn đặt sân!");
-    } else {
-      alert(
-        "Vui lòng nhập đầy đủ thông tin đặt sân (Tên đội, Tên đội trưởng, SĐT, Ngày, Giờ, Sân)."
-      );
-    }
-  };
-
-  handleRemoveBookingItem = (index) => {
-    this.setState((prevState) => {
-      const updatedBookings = [...prevState.bookings];
-
-      const bookingToRemove = updatedBookings[index];
-
-      const priceOfRemovedBooking = this.calculateTotalPrice(
-        bookingToRemove.selectedField,
-        bookingToRemove.startTimeHour,
-        bookingToRemove.startTimeMinute,
-        bookingToRemove.endTimeHour,
-        bookingToRemove.endTimeMinute,
-        bookingToRemove.selectedServices
-      );
-
-      updatedBookings.splice(index, 1);
-
-      return {
-        bookings: updatedBookings,
-        finalTotalPrice: prevState.finalTotalPrice - priceOfRemovedBooking,
-      };
+      totalPrice: 0,
+      finalTotalPrice: 0,
     });
   };
 
-  handleSendBookingsToBackend = async () => {
-    if (this.state.bookings.length === 0) {
-      alert("Vui lòng thêm ít nhất một hóa đơn đặt sân để gửi.");
+  handleRemoveBookingItemClick = (index) => {
+    const { updatedBookings, priceChange } = removeBookingItem(
+      this.state.bookings,
+      index,
+      this.props.fieldPrices,
+      this.props.services
+    );
+    this.setState((prevState) => ({
+      bookings: updatedBookings,
+      finalTotalPrice: prevState.finalTotalPrice + priceChange,
+    }));
+  };
+
+  validateAndSetFormState = () => {
+    const { currentBooking } = this.state;
+    const { services } = this.props;
+    const validationResult = validateBookingData(currentBooking, services);
+
+    this.setState({
+      formErrors: validationResult.errors,
+      errorMessage: validationResult.errorMessage,
+      isFormValid: validationResult.isValid,
+    });
+
+    return validationResult;
+  };
+
+  validateCalendarInput = (bookingDate, selectedField, fieldPrices) => {
+    let error = "";
+
+    if (!bookingDate) {
+      error = "Vui lòng chọn ngày đặt sân.";
+    } else if (!selectedField) {
+      error = "Vui lòng chọn sân.";
+    } else {
+      try {
+        const selectedDateObj = moment(bookingDate, "YYYY-MM-DD");
+        const today = moment().startOf("day");
+        const threeMonthsLater = moment().add(3, "months").endOf("day");
+
+        if (!selectedDateObj.isValid()) {
+          error = "Ngày đặt sân không hợp lệ.";
+        } else if (selectedDateObj.isBefore(today)) {
+          error = "Không thể xem lịch cho ngày trong quá khứ.";
+        } else if (selectedDateObj.isAfter(threeMonthsLater)) {
+          error = "Chỉ có thể xem lịch trong vòng 3 tháng tới.";
+        }
+      } catch (e) {
+        error = "Định dạng ngày đặt sân không đúng.";
+      }
+
+      if (!error && fieldPrices) {
+        const fieldExists = fieldPrices.some(
+          (field) => String(field.field_id) === String(selectedField)
+        );
+        if (!fieldExists) {
+          error = "Sân được chọn không tồn tại hoặc đã bị xóa.";
+        }
+      } else if (!fieldPrices) {
+        error = "Không có thông tin giá sân. Vui lòng thử lại.";
+      }
+    }
+    return error;
+  };
+
+  handleDatePickerChange = (date) => {
+    this.setState((prevState) => ({
+      currentBooking: {
+        ...prevState.currentBooking,
+        bookingDate: date,
+      },
+    }));
+  };
+
+  handleFieldChange = (event) => {
+    this.setState((prevState) => ({
+      currentBooking: {
+        ...prevState.currentBooking,
+        selectedField: event.target.value,
+      },
+    }));
+  };
+
+  handleOpenCalendarModal = async () => {
+    const { currentBooking } = this.state;
+    const { bookingDate, selectedField } = currentBooking;
+    const { fieldPrices } = this.props;
+
+    const calendarSpecificError = this.validateCalendarInput(
+      bookingDate,
+      selectedField,
+      fieldPrices
+    );
+
+    if (calendarSpecificError) {
+      this.setState({
+        calendarButtonError: calendarSpecificError,
+        isCalendarModalOpen: false,
+        isLoadingCalendarData: false,
+        calendarError: "",
+        fieldBookingsData: null,
+      });
       return;
     }
 
+    this.setState({
+      calendarButtonError: "",
+      isLoadingCalendarData: true,
+      calendarError: "",
+      isCalendarModalOpen: true,
+    });
+
     try {
-      const { services, fieldPrices } = this.props;
-      let allBookingsSuccessful = true;
+      const response = await appApiService.getSchedules({
+        field_id: Number(selectedField),
+        date: bookingDate,
+      });
 
-      for (const bookingItem of this.state.bookings) {
-        const fieldInfo = fieldPrices.find(
-          (f) => f.field_id.toString() === bookingItem.selectedField
-        );
-        if (!fieldInfo) {
-          console.error(
-            `Không tìm thấy thông tin sân với ID: ${bookingItem.selectedField}`
-          );
-          alert(
-            `Lỗi: Không tìm thấy thông tin sân ${bookingItem.selectedField}. Vui lòng chọn lại.`
-          );
-          allBookingsSuccessful = false;
-          break;
-        }
+      const backendBookings = response.schedules;
 
-        const calculatedTotalPrice = this.calculateTotalPrice(
-          bookingItem.selectedField,
-          bookingItem.startTimeHour,
-          bookingItem.startTimeMinute,
-          bookingItem.endTimeHour,
-          bookingItem.endTimeMinute,
-          bookingItem.selectedServices
-        );
+      const START_HOUR = 6;
+      const END_HOUR = 22;
+      const MINUTES_STEP = 30;
 
-        const payload = {
-          team_name: bookingItem.teamName,
-          captain_name: bookingItem.captainName,
-          phone_number: bookingItem.phoneNumber,
-          booking_date: bookingItem.bookingDate,
-          field_id: parseInt(bookingItem.selectedField, 10),
-          start_time: `${bookingItem.startTimeHour}:${bookingItem.startTimeMinute}`,
-          end_time: `${bookingItem.endTimeHour}:${bookingItem.endTimeMinute}`,
-          total_price: calculatedTotalPrice,
-          services: Object.keys(bookingItem.selectedServices).map(
-            (serviceId) => {
-              const serviceInfo = services.find(
-                (s) => s.service_id.toString() === serviceId
-              );
-              return {
-                service_id: parseInt(serviceId, 10),
-                quantity: bookingItem.selectedServices[serviceId],
-                price_at_booking: serviceInfo
-                  ? parseFloat(serviceInfo.price)
-                  : 0,
-              };
-            }
-          ),
-        };
-        console.log("Dữ liệu gửi đi cho booking:", payload);
-
-        const res = await createBookingService(payload);
-
-        if (res && res.errCode === 0) {
-          console.log(
-            "Đặt sân thành công cho đội",
-            bookingItem.teamName,
-            ":",
-            res
-          );
-        } else {
-          console.error(
-            "Lỗi khi đặt sân cho đội",
-            bookingItem.teamName,
-            ":",
-            res
-          );
-          alert(
-            `Lỗi khi đặt sân cho đội ${bookingItem.teamName}: ${
-              res.message || JSON.stringify(res)
-            }`
-          );
-          allBookingsSuccessful = false;
-          break;
+      let hoursInDay = [];
+      for (let h = START_HOUR; h < END_HOUR; h++) {
+        for (let m = 0; m < 60; m += MINUTES_STEP) {
+          const hourString = `${h < 10 ? "0" : ""}${h}`;
+          const minuteString = `${m < 10 ? "0" : ""}${m}`;
+          hoursInDay.push({
+            hour: `${hourString}:${minuteString}`,
+            status: "available",
+            team: "",
+            bookingDetailId: null,
+          });
         }
       }
 
-      if (allBookingsSuccessful) {
-        alert("Tất cả các yêu cầu đặt sân đã được gửi thành công!");
-        this.setState({
-          bookings: [],
-          currentBooking: {
-            teamName: "",
-            captainName: "",
-            phoneNumber: "",
-            bookingDate: "",
-            selectedField: "",
-            startTimeHour: "18",
-            startTimeMinute: "00",
-            endTimeHour: "19",
-            endTimeMinute: "00",
-            selectedServices: {},
-          },
-          totalPrice: 0,
-          finalTotalPrice: 0,
+      backendBookings.forEach((booking) => {
+        const bookingStartTime = moment(booking.start_time, "HH:mm:ss");
+        const bookingEndTime = moment(booking.end_time, "HH:mm:ss");
+
+        hoursInDay = hoursInDay.map((slot) => {
+          const slotMoment = moment(slot.hour, "HH:mm");
+          const nextSlotMoment = moment(slot.hour, "HH:mm").add(
+            MINUTES_STEP,
+            "minutes"
+          );
+
+          const isOverlapping =
+            bookingStartTime.isBefore(nextSlotMoment) &&
+            bookingEndTime.isAfter(slotMoment);
+
+          if (isOverlapping) {
+            return {
+              ...slot,
+              status: "booked",
+              team: booking.team_name,
+              bookingDetailId: booking.booking_detail_id,
+            };
+          }
+          return slot;
         });
-      } else {
-        alert(
-          "Có lỗi xảy ra, một số yêu cầu đặt sân không được gửi thành công."
-        );
-      }
+      });
+
+      console.log("Dữ liệu hoursInDay đã xử lý:", hoursInDay);
+
+      this.setState({
+        fieldBookingsData: {
+          fieldId: selectedField,
+          date: bookingDate,
+          slots: hoursInDay,
+        },
+        isLoadingCalendarData: false,
+        calendarError: "",
+      });
     } catch (error) {
-      console.error("Lỗi trong quá trình gửi yêu cầu đặt sân:", error);
-      alert("Đã có lỗi xảy ra khi gửi yêu cầu đặt sân. Vui lòng thử lại.");
+      console.error("Lỗi khi tải lịch đặt sân:", error);
+      let errorMessage = "Không thể tải lịch đặt sân. Vui lòng thử lại sau.";
+      if (error.response) {
+        errorMessage =
+          error.response.data.errMessage ||
+          error.response.data.message ||
+          "Có lỗi xảy ra từ máy chủ.";
+      } else if (error.request) {
+        errorMessage =
+          "Không thể kết nối đến máy chủ. Vui lòng kiểm tra kết nối mạng.";
+      }
+      this.setState({
+        calendarError: errorMessage,
+        isLoadingCalendarData: false,
+        fieldBookingsData: null,
+      });
     }
   };
 
-  calculateTotalPrice = (
-    selectedFieldId,
-    startTimeHour,
-    startTimeMinute,
-    endTimeHour,
-    endTimeMinute,
-    selectedServices
-  ) => {
-    const { fieldPrices, services } = this.props;
-
-    let fieldPrice = 0;
-    const fieldInfo = fieldPrices.find(
-      (field) => field.field_id.toString() === selectedFieldId
-    );
-
-    if (fieldInfo) {
-      const pricePerMinute = parseFloat(fieldInfo.price_per_minute);
-
-      const startHourInt = parseInt(startTimeHour, 10);
-      const startMinuteInt = parseInt(startTimeMinute, 10);
-      const endHourInt = parseInt(endTimeHour, 10);
-      const endMinuteInt = parseInt(endTimeMinute, 10);
-
-      let startTotalMinutes = startHourInt * 60 + startMinuteInt;
-      let endTotalMinutes = endHourInt * 60 + endMinuteInt;
-
-      if (
-        isNaN(startTotalMinutes) ||
-        isNaN(endTotalMinutes) ||
-        endTotalMinutes <= startTotalMinutes
-      ) {
-        fieldPrice = 0;
-      } else {
-        const sixteenOClockInMinutes = 16 * 60;
-        const DOUBLE_PRICE_FACTOR = 2;
-
-        let costNormalRate = 0;
-        let costDoubleRate = 0;
-
-        if (endTotalMinutes <= sixteenOClockInMinutes) {
-          costNormalRate =
-            (endTotalMinutes - startTotalMinutes) * pricePerMinute;
-        } else if (startTotalMinutes >= sixteenOClockInMinutes) {
-          costDoubleRate =
-            (endTotalMinutes - startTotalMinutes) *
-            pricePerMinute *
-            DOUBLE_PRICE_FACTOR;
-        } else {
-          const minutesBefore16 = sixteenOClockInMinutes - startTotalMinutes;
-          costNormalRate = minutesBefore16 * pricePerMinute;
-
-          const minutesAfter16 = endTotalMinutes - sixteenOClockInMinutes;
-          costDoubleRate =
-            minutesAfter16 * pricePerMinute * DOUBLE_PRICE_FACTOR;
-        }
-
-        fieldPrice = costNormalRate + costDoubleRate;
-      }
-    }
-
-    let servicesPrice = 0;
-    if (selectedServices && typeof selectedServices === "object") {
-      Object.keys(selectedServices).forEach((serviceId) => {
-        const quantity = selectedServices[serviceId];
-        const serviceInfo = services.find(
-          (s) => s.service_id.toString() === serviceId
-        );
-        if (
-          serviceInfo &&
-          !isNaN(parseFloat(serviceInfo.price)) &&
-          quantity > 0
-        ) {
-          servicesPrice += parseFloat(serviceInfo.price) * quantity;
-        }
-      });
-    }
-
-    const finalTotalPrice = fieldPrice + servicesPrice;
-    return isNaN(finalTotalPrice) || finalTotalPrice < 0 ? 0 : finalTotalPrice;
+  handleCloseCalendarModal = () => {
+    this.setState({
+      isCalendarModalOpen: false,
+      fieldBookingsData: null,
+      calendarError: "",
+      isLoadingCalendarData: false,
+    });
   };
 
   async componentDidMount() {
-    console.log("fieldBooking: componentDidMount được gọi.");
     if (this.props.services.length === 0) {
-      console.log(
-        "fieldBooking: Services chưa có trong Redux state, dispatching fetchAllServices."
-      );
-      this.props.fetchAllServices();
-    } else {
-      console.log("fieldBooking: Services đã có trong Redux state.");
+      await this.props.fetchAllServices();
     }
 
     if (this.props.fieldPrices.length === 0) {
-      console.log(
-        "fieldBooking: Field Prices chưa có trong Redux state, dispatching fetchAllFields."
+      await this.props.fetchAllFields();
+    }
+
+    this.validateAndSetFormState();
+  }
+
+  componentDidUpdate(prevProps, prevState) {
+    if (
+      prevState.currentBooking.bookingDate !==
+        this.state.currentBooking.bookingDate ||
+      prevState.currentBooking.selectedField !==
+        this.state.currentBooking.selectedField ||
+      prevProps.fieldPrices !== this.props.fieldPrices
+    ) {
+      const newCalendarButtonError = this.validateCalendarInput(
+        this.state.currentBooking.bookingDate,
+        this.state.currentBooking.selectedField,
+        this.props.fieldPrices
       );
-      this.props.fetchAllFields();
-    } else {
-      console.log("fieldBooking: Field Prices đã có trong Redux state.");
+
+      if (newCalendarButtonError !== this.state.calendarButtonError) {
+        this.setState({ calendarButtonError: newCalendarButtonError });
+      }
     }
   }
 
-  renderServiceSection = (bookingIndex, title, type) => {
-    const selectedServices =
-      bookingIndex === -1
-        ? this.state.currentBooking.selectedServices
-        : this.state.bookings[bookingIndex]?.selectedServices || {};
-
-    const { services, isLoadingServices } = this.props;
-
-    const filteredServices = services.filter((service) => {
-      return service.type === type;
-    });
-
-    return (
-      <div className="services-section">
-        <h3>{title}</h3>
-        <div className="services-grid">
-          {isLoadingServices ? (
-            <p>Đang tải dịch vụ...</p>
-          ) : filteredServices.length > 0 ? (
-            filteredServices.map((service) => {
-              if (service.name === undefined) {
-                console.error(
-                  `[R_SERV_SEC] LỖI: Thuộc tính 'name' của dịch vụ ID ${service.service_id} là UNDEFINED!`,
-                  service
-                );
-              }
-              const isChecked = selectedServices.hasOwnProperty(
-                service.service_id
-              );
-
-              return (
-                <div className="service-item-quantity" key={service.service_id}>
-                  <label
-                    htmlFor={`service-${bookingIndex}-${service.service_id}`}
-                  >
-                    <input
-                      type="checkbox"
-                      id={`service-${bookingIndex}-${service.service_id}`}
-                      name="services"
-                      value={service.service_id}
-                      onChange={this.handleServiceCheckboxChange}
-                      checked={isChecked}
-                    />
-                    {/* Sử dụng service.name, nếu undefined thì hiển thị fallback */}
-                    {service.name || "Tên dịch vụ không xác định"} (
-                    {parseFloat(service.price).toLocaleString("vi-VN")} VNĐ){" "}
-                  </label>
-                  {isChecked && (
-                    <div className="quantity-input">
-                      <label
-                        htmlFor={`quantity-${bookingIndex}-${service.service_id}`}
-                      >
-                        Số lượng:
-                      </label>
-                      <input
-                        type="number"
-                        id={`quantity-${bookingIndex}-${service.service_id}`}
-                        name={service.service_id}
-                        value={selectedServices[service.service_id] || 0}
-                        onChange={this.handleServiceQuantityChange}
-                        min="0"
-                      />
-                    </div>
-                  )}
-                </div>
-              );
-            })
-          ) : (
-            <p>Không có dịch vụ nào thuộc loại này.</p>
-          )}
-        </div>
-      </div>
-    );
-  };
-
-  renderBookingItem = (booking, index) => {
-    const {
-      teamName,
-      captainName,
-      phoneNumber,
-      bookingDate,
-      selectedField,
-      startTimeHour,
-      startTimeMinute,
-      endTimeHour,
-      endTimeMinute,
-      selectedServices,
-    } = booking;
-
-    const startTime = `${startTimeHour}:${startTimeMinute}`;
-    const endTime = `${endTimeHour}:${endTimeMinute}`;
-
-    const { services, fieldPrices } = this.props;
-
-    const fieldDisplayName =
-      fieldPrices.find((f) => f.field_id.toString() === selectedField)
-        ?.field_name || `Sân ${selectedField}`;
-
-    const rentedServices = Object.keys(selectedServices)
-      .filter((serviceId) => {
-        const service = services.find(
-          (s) => s.service_id.toString() === serviceId
-        );
-        const isServiceFound = !!service;
-        const isRentedType = service?.type === "Thuê";
-        return isServiceFound && isRentedType;
-      })
-      .map((serviceId) => {
-        const service = services.find(
-          (s) => s.service_id.toString() === serviceId
-        );
-
-        if (
-          service &&
-          service.name !== undefined &&
-          selectedServices[serviceId] !== undefined
-        ) {
-          return `${service.name} (x${selectedServices[serviceId]})`;
-        } else {
-          console.warn(
-            `[R_BOOK_ITEM] Map Thuê (${serviceId}): Dịch vụ không đầy đủ hoặc không tìm thấy tên. Service: ${!!service}, Service Name Exists: ${
-              service?.name !== undefined
-            }, Quantity Exists: ${
-              selectedServices[serviceId] !== undefined
-            }. Trả về chuỗi rỗng.`
-          );
-          return "";
-        }
-      })
-      .filter(Boolean)
-      .join(", ");
-
-    const soldServices = Object.keys(selectedServices)
-      .filter((serviceId) => {
-        const service = services.find(
-          (s) => s.service_id.toString() === serviceId
-        );
-        const isServiceFound = !!service;
-        const isSoldType = service?.type === "Mua";
-
-        return isServiceFound && isSoldType;
-      })
-      .map((serviceId) => {
-        const service = services.find(
-          (s) => s.service_id.toString() === serviceId
-        );
-
-        if (
-          service &&
-          service.name !== undefined &&
-          selectedServices[serviceId] !== undefined
-        ) {
-          return `${service.name} (x${selectedServices[serviceId]})`;
-        } else {
-          console.warn(
-            `[R_BOOK_ITEM] Map Mua (${serviceId}): Dịch vụ không đầy đủ hoặc không tìm thấy tên. Service: ${!!service}, Service Name Exists: ${
-              service?.name !== undefined
-            }, Quantity Exists: ${
-              selectedServices[serviceId] !== undefined
-            }. Trả về chuỗi rỗng.`
-          );
-          return "";
-        }
-      })
-      .filter(Boolean)
-      .join(", ");
-
-    const bookingTotalPrice = this.calculateTotalPrice(
-      selectedField,
-      startTimeHour,
-      startTimeMinute,
-      endTimeHour,
-      endTimeMinute,
-      selectedServices
-    );
-
-    return (
-      <tr key={index}>
-        <td>{teamName}</td>
-        <td>{captainName}</td>
-        <td>{phoneNumber}</td>
-        <td>{bookingDate}</td>
-        <td>{fieldDisplayName}</td>
-        <td>
-          {startTime} - {endTime}
-        </td>
-        <td>{rentedServices}</td>
-        <td>{soldServices}</td>
-        <td>{bookingTotalPrice.toLocaleString("vi-VN")} VNĐ</td>{" "}
-        {/* Định dạng lại tiền cho dễ đọc */}
-        <td>
-          <button
-            type="button"
-            onClick={() => this.handleRemoveBookingItem(index)}
-          >
-            Xóa
-          </button>
-        </td>
-      </tr>
-    );
-  };
-
   render() {
-    const { currentBooking, bookings, totalPrice, finalTotalPrice } =
-      this.state;
-    const { fieldPrices, isLoadingFields } = this.props;
+    const {
+      currentBooking,
+      bookings,
+      totalPrice,
+      finalTotalPrice,
+      formErrors,
+      errorMessage,
+      isFormValid,
+      isCalendarModalOpen,
+      isLoadingCalendarData,
+      calendarError,
+      fieldBookingsData,
+    } = this.state;
+    const { fieldPrices, isLoadingFields, services, isLoadingServices } =
+      this.props;
+
+    if (!fieldPrices || !services) {
+      return <p>Đang tải dữ liệu cần thiết...</p>;
+    }
 
     return (
       <React.Fragment>
@@ -775,13 +541,23 @@ class fieldBooking extends Component {
                   <label htmlFor="viewCalendar" className="invisible">
                     Xem lịch
                   </label>
-                  <button
-                    type="button"
-                    id="viewCalendar"
-                    className="icon-button"
-                  >
-                    <i className="far fa-calendar-alt"></i>{" "}
-                  </button>
+                  <div className="btn-err-wrap">
+                    {" "}
+                    <button
+                      type="button"
+                      id="viewCalendar"
+                      className="icon-button"
+                      onClick={this.handleOpenCalendarModal}
+                    >
+                      <i className="far fa-calendar-alt"></i>{" "}
+                    </button>
+                    {this.state.calendarButtonError && (
+                      <div className="btn-err-msg">
+                        {" "}
+                        {this.state.calendarButtonError}
+                      </div>
+                    )}
+                  </div>
                 </div>
               </div>
 
@@ -844,22 +620,87 @@ class fieldBooking extends Component {
                   </select>
                   <span>phút</span>
                 </div>
-                <button type="button" onClick={this.handleCheckAvailability}>
-                  Kiểm tra lịch đặt
-                </button>
               </div>
 
               <div className="form-group services-group">
                 <label>Chọn dịch vụ:</label>
-                {this.renderServiceSection(-1, "Dịch vụ thuê", "Thuê")}{" "}
-                {this.renderServiceSection(-1, "Dịch vụ mua", "Mua")}{" "}
+                {renderServiceSection(
+                  -1,
+                  "Dịch vụ thuê",
+                  "Thuê",
+                  services,
+                  isLoadingServices,
+                  currentBooking.selectedServices,
+                  this.handleServiceCheckboxChange,
+                  this.handleServiceQuantityChange
+                )}{" "}
+                {renderServiceSection(
+                  -1,
+                  "Dịch vụ mua",
+                  "Mua",
+                  services,
+                  isLoadingServices,
+                  currentBooking.selectedServices,
+                  this.handleServiceCheckboxChange,
+                  this.handleServiceQuantityChange
+                )}{" "}
               </div>
 
               <div className="form-group-book">
-                <p>Tổng tiền dự kiến cho hóa đơn mới: {totalPrice} VNĐ</p>
-                <button type="button" onClick={this.handleAddBookingItem}>
-                  Thêm lịch đặt sân
-                </button>
+                <p>
+                  Tổng tiền dự kiến cho hóa đơn mới:{" "}
+                  {totalPrice.toLocaleString("vi-VN")} VNĐ
+                </p>
+                <div className="add-booking-action-row">
+                  <button
+                    type="button"
+                    className="add-booking-btn"
+                    disabled={!isFormValid}
+                    onClick={() => {
+                      const validationResult = this.validateAndSetFormState();
+
+                      if (!validationResult.isValid) {
+                        const firstErrorField = Object.keys(
+                          validationResult.errors
+                        )[0];
+                        return;
+                      }
+
+                      const result = addBookingItem(
+                        this.state.currentBooking,
+                        this.state.bookings,
+                        this.props.fieldPrices,
+                        this.props.services
+                      );
+
+                      if (result) {
+                        const {
+                          updatedBookings,
+                          priceOfAddedBooking,
+                          newCurrentBookingState,
+                        } = result;
+                        this.setState(
+                          (prevState) => ({
+                            bookings: updatedBookings,
+                            currentBooking: newCurrentBookingState,
+                            totalPrice: 0,
+                            finalTotalPrice:
+                              prevState.finalTotalPrice + priceOfAddedBooking,
+                            errorMessage: "",
+                            formErrors: {},
+                          }),
+                          this.validateAndSetFormState
+                        );
+                        alert("Đã thêm hóa đơn đặt sân!");
+                      }
+                    }}
+                  >
+                    Thêm lịch đặt sân
+                  </button>
+                  {errorMessage && (
+                    <div className="booking-error-message">{errorMessage}</div>
+                  )}
+                </div>
               </div>
 
               {bookings.length > 0 && (
@@ -882,8 +723,14 @@ class fieldBooking extends Component {
                         </tr>
                       </thead>
                       <tbody>
-                        {bookings.map((booking, index) =>
-                          this.renderBookingItem(booking, index)
+                        {this.state.bookings.map((booking, index) =>
+                          renderBookingItemRow(
+                            booking,
+                            index,
+                            this.props.services,
+                            this.props.fieldPrices,
+                            this.handleRemoveBookingItemClick
+                          )
                         )}
                       </tbody>
                     </table>
@@ -891,7 +738,6 @@ class fieldBooking extends Component {
                 </div>
               )}
 
-              {/* Phần hiển thị Tổng tiền cuối cùng */}
               {bookings.length > 0 && (
                 <div className="final-total-price">
                   <span className="final-total-label">Tổng tiền :</span>
@@ -905,7 +751,14 @@ class fieldBooking extends Component {
                 <button
                   type="button"
                   className="confirm-button"
-                  onClick={this.handleSendBookingsToBackend}
+                  onClick={() =>
+                    sendBookingsToBackend(
+                      this.state.bookings,
+                      this.props.fieldPrices,
+                      this.props.services,
+                      this.resetBookingForm
+                    )
+                  }
                 >
                   Xác nhận đăng ký
                 </button>
@@ -914,6 +767,17 @@ class fieldBooking extends Component {
           </div>
         </div>
         <HomeFooter />
+
+        <CalendarModal
+          isOpen={isCalendarModalOpen}
+          onClose={this.handleCloseCalendarModal}
+          isLoading={isLoadingCalendarData}
+          apiError={calendarError}
+          data={fieldBookingsData}
+          selectedDate={currentBooking.bookingDate}
+          selectedField={currentBooking.selectedField}
+          fieldPrices={fieldPrices}
+        />
       </React.Fragment>
     );
   }
@@ -922,7 +786,6 @@ class fieldBooking extends Component {
 const mapStateToProps = (state) => {
   return {
     isLoggedIn: state.user.isLoggedIn,
-    // THÊM CÁC THUỘC TÍNH NÀY TỪ appReducer VÀO PROPS
     services: state.app.services,
     fieldPrices: state.app.fieldPrices,
     isLoadingServices: state.app.isLoadingServices,
@@ -932,7 +795,6 @@ const mapStateToProps = (state) => {
 
 const mapDispatchToProps = (dispatch) => {
   return {
-    // THÊM CÁC ACTION CREATORS NÀY VÀO PROPS
     fetchAllServices: () => dispatch(fetchAllServices()),
     fetchAllFields: () => dispatch(fetchAllFields()),
   };

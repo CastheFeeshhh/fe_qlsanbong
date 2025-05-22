@@ -2,7 +2,7 @@ import actionTypes from "./actionTypes";
 import {
   getAllServicesData,
   getAllFieldsData,
-} from "../../services/userService";
+} from "../../services/bookingService";
 
 export const appStartUpComplete = () => ({
   type: actionTypes.APP_START_UP_COMPLETE,

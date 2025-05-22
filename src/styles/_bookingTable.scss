@@ -1,0 +1,41 @@
+.bookings-list {
+  h3 {
+    font-size: 1.5em;
+    margin-bottom: 10px;
+  }
+}
+
+.booking-table-container {
+  overflow-x: auto;
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 20px;
+
+    th,
+    td {
+      border: 1px solid #ccc;
+      padding: 8px;
+      text-align: center;
+    }
+
+    th {
+      background-color: #f2f2f2;
+      font-weight: bold;
+    }
+
+    button { 
+      background-color: #dc3545;
+      color: white;
+      border: none;
+      padding: 5px 10px;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 0.9em;
+
+      &:hover {
+        background-color: #c82333;
+      }
+    }
+  }
+}

@@ -27,25 +27,10 @@ const editUserService = (inputData) => {
   return axios.put("/api/edit-user", inputData);
 };
 
-const getAllServicesData = () => {
-  return axios.get("/api/get-all-service");
-};
-
-const getAllFieldsData = () => {
-  return axios.get("/api/get-all-field");
-};
-
-const createBookingService = (data) => {
-  return axios.post("/api/create-booking", data);
-};
-
 export {
   handleLoginApi,
   getAllUsers,
   createNewUserService,
   deleteUserService,
   editUserService,
-  getAllServicesData,
-  getAllFieldsData,
-  createBookingService,
 };

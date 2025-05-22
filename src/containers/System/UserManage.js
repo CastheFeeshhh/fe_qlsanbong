@@ -40,7 +40,6 @@ class UserManage extends Component {
     this.setState({
       isOpenModalUser: true,
     });
-    // alert("click me");
   };
 
   toggleUserModal = () => {
@@ -114,15 +113,6 @@ class UserManage extends Component {
     }
   };
 
-  /** Life cycle
-   * Run component :
-   * 1. Run constructor -> init state
-   * 2. DidMount
-   * 3. Render (re-render)
-   *
-   *
-   */
-
   render() {
     let arrUsers = this.state.arrUsers;
     return (
@@ -138,7 +128,6 @@ class UserManage extends Component {
             toggleFromParent={this.toggleUserEditModal}
             currentUser={this.state.userEdit}
             editUser={this.doEditUser}
-            // createNewUser={this.createNewUser}
           />
         )}
         <div className="title text-center">Manage users with Feeeshh</div>
