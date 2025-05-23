@@ -35,7 +35,7 @@ const addDetailBooking = (data, id) => {
   console.log("id: ", id, " - data:", data);
   return axios.post("/api/add-detail-booking", {
     booking_id: id,
-    field_id: data.selectedField, // Use data.selectedField directly from bookingItem
+    field_id: data.selectedField,
     date: data.bookingDate,
     start_time: data.startTime,
     end_time: data.endTime,

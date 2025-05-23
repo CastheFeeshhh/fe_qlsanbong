@@ -207,8 +207,7 @@ export const removeBookingItem = (
 export const sendBookingsToBackend = async (
   bookings,
   finalTotalPrice,
-  resetFormCallback,
-  history // Add history parameter
+  history
 ) => {
   if (bookings.length === 0) {
     alert("Vui lòng thêm ít nhất một hóa đơn đặt sân để gửi.");
@@ -246,7 +245,6 @@ export const sendBookingsToBackend = async (
       }
     }
 
-    alert("Đặt sân thành công!");
     console.log(1);
     console.log(2);
     const orderInfoToSend = {
@@ -256,7 +254,11 @@ export const sendBookingsToBackend = async (
     };
     console.log(3);
 
-    return { success: true, message: "Đặt sân thành công!" };
+    return {
+      success: true,
+      message: "Đặt sân thành công!",
+      ...orderInfoToSend,
+    };
   } catch (error) {
     console.error("Lỗi khi gửi dữ liệu đặt sân:", error);
     let errorMessage = "Đã xảy ra lỗi khi gửi dữ liệu đặt sân.";

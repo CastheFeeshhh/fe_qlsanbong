@@ -1,7 +1,8 @@
 import React, { Component } from "react";
 import HomeHeader from "../containers/HomePage/HomeHeader";
 import HomeFooter from "../containers/HomePage/HomeFooter";
-import { withRouter } from "react-router-dom"; // Make sure to import withRouter
+import { withRouter } from "react-router-dom";
+import "../styles/payment.scss";
 
 class PaymentPage extends Component {
   constructor(props) {
@@ -10,27 +11,57 @@ class PaymentPage extends Component {
       orderInfo: null,
       loading: true,
       error: null,
+      allServicesMap: {},
     };
   }
 
   componentDidMount() {
-    // Retrieve order information from history.location.state
-    if (this.props.location.state && this.props.location.state.orderInfo) {
+    if (this.props.location.state && this.props.location.state.booking_id) {
+      const servicesArray = this.props.location.state.services || [];
+      const servicesMap = servicesArray.reduce((acc, service) => {
+        acc[service.service_id] = service;
+        return acc;
+      }, {});
+
       this.setState({
-        orderInfo: this.props.location.state.orderInfo,
+        orderInfo: this.props.location.state,
         loading: false,
+        allServicesMap: servicesMap,
       });
     } else {
       this.setState({
         error: "Không tìm thấy thông tin đơn hàng để thanh toán.",
         loading: false,
       });
-      // Optionally redirect if no data is found, e.g., to the booking page
-      // this.props.history.replace('/dat-san');
     }
   }
 
+  formatServices = (servicesObject) => {
+    const { allServicesMap } = this.state;
+    if (!servicesObject || Object.keys(servicesObject).length === 0) {
+      return "Không có";
+    }
+
+    const serviceList = Object.entries(servicesObject)
+      .filter(([, quantity]) => quantity > 0)
+      .map(([serviceId, quantity]) => {
+        const service = allServicesMap[serviceId];
+
+        if (service && service.name) {
+          return `${service.name} (x${quantity})`;
+        } else {
+          return `Dịch vụ không xác định (ID: ${serviceId}) (x${quantity})`;
+        }
+      });
+    return serviceList.join(", ");
+  };
+
+  scrollToTop = () => {
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  };
+
   render() {
+    this.scrollToTop();
     const { orderInfo, loading, error } = this.state;
 
     if (loading) {
@@ -51,8 +82,8 @@ class PaymentPage extends Component {
           <HomeHeader />
           <div className="payment-page-container">
             <p className="error-message">{error}</p>
-            <button onClick={() => this.props.history.push("/dat-san")}>
-              Quay lại trang đặt sân
+            <button onClick={() => this.props.history.push("/field-booking")}>
+              Trở về Trang Đặt Sân
             </button>
           </div>
           <HomeFooter />
@@ -60,12 +91,15 @@ class PaymentPage extends Component {
       );
     }
 
-    if (!orderInfo) {
+    if (!orderInfo || !orderInfo.booking_id) {
       return (
         <React.Fragment>
           <HomeHeader />
           <div className="payment-page-container">
-            <p>Không có thông tin đơn hàng.</p>
+            <p>Không có thông tin đơn hàng hợp lệ.</p>
+            <button onClick={() => this.props.history.push("/field-booking")}>
+              Trở về Trang Đặt Sân
+            </button>
           </div>
           <HomeFooter />
         </React.Fragment>
@@ -78,28 +112,60 @@ class PaymentPage extends Component {
         <div className="payment-page-container">
           <h1>Trang Thanh Toán</h1>
           <p>Mã hóa đơn: {orderInfo.booking_id}</p>
-          <p>
+          <p className="total-price-display">
             Tổng số tiền cần thanh toán:{" "}
-            {orderInfo.final_total_price.toLocaleString("vi-VN")} VNĐ
+            {orderInfo.final_total_price
+              ? orderInfo.final_total_price.toLocaleString("vi-VN")
+              : "N/A"}{" "}
+            VNĐ
           </p>
 
           <h3>Chi tiết các mục đã đặt:</h3>
-          <ul>
-            {orderInfo.booking_details &&
-              orderInfo.booking_details.map((item, index) => (
+          {orderInfo.booking_details &&
+          Array.isArray(orderInfo.booking_details) &&
+          orderInfo.booking_details.length > 0 ? (
+            <ul>
+              {orderInfo.booking_details.map((item, index) => (
                 <li key={index}>
-                  Đội: {item.teamName}, Sân: {item.selectedField}, Ngày:{" "}
-                  {item.bookingDate}, Thời gian: {item.startTime} -{" "}
-                  {item.endTime}, Tổng tiền:{" "}
-                  {item.totalPrice.toLocaleString("vi-VN")} VNĐ
-                  {Object.keys(item.selectedServices).length > 0 && (
-                    <span> (Dịch vụ: {item.servicesFormatted})</span>
-                  )}
+                  <p>
+                    Đội: <span>{item.teamName || orderInfo.teamName}</span> -
+                    Sân: <span>{item.selectedField}</span>, Ngày:{" "}
+                    <span>{item.bookingDate || orderInfo.bookingDate}</span> -
+                    Thời gian:{" "}
+                    <span>
+                      {item.startTime} - {item.endTime}
+                    </span>{" "}
+                    - Tổng tiền:{" "}
+                    <span>
+                      {item.totalPrice
+                        ? item.totalPrice.toLocaleString("vi-VN")
+                        : "N/A"}{" "}
+                      VNĐ
+                    </span>
+                    <p>
+                      {item.selectedServices &&
+                        Object.keys(item.selectedServices).length > 0 && (
+                          <span>
+                            {" "}
+                            (Dịch vụ đi kèm:{" "}
+                            {this.formatServices(item.selectedServices)})
+                          </span>
+                        )}
+                    </p>
+                  </p>
                 </li>
               ))}
-          </ul>
-          {/* Integrate payment methods here */}
-          <button className="btn btn-success">Thanh toán ngay</button>
+            </ul>
+          ) : (
+            <p>Không có chi tiết đặt sân nào được tìm thấy.</p>
+          )}
+
+          <div className="payment-actions">
+            <button className="btn-success">Thanh toán ngay</button>
+            <button onClick={() => this.props.history.push("/field-booking")}>
+              Trở về
+            </button>
+          </div>
         </div>
         <HomeFooter />
       </React.Fragment>

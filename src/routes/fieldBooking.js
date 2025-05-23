@@ -22,7 +22,7 @@ import {
 import { renderBookingItemRow } from "../helpers/bookingRendering";
 import * as appApiService from "../services/bookingService";
 import CalendarModal from "../component/CalendarModal";
-import { withRouter } from "react-router-dom"; // THÊM DÒNG NÀY
+import { withRouter } from "react-router-dom";
 
 import { validateCalendarSelection } from "../helpers/validationUtils";
 
@@ -71,7 +71,7 @@ class fieldBooking extends Component {
     this.handleAddBookingClick = this.handleAddBookingClick.bind(this);
     this.fetchFieldSchedules = this.fetchFieldSchedules.bind(this);
     this.getCalendarButtonError = this.getCalendarButtonError.bind(this);
-    this.handleConfirmBookingClick = this.handleConfirmBookingClick.bind(this); // THÊM DÒNG NÀY
+    this.handleConfirmBookingClick = this.handleConfirmBookingClick.bind(this);
 
     this.scheduleFetchTimeout = null;
   }
@@ -460,10 +460,8 @@ class fieldBooking extends Component {
     }
   };
 
-  // THÊM HÀM handleConfirmBookingClick NÀY
   handleConfirmBookingClick = async () => {
     const { bookings, finalTotalPrice } = this.state;
-    // Đảm bảo history object được truyền từ props
     const history = this.props.history;
 
     if (!history) {
@@ -475,14 +473,28 @@ class fieldBooking extends Component {
     }
 
     try {
-      const response = await sendBookingsToBackend(
-        bookings,
-        finalTotalPrice,
-        history // TRUYỀN HISTORY VÀO ĐÂY
-      );
+      const response = await sendBookingsToBackend(bookings, finalTotalPrice);
 
       if (response.success) {
         this.resetBookingForm();
+        alert(response.message);
+
+        console.log("Dữ liệu chuẩn bị gửi đến trang /payment:", {
+          booking_id: response.booking_id,
+          final_total_price: response.final_total_price,
+          booking_details: response.booking_details,
+          services: this.props.services,
+        });
+
+        history.push({
+          pathname: "/payment",
+          state: {
+            booking_id: response.booking_id,
+            final_total_price: response.final_total_price,
+            booking_details: response.booking_details,
+            services: this.props.services,
+          },
+        });
       } else {
         console.error("Đặt sân thất bại:", response.message);
       }
@@ -823,7 +835,7 @@ class fieldBooking extends Component {
                 <button
                   type="button"
                   className="confirm-button"
-                  onClick={this.handleConfirmBookingClick} // SỬA NÀY
+                  onClick={this.handleConfirmBookingClick}
                   disabled={bookings.length === 0}
                 >
                   Xác nhận đăng ký

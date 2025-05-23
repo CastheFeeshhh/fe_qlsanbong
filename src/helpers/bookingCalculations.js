@@ -94,7 +94,6 @@ export const validateBookingData = (bookingData, services) => {
   const errors = {};
   let isValid = true;
 
-  // 1. Kiểm tra các trường bắt buộc
   if (!teamName) {
     isValid = false;
     errors.teamName = "Tên đội bóng không được để trống.";
@@ -116,7 +115,6 @@ export const validateBookingData = (bookingData, services) => {
     errors.selectedField = "Vui lòng chọn sân.";
   }
 
-  // 2. Số điện thoại không phải là số nguyên (kiểu dữ liệu string) và độ dài
   const cleanedPhoneNumber = phoneNumber.replace(/\s/g, "");
   if (phoneNumber && !/^\d+$/.test(cleanedPhoneNumber)) {
     isValid = false;
@@ -129,7 +127,6 @@ export const validateBookingData = (bookingData, services) => {
     errors.phoneNumber = "Số điện thoại phải có từ 9 đến 11 chữ số.";
   }
 
-  // 3. Ngày đặt trong quá khứ VÀ Giờ đặt sớm hơn giờ hiện tại (nếu là ngày hôm nay)
   const today = new Date();
   today.setHours(0, 0, 0, 0);
   const selectedDate = new Date(bookingDate);
@@ -153,21 +150,17 @@ export const validateBookingData = (bookingData, services) => {
     }
   }
 
-  // Chuyển đổi thời gian sang phút để dễ so sánh
   const startMinutes = parseInt(startTimeHour) * 60 + parseInt(startTimeMinute);
   const endMinutes = parseInt(endTimeHour) * 60 + parseInt(endTimeMinute);
 
-  // Giờ mở cửa và đóng cửa của sân (6h - 22h)
   const earliestStartMinutes = 6 * 60;
   const latestEndMinutes = 22 * 60;
 
-  // 4. Giờ bắt đầu >= giờ kết thúc
   if (startMinutes >= endMinutes) {
     isValid = false;
     errors.timeSlot = "Giờ bắt đầu phải nhỏ hơn giờ kết thúc.";
   }
 
-  // 5. Thời gian đặt sân phải trong khoảng 6h-22h
   if (startMinutes < earliestStartMinutes || endMinutes > latestEndMinutes) {
     isValid = false;
     errors.timeSlot = `Thời gian đặt sân phải trong khoảng từ ${
@@ -175,7 +168,6 @@ export const validateBookingData = (bookingData, services) => {
     }h00 đến ${latestEndMinutes / 60}h00.`;
   }
 
-  // 6. Thời gian đặt sân tối thiểu 60 phút
   const minDurationMinutes = 60;
   const duration = endMinutes - startMinutes;
 
@@ -184,7 +176,6 @@ export const validateBookingData = (bookingData, services) => {
     errors.duration = "Thời gian đặt sân tối thiểu là 60 phút (1 giờ).";
   }
 
-  // 7. Số lượng dịch vụ: Đảm bảo số lượng là số dương, không quá lớn (<50)
   const MAX_SERVICE_QUANTITY = 50;
   for (const serviceId in selectedServices) {
     const quantity = selectedServices[serviceId];
