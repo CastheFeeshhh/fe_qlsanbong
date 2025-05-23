@@ -33,7 +33,10 @@ class HomePage extends Component {
               Trải nghiệm đặt sân nhanh chóng - dễ dàng - mọi lúc mọi nơi{" "}
             </div>
             <div className="link-book">
-              <button className="btn-book">
+              <button
+                className="btn-book"
+                onClick={() => (window.location.href = "/field-booking")}
+              >
                 <span>Đặt sân ngay </span>
                 <i class="fas fa-arrow-right"></i>
               </button>
@@ -71,7 +74,7 @@ class HomePage extends Component {
               <div className="learn-more-wrapper">
                 <button
                   className="btn-learn-more"
-                  onClick={() => (window.location.href = "/gioi-thieu")}
+                  onClick={() => (window.location.href = "/information")}
                 >
                   <span className="text-about">Tìm hiểu thêm về chúng tôi</span>
                   <i class="fas fa-arrow-right"></i>
@@ -168,7 +171,7 @@ class HomePage extends Component {
               <div className="news-button-wrapper">
                 <button
                   className="btn-news"
-                  onClick={() => (window.location.href = "/tin-tuc")}
+                  onClick={() => (window.location.href = "/field-news")}
                 >
                   <span>Xem thêm tại mục Tin Tức</span>
                   <i class="fas fa-arrow-right"></i>

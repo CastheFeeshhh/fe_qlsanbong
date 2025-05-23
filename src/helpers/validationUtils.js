@@ -1,3 +1,5 @@
+import moment from "moment";
+
 export const validateCalendarSelection = (
   bookingDate,
   selectedField,
@@ -16,30 +18,25 @@ export const validateCalendarSelection = (
   if (error) return error;
 
   try {
-    const selectedDate = new Date(bookingDate);
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
-    selectedDate.setHours(0, 0, 0, 0);
+    const selectedDateMoment = moment(bookingDate, "YYYY-MM-DD");
+    const todayMoment = moment().startOf("day");
+    const threeMonthsLaterMoment = moment().add(3, "months").endOf("day");
 
-    if (selectedDate < today) {
+    if (!selectedDateMoment.isValid()) {
+      error = "Ngày đặt sân không hợp lệ.";
+    } else if (selectedDateMoment.isBefore(todayMoment)) {
       error = "Không thể xem lịch cho ngày trong quá khứ.";
-    }
-
-    const threeMonthsLater = new Date();
-    threeMonthsLater.setMonth(threeMonthsLater.getMonth() + 3);
-    threeMonthsLater.setHours(0, 0, 0, 0);
-
-    if (selectedDate > threeMonthsLater) {
+    } else if (selectedDateMoment.isAfter(threeMonthsLaterMoment)) {
       error = "Chỉ có thể xem lịch trong vòng 3 tháng tới.";
     }
   } catch (e) {
-    error = "Ngày đặt sân không hợp lệ.";
+    error = "Định dạng ngày đặt sân không đúng.";
   }
 
   if (error) return error;
 
   const fieldExists = fieldPrices.some(
-    (field) => field.field_id === selectedField
+    (field) => String(field.field_id) === String(selectedField)
   );
   if (!fieldExists) {
     error = "Sân được chọn không tồn tại hoặc đã bị xóa.";

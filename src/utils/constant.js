@@ -9,6 +9,7 @@ export const path = {
   FIELDSCHEDULE: "/field-schedule",
   FIELDNEWS: "/field-news",
   CONTACT: "/contact",
+  PAYMENT: "/payment",
   LOGIN: "/login",
   LOG_OUT: "/logout",
   SYSTEM: "/system",

@@ -1,117 +1,170 @@
-import { createBookingService } from "../services/bookingService";
+import moment from "moment";
+import {
+  createNewBooking,
+  addDetailBooking,
+  addServiceBooking,
+  addServiceBookingDetail,
+} from "../services/bookingService";
 import {
   calculateTotalPrice,
   validateBookingData,
 } from "./bookingCalculations";
-import { formatSelectedServices } from "./serviceUtils";
 
-export const sendBookingsToBackend = async (
+const isTimeSlotOverlapping = (
+  newStartTime,
+  newEndTime,
+  existingBookings,
+  currentFieldId,
+  currentBookingDate
+) => {
+  const newStart = moment(newStartTime, "HH:mm");
+  const newEnd = moment(newEndTime, "HH:mm");
+
+  if (newEnd.isSameOrBefore(newStart)) {
+    return "Thời gian kết thúc phải sau thời gian bắt đầu.";
+  }
+
+  const durationMinutes = newEnd.diff(newStart, "minutes");
+  if (durationMinutes < 60) {
+    return "Thời gian đặt sân tối thiểu là 1 giờ.";
+  }
+
+  for (let i = 0; i < existingBookings.length; i++) {
+    const existingBooking = existingBookings[i];
+
+    if (
+      String(existingBooking.fieldId || existingBooking.selectedField) ===
+        String(currentFieldId) &&
+      existingBooking.bookingDate === currentBookingDate
+    ) {
+      const existingStart = moment(existingBooking.startTime, "HH:mm");
+      const existingEnd = moment(existingBooking.endTime, "HH:mm");
+
+      if (newStart.isBefore(existingEnd) && newEnd.isAfter(existingStart)) {
+        const teamName =
+          existingBooking.teamName || existingBooking.team || "Đội khác";
+        return `Thời gian bạn chọn (${newStart.format(
+          "HH:mm"
+        )} - ${newEnd.format(
+          "HH:mm"
+        )}) bị trùng với lịch đặt sân của ${teamName} vào lúc ${existingStart.format(
+          "HH:mm"
+        )} - ${existingEnd.format("HH:mm")}.`;
+      }
+    }
+  }
+  return "";
+};
+
+export const addBookingItem = (
+  currentBooking,
   bookings,
   fieldPrices,
   services,
-  resetFormCallback
+  fieldBookingsDataFromDB
 ) => {
-  if (bookings.length === 0) {
-    alert("Vui lòng thêm ít nhất một hóa đơn đặt sân để gửi.");
-    return { success: false, message: "No bookings to send." };
+  const {
+    teamName,
+    captainName,
+    phoneNumber,
+    bookingDate,
+    selectedField,
+    startTimeHour,
+    startTimeMinute,
+    endTimeHour,
+    endTimeMinute,
+    selectedServices,
+  } = currentBooking;
+
+  const validationResult = validateBookingData(currentBooking);
+  if (!validationResult.isValid) {
+    alert(validationResult.errorMessage);
+    return null;
   }
 
-  try {
-    let allBookingsSuccessful = true;
-    let errorMessage = "";
+  const startTime = `${startTimeHour}:${startTimeMinute}`;
+  const endTime = `${endTimeHour}:${endTimeMinute}`;
 
-    for (const bookingItem of bookings) {
-      const fieldInfo = fieldPrices.find(
-        (f) => f.field_id.toString() === bookingItem.selectedField
-      );
-      if (!fieldInfo) {
-        console.error(
-          `Không tìm thấy thông tin sân với ID: ${bookingItem.selectedField}`
-        );
-        errorMessage = `Lỗi: Không tìm thấy thông tin sân ${bookingItem.selectedField}. Vui lòng chọn lại.`;
-        allBookingsSuccessful = false;
-        break;
-      }
+  const dbBookedSlots =
+    fieldBookingsDataFromDB && fieldBookingsDataFromDB.slots
+      ? fieldBookingsDataFromDB.slots
+          .filter((slot) => slot.status === "booked")
+          .map((slot) => ({
+            startTime: slot.hour,
+            endTime: moment(slot.hour, "HH:mm")
+              .add(fieldBookingsDataFromDB.minutesStep || 30, "minutes")
+              .format("HH:mm"),
+            teamName: slot.team,
+            fieldId: fieldBookingsDataFromDB.fieldId,
+            bookingDate: fieldBookingsDataFromDB.date,
+          }))
+      : [];
 
-      const calculatedTotalPrice = calculateTotalPrice(
-        bookingItem.selectedField,
-        bookingItem.startTimeHour,
-        bookingItem.startTimeMinute,
-        bookingItem.endTimeHour,
-        bookingItem.endTimeMinute,
-        bookingItem.selectedServices,
-        fieldPrices,
-        services
-      );
+  const allExistingBookingsForOverlapCheck = [...bookings, ...dbBookedSlots];
 
-      const payload = {
-        team_name: bookingItem.teamName,
-        captain_name: bookingItem.captainName,
-        phone_number: bookingItem.phoneNumber,
-        booking_date: bookingItem.bookingDate,
-        field_id: parseInt(bookingItem.selectedField, 10),
-        start_time: `${bookingItem.startTimeHour}:${bookingItem.startTimeMinute}`,
-        end_time: `${bookingItem.endTimeHour}:${bookingItem.endTimeMinute}`,
-        total_price: calculatedTotalPrice,
-        services: Object.keys(bookingItem.selectedServices).map((serviceId) => {
-          const serviceInfo = services.find(
-            (s) => s.service_id.toString() === serviceId
-          );
-          return {
-            service_id: parseInt(serviceId, 10),
-            quantity: bookingItem.selectedServices[serviceId],
-            price_at_booking: serviceInfo ? parseFloat(serviceInfo.price) : 0,
-          };
-        }),
-      };
-      console.log("Dữ liệu gửi đi cho booking:", payload);
+  const overlapError = isTimeSlotOverlapping(
+    startTime,
+    endTime,
+    allExistingBookingsForOverlapCheck,
+    selectedField,
+    bookingDate
+  );
 
-      const res = await createBookingService(payload);
-
-      if (res && res.errCode === 0) {
-        console.log(
-          "Đặt sân thành công cho đội",
-          bookingItem.teamName,
-          ":",
-          res
-        );
-      } else {
-        console.error(
-          "Lỗi khi đặt sân cho đội",
-          bookingItem.teamName,
-          ":",
-          res
-        );
-        errorMessage = `Lỗi khi đặt sân cho đội ${bookingItem.teamName}: ${
-          res.message || JSON.stringify(res)
-        }`;
-        allBookingsSuccessful = false;
-        break;
-      }
-    }
-
-    if (allBookingsSuccessful) {
-      alert("Tất cả các yêu cầu đặt sân đã được gửi thành công!");
-      resetFormCallback();
-      return { success: true, message: "All bookings sent successfully!" };
-    } else {
-      alert(
-        errorMessage ||
-          "Có lỗi xảy ra, một số yêu cầu đặt sân không được gửi thành công."
-      );
-      return {
-        success: false,
-        message: errorMessage || "Some bookings failed.",
-      };
-    }
-  } catch (error) {
-    console.error("Lỗi trong quá trình gửi yêu cầu đặt sân:", error);
-    alert("Đã có lỗi xảy ra khi gửi yêu cầu đặt sân. Vui lòng thử lại.");
-    return {
-      success: false,
-      message: "An error occurred during booking submission.",
-    };
+  if (overlapError) {
+    alert(overlapError);
+    return null;
   }
+
+  const bookingTotalPrice = calculateTotalPrice(
+    selectedField,
+    startTimeHour,
+    startTimeMinute,
+    endTimeHour,
+    endTimeMinute,
+    selectedServices,
+    fieldPrices,
+    services
+  );
+
+  const newBooking = {
+    ...currentBooking,
+    startTime: startTime,
+    endTime: endTime,
+    totalPrice: bookingTotalPrice,
+    servicesFormatted:
+      Object.keys(selectedServices).length > 0
+        ? Object.entries(selectedServices)
+            .map(([serviceId, quantity]) => {
+              const service = services.find(
+                (s) => String(s.service_id) === String(serviceId)
+              );
+              return service ? `${service.service_name} (x${quantity})` : "";
+            })
+            .filter(Boolean)
+            .join(", ")
+        : "Không có",
+  };
+
+  const updatedBookings = [...bookings, newBooking];
+
+  const newCurrentBookingState = {
+    teamName: "",
+    captainName: "",
+    phoneNumber: "",
+    bookingDate: currentBooking.bookingDate,
+    selectedField: currentBooking.selectedField,
+    startTimeHour: "18",
+    startTimeMinute: "00",
+    endTimeHour: "19",
+    endTimeMinute: "00",
+    selectedServices: {},
+  };
+
+  return {
+    updatedBookings,
+    priceOfAddedBooking: bookingTotalPrice,
+    newCurrentBookingState,
+  };
 };
 
 export const removeBookingItem = (
@@ -129,16 +182,19 @@ export const removeBookingItem = (
 
   const bookingToRemove = updatedBookings[indexToRemove];
 
-  const priceOfRemovedBooking = calculateTotalPrice(
-    bookingToRemove.selectedField,
-    bookingToRemove.startTimeHour,
-    bookingToRemove.startTimeMinute,
-    bookingToRemove.endTimeHour,
-    bookingToRemove.endTimeMinute,
-    bookingToRemove.selectedServices,
-    fieldPrices,
-    services
-  );
+  const priceOfRemovedBooking =
+    bookingToRemove.totalPrice !== undefined
+      ? bookingToRemove.totalPrice
+      : calculateTotalPrice(
+          bookingToRemove.selectedField,
+          bookingToRemove.startTimeHour,
+          bookingToRemove.startTimeMinute,
+          bookingToRemove.endTimeHour,
+          bookingToRemove.endTimeMinute,
+          bookingToRemove.selectedServices,
+          fieldPrices,
+          services
+        );
 
   updatedBookings.splice(indexToRemove, 1);
 
@@ -148,53 +204,66 @@ export const removeBookingItem = (
   };
 };
 
-export const addBookingItem = (
-  currentBooking,
-  existingBookings,
-  fieldPrices,
-  services
+export const sendBookingsToBackend = async (
+  bookings,
+  finalTotalPrice,
+  resetFormCallback,
+  history // Add history parameter
 ) => {
-  const validationResult = validateBookingData(currentBooking);
-
-  if (!validationResult.isValid) {
-    console.error("Booking validation failed:", validationResult.errorMessage);
-    return null;
+  if (bookings.length === 0) {
+    alert("Vui lòng thêm ít nhất một hóa đơn đặt sân để gửi.");
+    return { success: false, message: "Không có hóa đơn để gửi." };
   }
 
-  const bookingTotalPrice = calculateTotalPrice(
-    currentBooking.selectedField,
-    currentBooking.startTimeHour,
-    currentBooking.startTimeMinute,
-    currentBooking.endTimeHour,
-    currentBooking.endTimeMinute,
-    currentBooking.selectedServices,
-    fieldPrices,
-    services
-  );
+  try {
+    let fieldBooking = await createNewBooking(9, finalTotalPrice); // user tạo sẽ được cập nhật sau, sau khi thêm phân quyền và đăng nhập
+    let fieldBookingId = fieldBooking.booking_id;
+    console.log("dữ liệu bookings :", bookings);
 
-  const newBooking = {
-    ...currentBooking,
-    totalPrice: bookingTotalPrice,
-  };
+    for (const bookingItem of bookings) {
+      let detailBooking = await addDetailBooking(bookingItem, fieldBookingId);
+      let detailBookingId = detailBooking.booking_detail_id;
 
-  const updatedBookings = [...existingBookings, newBooking];
+      if (Object.keys(bookingItem.selectedServices).length > 0) {
+        let serviceBooking = await addServiceBooking(detailBookingId);
+        let serviceBookingId = serviceBooking.service_booking_id;
+        let serviceBookingObject = bookingItem.selectedServices;
 
-  const newCurrentBookingState = {
-    teamName: "",
-    captainName: "",
-    phoneNumber: "",
-    bookingDate: "",
-    selectedField: "",
-    startTimeHour: "18",
-    startTimeMinute: "00",
-    endTimeHour: "19",
-    endTimeMinute: "00",
-    selectedServices: {},
-  };
+        const formattedServices = Object.entries(serviceBookingObject).map(
+          ([key, value]) => {
+            return {
+              key: Number(key),
+              value: value,
+            };
+          }
+        );
+        console.log("id mới sv:", serviceBookingId, " - ", formattedServices);
+        for (const serviceDetail of formattedServices) {
+          const { key: serviceId, value: quantity } = serviceDetail;
+          console.log(serviceId, "+", quantity);
+          await addServiceBookingDetail(serviceBookingId, serviceId, quantity);
+        }
+      }
+    }
 
-  return {
-    updatedBookings,
-    priceOfAddedBooking: bookingTotalPrice,
-    newCurrentBookingState,
-  };
+    alert("Đặt sân thành công!");
+    console.log(1);
+    console.log(2);
+    const orderInfoToSend = {
+      booking_id: fieldBookingId,
+      final_total_price: finalTotalPrice,
+      booking_details: bookings,
+    };
+    console.log(3);
+
+    return { success: true, message: "Đặt sân thành công!" };
+  } catch (error) {
+    console.error("Lỗi khi gửi dữ liệu đặt sân:", error);
+    let errorMessage = "Đã xảy ra lỗi khi gửi dữ liệu đặt sân.";
+    if (error.response && error.response.data && error.response.data.message) {
+      errorMessage = error.response.data.message;
+    }
+    alert(errorMessage);
+    return { success: false, message: errorMessage };
+  }
 };

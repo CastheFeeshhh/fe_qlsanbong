@@ -22,6 +22,9 @@ import {
 import { renderBookingItemRow } from "../helpers/bookingRendering";
 import * as appApiService from "../services/bookingService";
 import CalendarModal from "../component/CalendarModal";
+import { withRouter } from "react-router-dom"; // THÊM DÒNG NÀY
+
+import { validateCalendarSelection } from "../helpers/validationUtils";
 
 class fieldBooking extends Component {
   constructor(props) {
@@ -31,7 +34,7 @@ class fieldBooking extends Component {
         teamName: "",
         captainName: "",
         phoneNumber: "",
-        bookingDate: "",
+        bookingDate: moment().format("YYYY-MM-DD"),
         selectedField: "",
         startTimeHour: "18",
         startTimeMinute: "00",
@@ -51,6 +54,7 @@ class fieldBooking extends Component {
       isLoadingCalendarData: false,
       calendarError: "",
       calendarButtonError: "",
+      addBookingLoading: false,
     };
     this.handleInputChange = this.handleInputChange.bind(this);
     this.handleTimeChange = this.handleTimeChange.bind(this);
@@ -64,50 +68,73 @@ class fieldBooking extends Component {
     this.validateAndSetFormState = this.validateAndSetFormState.bind(this);
     this.handleOpenCalendarModal = this.handleOpenCalendarModal.bind(this);
     this.handleCloseCalendarModal = this.handleCloseCalendarModal.bind(this);
-    this.handleDatePickerChange = this.handleDatePickerChange.bind(this);
-    this.handleFieldChange = this.handleFieldChange.bind(this);
+    this.handleAddBookingClick = this.handleAddBookingClick.bind(this);
+    this.fetchFieldSchedules = this.fetchFieldSchedules.bind(this);
+    this.getCalendarButtonError = this.getCalendarButtonError.bind(this);
+    this.handleConfirmBookingClick = this.handleConfirmBookingClick.bind(this); // THÊM DÒNG NÀY
+
+    this.scheduleFetchTimeout = null;
   }
 
   handleInputChange = (event) => {
     const { name, value } = event.target;
-    this.setState((prevState) => {
-      const updatedCurrentBooking = {
-        ...prevState.currentBooking,
-        [name]: value,
-      };
+    this.setState(
+      (prevState) => {
+        const updatedCurrentBooking = {
+          ...prevState.currentBooking,
+          [name]: value,
+        };
 
-      const { updatedBooking, newTotalPrice } = getBookingPriceDetails(
-        updatedCurrentBooking,
-        this.props.fieldPrices,
-        this.props.services
-      );
+        const { updatedBooking, newTotalPrice } = getBookingPriceDetails(
+          updatedCurrentBooking,
+          this.props.fieldPrices,
+          this.props.services
+        );
 
-      return {
-        currentBooking: updatedBooking,
-        totalPrice: newTotalPrice,
-      };
-    }, this.validateAndSetFormState);
+        return {
+          currentBooking: updatedBooking,
+          totalPrice: newTotalPrice,
+        };
+      },
+      () => {
+        this.validateAndSetFormState();
+
+        if (name === "bookingDate" || name === "selectedField") {
+          if (this.scheduleFetchTimeout) {
+            clearTimeout(this.scheduleFetchTimeout);
+          }
+          this.scheduleFetchTimeout = setTimeout(() => {
+            this.fetchFieldSchedules();
+          }, 500);
+        }
+      }
+    );
   };
 
   handleTimeChange = (event) => {
     const { name, value } = event.target;
-    this.setState((prevState) => {
-      const updatedCurrentBooking = {
-        ...prevState.currentBooking,
-        [name]: value,
-      };
+    this.setState(
+      (prevState) => {
+        const updatedCurrentBooking = {
+          ...prevState.currentBooking,
+          [name]: value,
+        };
 
-      const { updatedBooking, newTotalPrice } = getBookingPriceDetails(
-        updatedCurrentBooking,
-        this.props.fieldPrices,
-        this.props.services
-      );
+        const { updatedBooking, newTotalPrice } = getBookingPriceDetails(
+          updatedCurrentBooking,
+          this.props.fieldPrices,
+          this.props.services
+        );
 
-      return {
-        currentBooking: updatedBooking,
-        totalPrice: newTotalPrice,
-      };
-    }, this.validateAndSetFormState);
+        return {
+          currentBooking: updatedBooking,
+          totalPrice: newTotalPrice,
+        };
+      },
+      () => {
+        this.validateAndSetFormState();
+      }
+    );
   };
 
   handleServiceQuantityChange = (event) => {
@@ -174,23 +201,39 @@ class fieldBooking extends Component {
   };
 
   resetBookingForm = () => {
-    this.setState({
-      bookings: [],
-      currentBooking: {
-        teamName: "",
-        captainName: "",
-        phoneNumber: "",
-        bookingDate: "",
-        selectedField: "",
-        startTimeHour: "18",
-        startTimeMinute: "00",
-        endTimeHour: "19",
-        endTimeMinute: "00",
-        selectedServices: {},
+    this.setState(
+      {
+        bookings: [],
+        currentBooking: {
+          teamName: "",
+          captainName: "",
+          phoneNumber: "",
+          bookingDate: moment().format("YYYY-MM-DD"),
+          selectedField: "",
+          startTimeHour: "18",
+          startTimeMinute: "00",
+          endTimeHour: "19",
+          endTimeMinute: "00",
+          selectedServices: {},
+        },
+        totalPrice: 0,
+        finalTotalPrice: 0,
+        errorMessage: "",
+        formErrors: {},
+        isFormValid: false,
+        fieldBookingsData: null,
+        calendarError: "",
+        calendarButtonError: "",
       },
-      totalPrice: 0,
-      finalTotalPrice: 0,
-    });
+      () => {
+        if (
+          this.state.currentBooking.bookingDate &&
+          this.state.currentBooking.selectedField
+        ) {
+          this.fetchFieldSchedules();
+        }
+      }
+    );
   };
 
   handleRemoveBookingItemClick = (index) => {
@@ -220,77 +263,24 @@ class fieldBooking extends Component {
     return validationResult;
   };
 
-  validateCalendarInput = (bookingDate, selectedField, fieldPrices) => {
-    let error = "";
-
-    if (!bookingDate) {
-      error = "Vui lòng chọn ngày đặt sân.";
-    } else if (!selectedField) {
-      error = "Vui lòng chọn sân.";
-    } else {
-      try {
-        const selectedDateObj = moment(bookingDate, "YYYY-MM-DD");
-        const today = moment().startOf("day");
-        const threeMonthsLater = moment().add(3, "months").endOf("day");
-
-        if (!selectedDateObj.isValid()) {
-          error = "Ngày đặt sân không hợp lệ.";
-        } else if (selectedDateObj.isBefore(today)) {
-          error = "Không thể xem lịch cho ngày trong quá khứ.";
-        } else if (selectedDateObj.isAfter(threeMonthsLater)) {
-          error = "Chỉ có thể xem lịch trong vòng 3 tháng tới.";
-        }
-      } catch (e) {
-        error = "Định dạng ngày đặt sân không đúng.";
-      }
-
-      if (!error && fieldPrices) {
-        const fieldExists = fieldPrices.some(
-          (field) => String(field.field_id) === String(selectedField)
-        );
-        if (!fieldExists) {
-          error = "Sân được chọn không tồn tại hoặc đã bị xóa.";
-        }
-      } else if (!fieldPrices) {
-        error = "Không có thông tin giá sân. Vui lòng thử lại.";
-      }
-    }
-    return error;
-  };
-
-  handleDatePickerChange = (date) => {
-    this.setState((prevState) => ({
-      currentBooking: {
-        ...prevState.currentBooking,
-        bookingDate: date,
-      },
-    }));
-  };
-
-  handleFieldChange = (event) => {
-    this.setState((prevState) => ({
-      currentBooking: {
-        ...prevState.currentBooking,
-        selectedField: event.target.value,
-      },
-    }));
-  };
-
-  handleOpenCalendarModal = async () => {
+  getCalendarButtonError = () => {
     const { currentBooking } = this.state;
     const { bookingDate, selectedField } = currentBooking;
     const { fieldPrices } = this.props;
 
-    const calendarSpecificError = this.validateCalendarInput(
-      bookingDate,
-      selectedField,
-      fieldPrices
-    );
+    return validateCalendarSelection(bookingDate, selectedField, fieldPrices);
+  };
 
-    if (calendarSpecificError) {
+  fetchFieldSchedules = async () => {
+    const { currentBooking } = this.state;
+    const { bookingDate, selectedField } = currentBooking;
+    const { fieldPrices } = this.props;
+
+    const validationError = this.getCalendarButtonError();
+
+    if (validationError) {
       this.setState({
-        calendarButtonError: calendarSpecificError,
-        isCalendarModalOpen: false,
+        calendarButtonError: validationError,
         isLoadingCalendarData: false,
         calendarError: "",
         fieldBookingsData: null,
@@ -302,7 +292,7 @@ class fieldBooking extends Component {
       calendarButtonError: "",
       isLoadingCalendarData: true,
       calendarError: "",
-      isCalendarModalOpen: true,
+      fieldBookingsData: null,
     });
 
     try {
@@ -312,6 +302,7 @@ class fieldBooking extends Component {
       });
 
       const backendBookings = response.schedules;
+      console.log("Lịch từ DB:", backendBookings);
 
       const START_HOUR = 6;
       const END_HOUR = 22;
@@ -320,8 +311,8 @@ class fieldBooking extends Component {
       let hoursInDay = [];
       for (let h = START_HOUR; h < END_HOUR; h++) {
         for (let m = 0; m < 60; m += MINUTES_STEP) {
-          const hourString = `${h < 10 ? "0" : ""}${h}`;
-          const minuteString = `${m < 10 ? "0" : ""}${m}`;
+          const hourString = String(h).padStart(2, "0");
+          const minuteString = String(m).padStart(2, "0");
           hoursInDay.push({
             hour: `${hourString}:${minuteString}`,
             status: "available",
@@ -358,13 +349,12 @@ class fieldBooking extends Component {
         });
       });
 
-      console.log("Dữ liệu hoursInDay đã xử lý:", hoursInDay);
-
       this.setState({
         fieldBookingsData: {
           fieldId: selectedField,
           date: bookingDate,
           slots: hoursInDay,
+          minutesStep: MINUTES_STEP,
         },
         isLoadingCalendarData: false,
         calendarError: "",
@@ -389,44 +379,143 @@ class fieldBooking extends Component {
     }
   };
 
+  handleOpenCalendarModal = async () => {
+    if (this.scheduleFetchTimeout) {
+      clearTimeout(this.scheduleFetchTimeout);
+      this.scheduleFetchTimeout = null;
+    }
+    await this.fetchFieldSchedules();
+    if (!this.state.calendarError && this.state.fieldBookingsData) {
+      this.setState({ isCalendarModalOpen: true });
+    }
+  };
+
   handleCloseCalendarModal = () => {
     this.setState({
       isCalendarModalOpen: false,
-      fieldBookingsData: null,
-      calendarError: "",
-      isLoadingCalendarData: false,
     });
   };
 
-  async componentDidMount() {
-    if (this.props.services.length === 0) {
-      await this.props.fetchAllServices();
+  handleAddBookingClick = async () => {
+    this.setState({ addBookingLoading: true });
+
+    const validationResult = this.validateAndSetFormState();
+    if (!validationResult.isValid) {
+      this.setState({ addBookingLoading: false });
+      return;
     }
 
-    if (this.props.fieldPrices.length === 0) {
-      await this.props.fetchAllFields();
+    const { currentBooking, bookings, fieldBookingsData } = this.state;
+    const { fieldPrices, services } = this.props;
+
+    if (
+      !fieldBookingsData ||
+      fieldBookingsData.date !== currentBooking.bookingDate ||
+      String(fieldBookingsData.fieldId) !== String(currentBooking.selectedField)
+    ) {
+      if (this.scheduleFetchTimeout) {
+        clearTimeout(this.scheduleFetchTimeout);
+        this.scheduleFetchTimeout = null;
+      }
+      await this.fetchFieldSchedules();
+
+      if (this.state.calendarError || !this.state.fieldBookingsData) {
+        alert(
+          this.state.calendarError ||
+            "Không thể tải lịch sân để kiểm tra trùng lặp. Vui lòng thử lại."
+        );
+        this.setState({ addBookingLoading: false });
+        return;
+      }
     }
+
+    const result = addBookingItem(
+      currentBooking,
+      bookings,
+      fieldPrices,
+      services,
+      this.state.fieldBookingsData
+    );
+
+    if (result) {
+      const { updatedBookings, priceOfAddedBooking, newCurrentBookingState } =
+        result;
+      this.setState(
+        (prevState) => ({
+          bookings: updatedBookings,
+          currentBooking: newCurrentBookingState,
+          totalPrice: 0,
+          finalTotalPrice: prevState.finalTotalPrice + priceOfAddedBooking,
+          errorMessage: "",
+          formErrors: {},
+          addBookingLoading: false,
+        }),
+        () => {
+          this.validateAndSetFormState();
+          alert("Đã thêm hóa đơn đặt sân!");
+        }
+      );
+    } else {
+      this.setState({ addBookingLoading: false });
+    }
+  };
+
+  // THÊM HÀM handleConfirmBookingClick NÀY
+  handleConfirmBookingClick = async () => {
+    const { bookings, finalTotalPrice } = this.state;
+    // Đảm bảo history object được truyền từ props
+    const history = this.props.history;
+
+    if (!history) {
+      console.error("Lỗi: history object không có sẵn.");
+      alert(
+        "Đã xảy ra lỗi hệ thống, vui lòng thử lại sau. (Lỗi: Không tìm thấy đối tượng điều hướng)"
+      );
+      return;
+    }
+
+    try {
+      const response = await sendBookingsToBackend(
+        bookings,
+        finalTotalPrice,
+        history // TRUYỀN HISTORY VÀO ĐÂY
+      );
+
+      if (response.success) {
+        this.resetBookingForm();
+      } else {
+        console.error("Đặt sân thất bại:", response.message);
+      }
+    } catch (error) {
+      console.error("Lỗi khi xác nhận đặt sân từ UI:", error);
+      alert("Đã xảy ra lỗi không mong muốn khi xử lý đặt sân.");
+    }
+  };
+
+  async componentDidMount() {
+    await this.props.fetchAllServices();
+    await this.props.fetchAllFields();
 
     this.validateAndSetFormState();
+
+    if (
+      this.state.currentBooking.bookingDate &&
+      this.state.currentBooking.selectedField
+    ) {
+      this.fetchFieldSchedules();
+    }
+  }
+
+  componentWillUnmount() {
+    if (this.scheduleFetchTimeout) {
+      clearTimeout(this.scheduleFetchTimeout);
+    }
   }
 
   componentDidUpdate(prevProps, prevState) {
-    if (
-      prevState.currentBooking.bookingDate !==
-        this.state.currentBooking.bookingDate ||
-      prevState.currentBooking.selectedField !==
-        this.state.currentBooking.selectedField ||
-      prevProps.fieldPrices !== this.props.fieldPrices
-    ) {
-      const newCalendarButtonError = this.validateCalendarInput(
-        this.state.currentBooking.bookingDate,
-        this.state.currentBooking.selectedField,
-        this.props.fieldPrices
-      );
-
-      if (newCalendarButtonError !== this.state.calendarButtonError) {
-        this.setState({ calendarButtonError: newCalendarButtonError });
-      }
+    const newCalendarButtonError = this.getCalendarButtonError();
+    if (newCalendarButtonError !== prevState.calendarButtonError) {
+      this.setState({ calendarButtonError: newCalendarButtonError });
     }
   }
 
@@ -436,19 +525,32 @@ class fieldBooking extends Component {
       bookings,
       totalPrice,
       finalTotalPrice,
-      formErrors,
       errorMessage,
       isFormValid,
       isCalendarModalOpen,
       isLoadingCalendarData,
       calendarError,
       fieldBookingsData,
+      addBookingLoading,
     } = this.state;
     const { fieldPrices, isLoadingFields, services, isLoadingServices } =
       this.props;
 
-    if (!fieldPrices || !services) {
+    if (isLoadingFields || isLoadingServices) {
       return <p>Đang tải dữ liệu cần thiết...</p>;
+    }
+    if (
+      !fieldPrices ||
+      fieldPrices.length === 0 ||
+      !services ||
+      services.length === 0
+    ) {
+      return (
+        <p>
+          Không thể tải dữ liệu sân hoặc dịch vụ. Vui lòng kiểm tra kết nối hoặc
+          thử lại sau.
+        </p>
+      );
     }
 
     return (
@@ -542,18 +644,25 @@ class fieldBooking extends Component {
                     Xem lịch
                   </label>
                   <div className="btn-err-wrap">
-                    {" "}
                     <button
                       type="button"
                       id="viewCalendar"
                       className="icon-button"
                       onClick={this.handleOpenCalendarModal}
+                      disabled={
+                        isLoadingCalendarData ||
+                        !currentBooking.bookingDate ||
+                        !currentBooking.selectedField
+                      }
                     >
-                      <i className="far fa-calendar-alt"></i>{" "}
+                      {isLoadingCalendarData ? (
+                        <i className="fas fa-spinner fa-spin"></i>
+                      ) : (
+                        <i className="far fa-calendar-alt"></i>
+                      )}
                     </button>
                     {this.state.calendarButtonError && (
                       <div className="btn-err-msg">
-                        {" "}
                         {this.state.calendarButtonError}
                       </div>
                     )}
@@ -571,11 +680,8 @@ class fieldBooking extends Component {
                     required
                   >
                     {Array.from({ length: 17 }, (_, i) => i + 6).map((hour) => (
-                      <option
-                        key={hour}
-                        value={hour < 10 ? `0${hour}` : `${hour}`}
-                      >
-                        {hour < 10 ? `0${hour}` : `${hour}`}
+                      <option key={hour} value={String(hour).padStart(2, "0")}>
+                        {String(hour).padStart(2, "0")}
                       </option>
                     ))}
                   </select>
@@ -600,11 +706,8 @@ class fieldBooking extends Component {
                     required
                   >
                     {Array.from({ length: 17 }, (_, i) => i + 6).map((hour) => (
-                      <option
-                        key={hour}
-                        value={hour < 10 ? `0${hour}` : `${hour}`}
-                      >
-                        {hour < 10 ? `0${hour}` : `${hour}`}
+                      <option key={hour} value={String(hour).padStart(2, "0")}>
+                        {String(hour).padStart(2, "0")}
                       </option>
                     ))}
                   </select>
@@ -633,7 +736,7 @@ class fieldBooking extends Component {
                   currentBooking.selectedServices,
                   this.handleServiceCheckboxChange,
                   this.handleServiceQuantityChange
-                )}{" "}
+                )}
                 {renderServiceSection(
                   -1,
                   "Dịch vụ mua",
@@ -643,7 +746,7 @@ class fieldBooking extends Component {
                   currentBooking.selectedServices,
                   this.handleServiceCheckboxChange,
                   this.handleServiceQuantityChange
-                )}{" "}
+                )}
               </div>
 
               <div className="form-group-book">
@@ -655,47 +758,16 @@ class fieldBooking extends Component {
                   <button
                     type="button"
                     className="add-booking-btn"
-                    disabled={!isFormValid}
-                    onClick={() => {
-                      const validationResult = this.validateAndSetFormState();
-
-                      if (!validationResult.isValid) {
-                        const firstErrorField = Object.keys(
-                          validationResult.errors
-                        )[0];
-                        return;
-                      }
-
-                      const result = addBookingItem(
-                        this.state.currentBooking,
-                        this.state.bookings,
-                        this.props.fieldPrices,
-                        this.props.services
-                      );
-
-                      if (result) {
-                        const {
-                          updatedBookings,
-                          priceOfAddedBooking,
-                          newCurrentBookingState,
-                        } = result;
-                        this.setState(
-                          (prevState) => ({
-                            bookings: updatedBookings,
-                            currentBooking: newCurrentBookingState,
-                            totalPrice: 0,
-                            finalTotalPrice:
-                              prevState.finalTotalPrice + priceOfAddedBooking,
-                            errorMessage: "",
-                            formErrors: {},
-                          }),
-                          this.validateAndSetFormState
-                        );
-                        alert("Đã thêm hóa đơn đặt sân!");
-                      }
-                    }}
+                    onClick={this.handleAddBookingClick}
+                    disabled={
+                      !isFormValid || addBookingLoading || isLoadingCalendarData
+                    }
                   >
-                    Thêm lịch đặt sân
+                    {addBookingLoading ? (
+                      <i className="fas fa-spinner fa-spin"></i>
+                    ) : (
+                      "Thêm lịch đặt sân"
+                    )}
                   </button>
                   {errorMessage && (
                     <div className="booking-error-message">{errorMessage}</div>
@@ -751,14 +823,8 @@ class fieldBooking extends Component {
                 <button
                   type="button"
                   className="confirm-button"
-                  onClick={() =>
-                    sendBookingsToBackend(
-                      this.state.bookings,
-                      this.props.fieldPrices,
-                      this.props.services,
-                      this.resetBookingForm
-                    )
-                  }
+                  onClick={this.handleConfirmBookingClick} // SỬA NÀY
+                  disabled={bookings.length === 0}
                 >
                   Xác nhận đăng ký
                 </button>
@@ -800,4 +866,6 @@ const mapDispatchToProps = (dispatch) => {
   };
 };
 
-export default connect(mapStateToProps, mapDispatchToProps)(fieldBooking);
+export default withRouter(
+  connect(mapStateToProps, mapDispatchToProps)(fieldBooking)
+);

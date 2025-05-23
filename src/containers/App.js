@@ -24,6 +24,7 @@ import fieldBooking from "../routes/fieldBooking";
 import fieldSchedule from "../routes/fieldSchedule";
 import fieldNews from "../routes/fieldNews";
 import contact from "../routes/contact";
+import payment from "../routes/payment";
 
 class App extends Component {
   handlePersistorState = () => {
@@ -72,6 +73,7 @@ class App extends Component {
                 <Route path={path.FIELDSCHEDULE} component={fieldSchedule} />
                 <Route path={path.FIELDNEWS} component={fieldNews} />
                 <Route path={path.CONTACT} component={contact} />
+                <Route path={path.PAYMENT} component={payment} />
               </Switch>
             </span>
           </div>
