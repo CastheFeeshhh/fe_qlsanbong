@@ -7,9 +7,13 @@ import Header from "../containers/Header/Header";
 class System extends Component {
   render() {
     const { systemMenuPath, isLoggedIn } = this.props;
+    console.log("check isLoggedIn ở fieldBooking.js:", isLoggedIn);
+    if (!isLoggedIn) {
+      return <Redirect to="/login" />;
+    }
     return (
       <React.Fragment>
-        {isLoggedIn && <Header />}
+        <Header />
         <div className="system-container" style={{ paddingTop: "80px" }}>
           <div className="system-list">
             <Switch>

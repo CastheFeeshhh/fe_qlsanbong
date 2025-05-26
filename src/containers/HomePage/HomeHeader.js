@@ -5,6 +5,7 @@ import {
   Redirect,
   withRouter,
 } from "react-router-dom/cjs/react-router-dom.min";
+import { processLogout } from "../../store/actions";
 
 class HomeHeader extends Component {
   HomeHeader = () => {};
@@ -21,8 +22,17 @@ class HomeHeader extends Component {
     this.props.history.push("/contact");
   };
 
+  handleGoLogin = () => {
+    this.props.history.push("/login");
+  };
+
+  handleLogout = () => {
+    this.props.processLogout();
+    this.props.history.push("/login");
+  };
+
   render() {
-    const { activeTab } = this.props;
+    const { activeTab, processLogout } = this.props;
     return (
       <React.Fragment>
         <div className="home-header-container">
@@ -53,7 +63,6 @@ class HomeHeader extends Component {
                   <a href="/information">Thông tin chung</a>
                   <a href="/field-list">Danh sách sân</a>
                   <a href="/service">Dịch vụ</a>
-                  <a href="/field-map">Bản đồ</a>
                 </div>
               </div>
 
@@ -89,7 +98,43 @@ class HomeHeader extends Component {
               </div>
             </div>
             <div className="right-content">
-              <button>Đăng nhập / Đăng ký</button>
+              {!this.props.isLoggedIn ? (
+                <button onClick={this.handleGoLogin}>
+                  Đăng nhập / Đăng ký
+                </button>
+              ) : (
+                <div className="user-logged-in">
+                  <div className="user-info-wrapper">
+                    <div className="user-mini-avatar"></div>
+                    <div className="user-info-text">
+                      <div className="user-name">
+                        {this.props.userInfo?.first_name +
+                          " " +
+                          this.props.userInfo?.last_name ||
+                          this.props.userInfo?.email ||
+                          "Người dùng"}
+                      </div>
+                      <div className="user-role">
+                        <i className="fas fa-user-tie"></i>
+                        {(() => {
+                          const roleId = this.props.userInfo?.role_id;
+                          if (roleId === 1) return "Chủ sân";
+                          if (roleId === 2) return "Nhân viên";
+                          if (roleId === 3) return "Khách hàng";
+                          return "Không rõ vai trò";
+                        })()}
+                      </div>
+                    </div>
+                  </div>
+                  <div
+                    className="btn btn-logout"
+                    onClick={this.handleLogout}
+                    title="Đăng xuất"
+                  >
+                    <i className="fas fa-sign-out-alt"></i>
+                  </div>
+                </div>
+              )}
             </div>
           </div>
         </div>
@@ -101,11 +146,14 @@ class HomeHeader extends Component {
 const mapStateToProps = (state) => {
   return {
     isLoggedIn: state.user.isLoggedIn,
+    userInfo: state.user.userInfo,
   };
 };
 
 const mapDispatchToProps = (dispatch) => {
-  return {};
+  return {
+    processLogout: () => dispatch(processLogout()),
+  };
 };
 
 export default connect(

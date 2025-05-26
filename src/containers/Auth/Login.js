@@ -1,8 +1,6 @@
 import React, { Component } from "react";
 import { connect } from "react-redux";
 import { push } from "connected-react-router";
-
-// import * as actions from "../store/actions";
 import * as actions from "../../store/actions";
 
 import "./Login.scss";
@@ -20,81 +18,80 @@ class Login extends Component {
   }
 
   handleOnChangeUsername = (event) => {
-    this.setState({
-      username: event.target.value,
-    });
+    this.setState({ username: event.target.value });
   };
 
   handleOnChangePassword = (event) => {
-    this.setState({
-      password: event.target.value,
-    });
+    this.setState({ password: event.target.value });
   };
 
   handleLogin = async () => {
-    this.setState({
-      errMessage: "",
-    });
-    // console.log(this.state.username + " " + this.state.password);
+    this.setState({ errMessage: "" });
     try {
-      let data = await handleLoginApi(this.state.username, this.state.password);
-      console.log(data);
+      const data = await handleLoginApi(
+        this.state.username,
+        this.state.password
+      );
+
       if (data && data.errCode !== 0) {
-        this.setState({
-          errMessage: data.message,
-        });
+        this.setState({ errMessage: data.message });
       }
+
       if (data && data.errCode === 0) {
-        this.props.userLoginSuccess(data.user);
-        console.log("login success");
+        const { user, token } = data;
+
+        localStorage.setItem("token", token);
+        this.props.userLoginSuccess({ ...user, token });
+
+        if (user.role_id === 1) {
+          this.props.navigate("/system/user-manage"); // Admin
+        } else {
+          this.props.navigate("/home"); // Người dùng thường
+        }
       }
     } catch (error) {
-      if (error.response) {
-        if (error.response.data) {
-          this.setState({
-            errMessage: error.response.data.message,
-          });
-        }
+      if (error.response && error.response.data) {
+        this.setState({ errMessage: error.response.data.message });
       }
     }
   };
 
   handleShowHidePassword = () => {
-    this.setState({
-      isShowPassword: !this.state.isShowPassword,
-    });
+    this.setState((prevState) => ({
+      isShowPassword: !prevState.isShowPassword,
+    }));
   };
 
   render() {
+    const { isLoggedIn } = this.props;
+    if (isLoggedIn) {
+      this.props.history.push("/login");
+    }
     return (
       <div className="login-background">
         <div className="login-container">
           <div className="login-content row">
-            <div className="col-12 login-text">Login</div>
+            <div className="col-12 login-text">Đăng nhập</div>
             <div className="col-12 form-group login-input">
-              <label>Username : </label>
+              <label>Email : </label>
               <input
-                type="input"
-                className="form-control "
-                placeholder="Enter your username"
+                type="text"
+                className="form-control"
+                placeholder="Nhập email"
                 value={this.state.username}
-                onChange={(event) => this.handleOnChangeUsername(event)}
-              ></input>
+                onChange={this.handleOnChangeUsername}
+              />
             </div>
             <div className="col-12 form-group login-input">
-              <label>Password : </label>
+              <label>Mật khẩu : </label>
               <div className="custom-input-password">
                 <input
                   type={this.state.isShowPassword ? "text" : "password"}
                   className="form-control"
-                  placeholder="Enter your password"
-                  onChange={(event) => this.handleOnChangePassword(event)}
-                ></input>
-                <span
-                  onClick={() => {
-                    this.handleShowHidePassword();
-                  }}
-                >
+                  placeholder="Nhập mật khẩu"
+                  onChange={this.handleOnChangePassword}
+                />
+                <span onClick={this.handleShowHidePassword}>
                   <i
                     className={
                       this.state.isShowPassword
@@ -109,20 +106,15 @@ class Login extends Component {
               </div>
             </div>
             <div className="col-12">
-              <button
-                className="btn-login"
-                onClick={() => {
-                  this.handleLogin();
-                }}
-              >
-                Login
+              <button className="btn-login" onClick={this.handleLogin}>
+                Đăng nhập
               </button>
             </div>
             <div className="col-12">
-              <span className="forgot-password">Forgot your password</span>
+              <span className="forgot-password">Quên mật khẩu</span>
             </div>
             <div className="col-12 text-center mt-4">
-              <span className="text-other-login">Or login with : </span>
+              <span className="text-other-login">Hoặc đăng nhập bằng : </span>
             </div>
             <div className="col-12 social-login">
               <i className="fab fa-google-plus-g google"></i>
@@ -135,16 +127,9 @@ class Login extends Component {
   }
 }
 
-const mapStateToProps = (state) => {
-  return {};
-};
+const mapDispatchToProps = (dispatch) => ({
+  navigate: (path) => dispatch(push(path)),
+  userLoginSuccess: (userInfo) => dispatch(actions.userLoginSuccess(userInfo)),
+});
 
-const mapDispatchToProps = (dispatch) => {
-  return {
-    navigate: (path) => dispatch(push(path)),
-    userLoginSuccess: (userInfor) =>
-      dispatch(actions.userLoginSuccess(userInfor)),
-  };
-};
-
-export default connect(mapStateToProps, mapDispatchToProps)(Login);
+export default connect(null, mapDispatchToProps)(Login);

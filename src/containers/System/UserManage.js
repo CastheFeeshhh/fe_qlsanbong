@@ -115,6 +115,7 @@ class UserManage extends Component {
 
   render() {
     let arrUsers = this.state.arrUsers;
+    console.log("userInfo:", this.props.userInfo);
     return (
       <div className="users-container">
         <ModalUser
@@ -130,7 +131,7 @@ class UserManage extends Component {
             editUser={this.doEditUser}
           />
         )}
-        <div className="title text-center">Manage users with Feeeshh</div>
+        <div className="title text-center">QUẢN LÝ NGƯỜI DÙNG</div>
         <div className="mx-1">
           <button
             className="btn btn-primary px-3"

@@ -1,4 +1,5 @@
 import React, { Component } from "react";
+import { Redirect } from "react-router-dom";
 import { connect } from "react-redux";
 import moment from "moment";
 import HomeHeader from "../containers/HomePage/HomeHeader";
@@ -507,6 +508,8 @@ class fieldBooking extends Component {
   async componentDidMount() {
     await this.props.fetchAllServices();
     await this.props.fetchAllFields();
+    console.log("FieldBooking mounted");
+    console.log("check isLoggedIn:", this.props.isLoggedIn);
 
     this.validateAndSetFormState();
 
@@ -532,6 +535,13 @@ class fieldBooking extends Component {
   }
 
   render() {
+    const { isLoggedIn } = this.props;
+    console.log("check isLoggedIn ở fieldBooking.js:", isLoggedIn);
+
+    if (!isLoggedIn) {
+      alert("đăng nhập để sử dụng tính năng");
+      return <Redirect to="/login" />;
+    }
     const {
       currentBooking,
       bookings,

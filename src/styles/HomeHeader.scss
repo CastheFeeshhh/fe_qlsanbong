@@ -136,8 +136,74 @@ html, body {
         .right-content {
             background-color: #ffffff;
             width: 20%;
-            text-align: center;
-            padding: 11px;
+            align-items: center;
+            display: flex;
+            justify-content: center;
+            padding: 12px;
+            
+
+            .user-logged-in {
+                padding-left: 10px;
+                display: flex;
+                align-items: center;
+                width: 100%;
+                gap: 60px; 
+                cursor: pointer;
+
+                .user-info-wrapper {
+                    display: flex;
+                    align-items: center;
+                    gap: 12px; 
+                }
+
+                .user-mini-avatar {
+                    width: 40px;
+                    height: 40px;
+                    border: 2px solid #dfdddd;
+                    background: url("../assets/images/default_avatar.jpg") center center no-repeat;
+                    background-size: cover;
+                    background-color: #cecece;
+                }
+
+                .user-info-text {
+                    text-align: left;
+                    color: #0f0f0f;
+
+                    .user-name {
+                        font-weight: bold;
+                        font-size: 15px;
+                    }
+
+                    .user-role {
+                    font-size: 12px;
+                    color: #898989;
+                    display: flex;
+                    gap: 6px;
+
+                        i {
+                            color: rgb(5, 100, 217);
+                            padding-top: 2px;
+                        }
+                    }
+                }
+
+                .btn-logout {
+                    background: none;
+                    border: none;
+                    color: #0de02d;
+                    cursor: pointer;
+                    transition: color 0.2s;
+
+                    i {
+                        font-size: 26px;
+                    }
+
+                    &:hover {
+                        color: #f56c6c;
+                    }
+                }
+            }
+
 
             button  {
                 padding: 7px 15px;
@@ -152,10 +218,13 @@ html, body {
                     color: #07b307;
                     border: 1px solid #07b307;
                 }
-            }
+            } 
         }
     }
 }
+
+
+
 
 
 

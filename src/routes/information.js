@@ -30,12 +30,12 @@ class information extends Component {
           "Website hỗ trợ đặt sân online nhanh chóng, theo dõi lịch thuê sân, tích hợp thanh toán trực tuyến, đăng ký dịch vụ đi kèm và nhiều tiện ích khác.",
         imageClass: "img3-info",
       },
-      {
-        title: "🌐 Về website",
-        content:
-          "Website hỗ trợ đặt sân online nhanh chóng, theo dõi lịch thuê sân, tích hợp thanh toán trực tuyến, đăng ký dịch vụ đi kèm và nhiều tiện ích khác.",
-        imageClass: "img4-info",
-      },
+      // {
+      //   title: "🌐 Về website",
+      //   content:
+      //     "Website hỗ trợ đặt sân online nhanh chóng, theo dõi lịch thuê sân, tích hợp thanh toán trực tuyến, đăng ký dịch vụ đi kèm và nhiều tiện ích khác.",
+      //   imageClass: "img4-info",
+      // },
     ];
 
     return (

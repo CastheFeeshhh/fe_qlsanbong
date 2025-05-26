@@ -4,12 +4,9 @@ import { Route, Switch } from "react-router-dom";
 import { ConnectedRouter as Router } from "connected-react-router";
 import { history } from "../redux";
 import { ToastContainer } from "react-toastify";
-import {
-  userIsAuthenticated,
-  userIsNotAuthenticated,
-} from "../hoc/authentication";
 
 import { path } from "../utils";
+import { restoreLogin } from "../store/actions/userActions";
 
 import Home from "../routes/home";
 import Login from "./Auth/Login";
@@ -27,25 +24,60 @@ import contact from "../routes/contact";
 import payment from "../routes/payment";
 
 class App extends Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      bootstrapped: false,
+    };
+  }
   handlePersistorState = () => {
     const { persistor } = this.props;
-    let { bootstrapped } = persistor.getState();
+    const { bootstrapped } = persistor.getState();
     if (bootstrapped) {
-      if (this.props.onBeforeLift) {
-        Promise.resolve(this.props.onBeforeLift())
-          .then(() => this.setState({ bootstrapped: true }))
-          .catch(() => this.setState({ bootstrapped: true }));
-      } else {
-        this.setState({ bootstrapped: true });
-      }
+      this.setState({ bootstrapped: true });
+    } else {
+      persistor.subscribe(() => {
+        const { bootstrapped } = persistor.getState();
+        if (bootstrapped) {
+          this.setState({ bootstrapped: true });
+        }
+      });
     }
   };
 
   componentDidMount() {
     this.handlePersistorState();
+
+    const token = localStorage.getItem("token");
+    if (token && !this.props.isLoggedIn) {
+      const userInfo = { token };
+      this.props.restoreLogin(userInfo);
+      console.log("userInfo ở app.js: ", userInfo);
+      console.log("token ở app.js: ", token);
+    }
+  }
+
+  componentDidUpdate(prevProps) {
+    if (!prevProps.isLoggedIn && this.props.isLoggedIn) {
+      const token = localStorage.getItem("token");
+      if (token) {
+        const userInfo = { token };
+        console.log("userInfo ở App.js (componentDidUpdate): ", userInfo);
+        console.log("trạng thái đăng nhập: isLogin:", this.props.isLoggedIn);
+      }
+    }
   }
 
   render() {
+    if (!this.state.bootstrapped) {
+      return null; // hoặc spinner
+    }
+    console.log("token ở trong render:", localStorage.getItem("token"));
+    console.log(
+      "trạng thái đăng nhập: isLogin trong render:",
+      this.props.isLoggedIn
+    );
+
     return (
       <Fragment>
         <Router history={history}>
@@ -55,15 +87,8 @@ class App extends Component {
             <span className="content-container">
               <Switch>
                 <Route path={path.HOME} exact component={Home} />
-                <Route
-                  path={path.LOGIN}
-                  s
-                  component={userIsNotAuthenticated(Login)}
-                />
-                <Route
-                  path={path.SYSTEM}
-                  component={userIsAuthenticated(System)}
-                />
+                <Route path={path.LOGIN} s component={Login} />
+                <Route path={path.SYSTEM} component={System} />
                 <Route path={path.HOMEPAGE} component={HomePage} />
                 <Route path={path.INFORMATION} component={information} />
                 <Route path={path.FIELDLIST} component={fieldList} />
@@ -91,7 +116,9 @@ const mapStateToProps = (state) => {
 };
 
 const mapDispatchToProps = (dispatch) => {
-  return {};
+  return {
+    restoreLogin: (userInfo) => dispatch(restoreLogin(userInfo)),
+  };
 };
 
 export default connect(mapStateToProps, mapDispatchToProps)(App);

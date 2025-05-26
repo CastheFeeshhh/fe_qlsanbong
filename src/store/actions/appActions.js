@@ -16,16 +16,16 @@ export const setContentOfConfirmModal = (contentOfConfirmModal) => ({
 export const fetchAllServices = () => {
   return async (dispatch, getState) => {
     try {
-      console.log("Action: Dispatching FETCH_ALL_SERVICES_START");
+      // console.log("Action: Dispatching FETCH_ALL_SERVICES_START");
       dispatch({ type: actionTypes.FETCH_ALL_SERVICES_START });
 
       let res = await getAllServicesData();
-      console.log("Action: getAllServicesData response:", res);
+      // console.log("Action: getAllServicesData response:", res);
 
       if (res && Array.isArray(res) && res.length > 0) {
-        console.log(
-          "Action: Dispatching FETCH_ALL_SERVICES_SUCCESS with data."
-        );
+        // console.log(
+        //   "Action: Dispatching FETCH_ALL_SERVICES_SUCCESS with data."
+        // );
         dispatch({
           type: actionTypes.FETCH_ALL_SERVICES_SUCCESS,
           data: res,
@@ -37,7 +37,7 @@ export const fetchAllServices = () => {
         dispatch({ type: actionTypes.FETCH_ALL_SERVICES_FAILED });
       }
     } catch (e) {
-      console.log("fetchAllServices error", e);
+      // console.log("fetchAllServices error", e);
       dispatch({ type: actionTypes.FETCH_ALL_SERVICES_FAILED });
     }
   };
@@ -46,14 +46,14 @@ export const fetchAllServices = () => {
 export const fetchAllFields = () => {
   return async (dispatch, getState) => {
     try {
-      console.log("Action: Dispatching FETCH_ALL_FIELDS_START");
+      // console.log("Action: Dispatching FETCH_ALL_FIELDS_START");
       dispatch({ type: actionTypes.FETCH_ALL_FIELDS_START });
 
       let res = await getAllFieldsData();
-      console.log("Action: getAllFieldsData response:", res);
+      // console.log("Action: getAllFieldsData response:", res);
 
       if (res && Array.isArray(res) && res.length > 0) {
-        console.log("Action: Dispatching FETCH_ALL_FIELDS_SUCCESS with data.");
+        // console.log("Action: Dispatching FETCH_ALL_FIELDS_SUCCESS with data.");
         dispatch({
           type: actionTypes.FETCH_ALL_FIELDS_SUCCESS,
           data: res,
