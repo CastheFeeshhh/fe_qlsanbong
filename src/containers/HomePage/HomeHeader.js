@@ -104,7 +104,7 @@ class HomeHeader extends Component {
                 </button>
               ) : (
                 <div className="user-logged-in">
-                  <div className="user-info-wrapper">
+                  <div className="user-info">
                     <div className="user-mini-avatar"></div>
                     <div className="user-info-text">
                       <div className="user-name">
@@ -124,6 +124,21 @@ class HomeHeader extends Component {
                           return "Không rõ vai trò";
                         })()}
                       </div>
+                    </div>
+                    <div className="user-dropdown-menu">
+                      <a href="/profile" className="dropdown-item">
+                        <i className="fas fa-user"></i> Trang cá nhân
+                      </a>
+                      {this.props.userInfo?.role_id === 1 && (
+                        <a href="/admin" className="dropdown-item">
+                          <i className="fas fa-cogs"></i> Trang quản lý
+                        </a>
+                      )}
+                      {this.props.userInfo?.role_id === 2 && (
+                        <a href="/staff" className="dropdown-item">
+                          <i className="fas fa-cogs"></i> Trang quản lý
+                        </a>
+                      )}
                     </div>
                   </div>
                   <div

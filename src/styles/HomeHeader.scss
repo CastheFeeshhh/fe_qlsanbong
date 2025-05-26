@@ -139,70 +139,150 @@ html, body {
             align-items: center;
             display: flex;
             justify-content: center;
-            padding: 12px;
-            
 
             .user-logged-in {
-                padding-left: 10px;
                 display: flex;
                 align-items: center;
+                justify-content: space-between;
                 width: 100%;
-                gap: 60px; 
-                cursor: pointer;
+                height: 100%;
 
-                .user-info-wrapper {
+                .user-info {
+                    position: relative;
                     display: flex;
                     align-items: center;
-                    gap: 12px; 
-                }
+                    gap: 12px;
+                    padding: 0 12px;
+                    cursor: pointer;
+                    height: 100%;
 
-                .user-mini-avatar {
-                    width: 40px;
-                    height: 40px;
-                    border: 2px solid #dfdddd;
-                    background: url("../assets/images/default_avatar.jpg") center center no-repeat;
-                    background-size: cover;
-                    background-color: #cecece;
-                }
-
-                .user-info-text {
-                    text-align: left;
-                    color: #0f0f0f;
-
-                    .user-name {
-                        font-weight: bold;
-                        font-size: 15px;
+                    &:hover .user-dropdown-menu {
+                        display: flex;
+                        width: 100%;
                     }
 
-                    .user-role {
-                    font-size: 12px;
-                    color: #898989;
-                    display: flex;
-                    gap: 6px;
+                    .user-mini-avatar {
+                        width: 40px;
+                        height: 40px;
+                        border: 2px solid rgb(229, 228, 228);
+                        background: url("../assets/images/default_avatar.jpg") center center no-repeat;
+                        background-size: cover;
+                        border-radius: 50%;
+                    }
 
-                        i {
-                            color: rgb(5, 100, 217);
-                            padding-top: 2px;
+                    .user-info-text {
+                        .user-name {
+                            font-weight: bold;
+                            font-size: 15px;
+                        }
+                        .user-role {
+                            font-size: 12px;
+                            color: #898989;
+                            display: flex;
+                            gap: 6px;
+                            i {
+                                color: rgb(5, 100, 217);
+                            }
                         }
                     }
-                }
 
-                .btn-logout {
-                    background: none;
-                    border: none;
-                    color: #0de02d;
-                    cursor: pointer;
-                    transition: color 0.2s;
+                    .user-dropdown-menu {
+                        position: absolute;
+                        top: 100%;
+                        left: 0%;
+                        min-width: 110%;
+                        background-color: #ffffff;
+                        color: #474b48;
+                        display: none;
+                        flex-direction: column;
+                        box-shadow: 0 8px 16px rgba(0,0,0,0.5);
+                        overflow: hidden;
+                        z-index: 998;
+                        height: 100px;
+                        text-align: center;
+                        padding: 8px 0;
+                        
 
-                    i {
-                        font-size: 26px;
-                    }
+                        .dropdown-item {
+                            padding: 10px 15px;
+                            text-decoration: none;
+                            color: #333;
+                            display: flex;
+                            align-items: center;
+                            gap: 8px;
 
-                    &:hover {
-                        color: #f56c6c;
-                    }
+                            &:hover {
+                                background-color: #e6e8e6;
+                                color: #008907;
+                            }
+
+                            i {
+                                width: 18px;      
+                                text-align: center;
+                                font-size: 14px;  
+                            }
+                        }
+
+                //      &.child-dropdown {
+
+                //     .nav-link {
+                //         display: flex;
+                //         align-items: center;
+                //         justify-content: center;
+                //         height: 100%;
+                //         width: 100%;
+                //         gap: 12px;
+                //     }
+
+                //     .dropdown-menu {
+                //         position: absolute;
+                //         top: 100%;
+                //         left: 50%;
+                //         transform: translateX(-50%);
+                //         min-width: 100%;
+                //         background-color: #ffffff;
+                //         color: #474b48;
+                //         display: none;
+                //         flex-direction: column;
+                //         box-shadow: 0 8px 16px rgba(0,0,0,0.5);
+                //         overflow: hidden;
+                //         border-radius: 0px;
+                //         z-index: 998;
+
+                //         a {
+                //             padding: 12px 16px;
+                //             text-decoration: none;
+                //             color: #474b48;
+                //             font-weight: bold;
+                //             background-color: transparent;
+
+                //             &:hover {
+                //                 background-color: #e6e8e6;
+                //                 color: #008907;
+                //             }
+                //         }
+                //     }
+                // }
                 }
             }
+
+            .btn-logout {
+                background: none;
+                border: none;
+                cursor: pointer;
+                color: #0de02d;
+                padding-right: 30px;
+
+                i {
+                    font-size: 25px;
+                }
+
+                &:hover {
+                    color: #f56c6c;
+                }
+            }
+            }
+
 
 
             button  {
@@ -222,6 +302,7 @@ html, body {
         }
     }
 }
+
 
 
 
