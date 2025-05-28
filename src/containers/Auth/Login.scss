@@ -141,8 +141,9 @@
         text-align: right;
         margin-bottom: 25px;
 
-        a {
+        span {
             color: #007bff;
+            cursor: pointer;
             text-decoration: none;
             font-size: 14px;
 
@@ -283,5 +284,99 @@
     .social-login i {
         font-size: 24px;
         padding: 8px;
+    }
+}
+
+.forgot-password-form-container {
+    padding: 30px 40px; 
+    width: 450px; 
+
+    .login-form-header {
+        font-size: 26px;
+        font-weight: 700;
+        text-align: center;
+        margin-bottom: 25px;
+        color: #333;
+    }
+
+    .login-content {
+        .form-group {
+            margin-bottom: 20px;
+            label {
+                display: block;
+                margin-bottom: 8px;
+                font-size: 14px;
+                color: #666;
+                font-weight: 500;
+            }
+            input.form-control {
+                width: 100%;
+                padding: 12px 15px;
+                border: 1px solid #ddd;
+                border-radius: 8px;
+                font-size: 16px;
+                box-sizing: border-box;
+                transition: all 0.3s ease;
+                outline: none;
+
+                &:focus {
+                    border-color: $colormain;
+                    box-shadow: 0 0 0 3px rgba($colormain, 0.2);
+                }
+            }
+        }
+
+        .error-message {
+            color: #e74c3c;
+            font-size: 14px;
+            margin-top: -10px;
+            margin-bottom: 15px;
+            text-align: center;
+            font-weight: 500;
+        }
+
+        .btn-login {
+            width: 100%;
+            padding: 15px;
+            border: none;
+            border-radius: 8px;
+            background-color: $colormain;
+            color: white;
+            font-size: 18px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.3s ease, transform 0.2s ease;
+
+            &:hover {
+                background-color: darken($colormain, 10%);
+                transform: translateY(-2px);
+            }
+        }
+
+        .back-to-login {
+            margin-top: 20px; 
+            text-align: center;
+            color: #007bff;
+            cursor: pointer;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 5px;
+
+            i {
+                margin-right: 5px;
+            }
+
+            &:hover {
+                text-decoration: underline;
+            }
+        }
+    }
+}
+
+@media (max-width: 600px) {
+    .forgot-password-form-container {
+        padding: 25px 30px; 
     }
 }

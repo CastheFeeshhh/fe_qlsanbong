@@ -12,6 +12,7 @@ export const path = {
   PAYMENT: "/payment",
   LOGIN: "/login",
   LOG_OUT: "/logout",
+  RESET_PASSWORD: "/reset-password",
   SYSTEM: "/system",
 };
 

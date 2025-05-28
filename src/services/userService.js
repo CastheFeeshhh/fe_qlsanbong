@@ -11,6 +11,10 @@ const handleRegisterApi = (data) => {
   return axios.post("/api/register", data);
 };
 
+const handleForgotPasswordApi = (email) => {
+  return axios.post("/api/forgot-password", { email });
+};
+
 const getAllUsers = (inputId) => {
   return axios.get(`/api/get-all-users?id=${inputId}`);
 };
@@ -34,6 +38,7 @@ const editUserService = (inputData) => {
 export {
   handleLoginApi,
   handleRegisterApi,
+  handleForgotPasswordApi,
   getAllUsers,
   createNewUserService,
   deleteUserService,

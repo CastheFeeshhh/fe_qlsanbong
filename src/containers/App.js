@@ -10,6 +10,7 @@ import { restoreLogin } from "../store/actions/userActions";
 
 import Home from "../routes/home";
 import Login from "./Auth/Login";
+import ResetPassword from "./Auth/ResetPassword";
 import System from "../routes/System";
 
 import HomePage from "./HomePage/homePage";
@@ -91,6 +92,7 @@ class App extends Component {
               <Switch>
                 <Route path={path.HOME} exact component={Home} />
                 <Route path={path.LOGIN} s component={Login} />
+                <Route path={path.RESET_PASSWORD} component={ResetPassword} />
                 <Route path={path.SYSTEM} component={System} />
                 <Route path={path.HOMEPAGE} component={HomePage} />
                 <Route path={path.INFORMATION} component={information} />

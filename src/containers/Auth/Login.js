@@ -4,7 +4,11 @@ import { push } from "connected-react-router";
 import * as actions from "../../store/actions";
 
 import "./Login.scss";
-import { handleLoginApi, handleRegisterApi } from "../../services/userService";
+import {
+  handleLoginApi,
+  handleRegisterApi,
+  handleForgotPasswordApi,
+} from "../../services/userService";
 
 class Login extends Component {
   constructor(props) {
@@ -27,6 +31,8 @@ class Login extends Component {
       roleId: "3",
       positionId: "1",
       activeTab: "login",
+      activeForm: "login",
+      forgotPasswordEmail: "",
     };
   }
 
@@ -45,6 +51,56 @@ class Login extends Component {
       ...stateCopy,
       errMessage: "",
     });
+  };
+
+  handleOnChangeForgotPasswordEmail = (event) => {
+    this.setState({ forgotPasswordEmail: event.target.value, errMessage: "" });
+  };
+
+  handleForgotPasswordRequest = async () => {
+    this.setState({ errMessage: "" });
+    const { forgotPasswordEmail } = this.state;
+
+    if (!forgotPasswordEmail) {
+      this.setState({ errMessage: "Vui lòng nhập địa chỉ email của bạn." });
+      return;
+    }
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(forgotPasswordEmail)) {
+      this.setState({ errMessage: "Email không đúng định dạng." });
+      return;
+    }
+
+    try {
+      const response = await handleForgotPasswordApi(forgotPasswordEmail);
+
+      if (response && response.errCode === 0) {
+        this.setState({
+          errMessage: "Vui lòng kiểm tra email của bạn để đặt lại mật khẩu.",
+          forgotPasswordEmail: "",
+        });
+      } else {
+        this.setState({
+          errMessage:
+            response.message ||
+            "Có lỗi xảy ra khi yêu cầu đặt lại mật khẩu. Vui lòng thử lại.",
+        });
+      }
+    } catch (error) {
+      if (error.response && error.response.data) {
+        this.setState({
+          errMessage:
+            error.response.data.message || error.response.data.errMessage,
+        });
+      } else {
+        this.setState({ errMessage: "Lỗi kết nối hoặc không xác định." });
+      }
+      console.error("Forgot password request error: ", error);
+    }
+  };
+
+  handleFormChange = (form) => {
+    this.setState({ activeForm: form, errMessage: "" });
   };
 
   handleLogin = async () => {
@@ -185,33 +241,31 @@ class Login extends Component {
   };
 
   handleTabChange = (tab) => {
-    this.setState({ activeTab: tab, errMessage: "" });
+    this.setState({ activeTab: tab, activeForm: tab, errMessage: "" });
   };
 
   render() {
+    const { activeForm, activeTab } = this.state;
+
     return (
       <div className="login-page-container">
         <div className="login-box-wrapper">
           <div className="login-header-tabs">
             <div
-              className={`tab-item ${
-                this.state.activeTab === "login" ? "active" : ""
-              }`}
+              className={`tab-item ${activeTab === "login" ? "active" : ""}`}
               onClick={() => this.handleTabChange("login")}
             >
               Đăng nhập
             </div>
             <div
-              className={`tab-item ${
-                this.state.activeTab === "register" ? "active" : ""
-              }`}
+              className={`tab-item ${activeTab === "register" ? "active" : ""}`}
               onClick={() => this.handleTabChange("register")}
             >
               Đăng ký
             </div>
           </div>
 
-          {this.state.activeTab === "login" && (
+          {activeForm === "login" && (
             <div className="login-form-container">
               <div className="login-form-header">Đăng nhập hệ thống</div>
               <div className="login-content">
@@ -251,7 +305,9 @@ class Login extends Component {
                   <div className="error-message">{this.state.errMessage}</div>
                 )}
                 <div className="forgot-password">
-                  <a href="#">Quên mật khẩu?</a>
+                  <span onClick={() => this.handleFormChange("forgotPassword")}>
+                    Quên mật khẩu?
+                  </span>
                 </div>
                 <button className="btn-login" onClick={this.handleLogin}>
                   Đăng nhập
@@ -269,11 +325,10 @@ class Login extends Component {
             </div>
           )}
 
-          {this.state.activeTab === "register" && (
+          {activeForm === "register" && (
             <div className="register-form-container">
               <div className="login-form-header">Đăng ký tài khoản</div>
               <div className="login-content">
-                {/* Email */}
                 <div className="form-group">
                   <label htmlFor="regEmail">Email:</label>
                   <input
@@ -287,7 +342,6 @@ class Login extends Component {
                     }
                   />
                 </div>
-                {/* Mật khẩu */}
                 <div className="form-group">
                   <label htmlFor="regPassword">Mật khẩu:</label>
                   <input
@@ -301,7 +355,6 @@ class Login extends Component {
                     }
                   />
                 </div>
-                {/* Xác nhận mật khẩu */}
                 <div className="form-group">
                   <label htmlFor="confirmPassword">Xác nhận mật khẩu:</label>
                   <input
@@ -315,7 +368,6 @@ class Login extends Component {
                     }
                   />
                 </div>
-                {/* Tên và Họ */}
                 <div className="form-row">
                   <div className="form-group half-width">
                     <label htmlFor="firstName">Tên:</label>
@@ -344,7 +396,6 @@ class Login extends Component {
                     />
                   </div>
                 </div>
-                {/* Địa chỉ */}
                 <div className="form-group">
                   <label htmlFor="address">Địa chỉ:</label>
                   <input
@@ -358,7 +409,6 @@ class Login extends Component {
                     }
                   />
                 </div>
-                {/* Giới tính */}
                 <div className="form-group">
                   <label htmlFor="gender">Giới tính:</label>
                   <select
@@ -374,7 +424,6 @@ class Login extends Component {
                     <option value="O">Khác</option>
                   </select>
                 </div>
-                {/* Số điện thoại */}
                 <div className="form-group">
                   <label htmlFor="phone">Số điện thoại:</label>
                   <input
@@ -395,6 +444,40 @@ class Login extends Component {
                 <button className="btn-register" onClick={this.handleRegister}>
                   Đăng ký
                 </button>
+              </div>
+            </div>
+          )}
+
+          {activeForm === "forgotPassword" && (
+            <div className="forgot-password-form-container">
+              <div className="login-form-header">Quên mật khẩu</div>
+              <div className="login-content">
+                <div className="form-group">
+                  <label htmlFor="forgotPasswordEmail">Email của bạn:</label>
+                  <input
+                    type="email"
+                    id="forgotPasswordEmail"
+                    className="form-control"
+                    placeholder="Nhập email đã đăng ký"
+                    value={this.state.forgotPasswordEmail}
+                    onChange={this.handleOnChangeForgotPasswordEmail}
+                  />
+                </div>
+                {this.state.errMessage && (
+                  <div className="error-message">{this.state.errMessage}</div>
+                )}
+                <button
+                  className="btn-login"
+                  onClick={this.handleForgotPasswordRequest}
+                >
+                  Gửi yêu cầu đặt lại mật khẩu
+                </button>
+                <div
+                  className="back-to-login"
+                  onClick={() => this.handleFormChange("login")}
+                >
+                  <i className="fas fa-arrow-left"></i> Quay lại đăng nhập
+                </div>
               </div>
             </div>
           )}
