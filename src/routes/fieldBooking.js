@@ -463,6 +463,8 @@ class fieldBooking extends Component {
 
   handleConfirmBookingClick = async () => {
     const { bookings, finalTotalPrice } = this.state;
+    const { userInfo } = this.props;
+    console.log("userInfo ở fieldBooking:", userInfo);
     const history = this.props.history;
 
     if (!history) {
@@ -474,13 +476,18 @@ class fieldBooking extends Component {
     }
 
     try {
-      const response = await sendBookingsToBackend(bookings, finalTotalPrice);
+      const response = await sendBookingsToBackend(
+        userInfo.user_id,
+        bookings,
+        finalTotalPrice
+      );
 
       if (response.success) {
         this.resetBookingForm();
         alert(response.message);
 
         console.log("Dữ liệu chuẩn bị gửi đến trang /payment:", {
+          userInfo: userInfo,
           booking_id: response.booking_id,
           final_total_price: response.final_total_price,
           booking_details: response.booking_details,
@@ -490,6 +497,7 @@ class fieldBooking extends Component {
         history.push({
           pathname: "/payment",
           state: {
+            userInfo: userInfo,
             booking_id: response.booking_id,
             final_total_price: response.final_total_price,
             booking_details: response.booking_details,
@@ -878,6 +886,7 @@ const mapStateToProps = (state) => {
     fieldPrices: state.app.fieldPrices,
     isLoadingServices: state.app.isLoadingServices,
     isLoadingFields: state.app.isLoadingFields,
+    userInfo: state.user.userInfo,
   };
 };
 

@@ -205,6 +205,7 @@ export const removeBookingItem = (
 };
 
 export const sendBookingsToBackend = async (
+  id,
   bookings,
   finalTotalPrice,
   history
@@ -215,7 +216,7 @@ export const sendBookingsToBackend = async (
   }
 
   try {
-    let fieldBooking = await createNewBooking(9, finalTotalPrice); // user tạo sẽ được cập nhật sau, sau khi thêm phân quyền và đăng nhập
+    let fieldBooking = await createNewBooking(id, finalTotalPrice);
     let fieldBookingId = fieldBooking.booking_id;
     console.log("dữ liệu bookings :", bookings);
 

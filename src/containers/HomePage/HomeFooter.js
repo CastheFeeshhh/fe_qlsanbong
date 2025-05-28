@@ -9,11 +9,11 @@ const HomeFooter = () => {
         <div className="footer-column">
           <h2 className="footer-logo">Old Trafford</h2>
           <p>
-            Địa chỉ: LK37 Đường Trịnh Văn Bô, Phường Xuân Phương, Quận Nam Từ
+            Địa chỉ: LK37 đường Trịnh Văn Bô, Phường Xuân Phương, Quận Nam Từ
             Liêm, TP. Hà Nội
           </p>
-          <p>Điện thoại: 0123 456 789</p>
-          <p>Email: contact@oldtrafford.vn</p>
+          <p>Điện thoại: 0559 025 896</p>
+          <p>Email: sanbongminioldtrafford@gmail.com</p>
         </div>
 
         <div className="footer-column">

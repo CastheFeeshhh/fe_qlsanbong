@@ -7,6 +7,10 @@ const handleLoginApi = (email, password) => {
   });
 };
 
+const handleRegisterApi = (data) => {
+  return axios.post("/api/register", data);
+};
+
 const getAllUsers = (inputId) => {
   return axios.get(`/api/get-all-users?id=${inputId}`);
 };
@@ -29,6 +33,7 @@ const editUserService = (inputData) => {
 
 export {
   handleLoginApi,
+  handleRegisterApi,
   getAllUsers,
   createNewUserService,
   deleteUserService,

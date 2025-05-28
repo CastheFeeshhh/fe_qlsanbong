@@ -202,7 +202,14 @@ class HomePage extends Component {
                       target="_blank"
                       rel="noopener noreferrer"
                     >
-                      <i className="fas fa-comments"></i>
+                      <div className="zalo-icon"></div>
+                    </a>
+                    <a
+                      href="https://www.youtube.com/yourchannel"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                    >
+                      <i class="fab fa-youtube"></i>
                     </a>
                   </div>
                 </div>

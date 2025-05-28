@@ -49,9 +49,12 @@ class App extends Component {
     this.handlePersistorState();
 
     const token = localStorage.getItem("token");
-    if (token && !this.props.isLoggedIn) {
-      const userInfo = { token };
+    const user = JSON.parse(localStorage.getItem("user"));
+
+    if (token && user && !this.props.isLoggedIn) {
+      const userInfo = { ...user, token };
       this.props.restoreLogin(userInfo);
+
       console.log("userInfo ở app.js: ", userInfo);
       console.log("token ở app.js: ", token);
     }
@@ -70,9 +73,9 @@ class App extends Component {
 
   render() {
     if (!this.state.bootstrapped) {
-      return null; // hoặc spinner
+      return null;
     }
-    console.log("token ở trong render:", localStorage.getItem("token"));
+    console.log("User info trong render App.js:", this.props.userInfo);
     console.log(
       "trạng thái đăng nhập: isLogin trong render:",
       this.props.isLoggedIn
@@ -112,6 +115,7 @@ const mapStateToProps = (state) => {
   return {
     started: state.app.started,
     isLoggedIn: state.user.isLoggedIn,
+    userInfo: state.user.userInfo,
   };
 };
 

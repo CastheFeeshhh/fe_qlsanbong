@@ -3,6 +3,9 @@ html, body {
   overflow: auto;
   margin: 0;
   padding: 0;
+  text-rendering: optimizeLegibility; 
+  -webkit-font-smoothing: antialiased; 
+  -moz-osx-font-smoothing: grayscale;
 }
 
 .home-scroll-container  {
@@ -35,7 +38,7 @@ html, body {
     }
 
     .title1 {
-      font-family: Arial, sans-serif;
+      font-family: 'Roboto', sans-serif;
       font-size: 57px;
       font-weight: 500;
       color: white;
@@ -341,7 +344,7 @@ html, body {
   }
 
   .section5 {
-    padding: 40px 20px;
+    padding: 20px;
     background-color: #fff;
 
     .community-container {
@@ -381,18 +384,41 @@ html, body {
         .social-icons {
           display: flex;
           gap: 35px;
+          align-items: center;
 
           a {
             font-size: 48px;
             color: #086cf0;
             transition: transform 0.2s ease;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            text-decoration: none;
 
             &:hover {
               transform: scale(1.2);
             }
 
             &:nth-child(2) {
-              color: rgb(5, 118, 231);
+              color: transparent;
+            }
+
+            .fa-youtube {
+              color: #ff0000;
+            }
+          }
+
+          .zalo-icon {
+            width: 48px;
+            height: 48px;
+            background-image: url('../assets/images/zalo-icon.png');
+            background-size: contain;
+            background-repeat: no-repeat;
+            background-position: center;
+            transition: transform 0.2s ease;
+
+            &:hover {
+              transform: scale(1.2);
             }
           }
         }

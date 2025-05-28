@@ -5,7 +5,6 @@ export const addUserSuccess = () => ({
 });
 
 export const userLoginSuccess = (userInfo) => {
-  localStorage.setItem("token", userInfo.token);
   console.log("token ở userAction: ", userInfo.token);
   return {
     type: actionTypes.USER_LOGIN_SUCCESS,
