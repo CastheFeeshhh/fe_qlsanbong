@@ -195,37 +195,33 @@
     justify-content: center;
     gap: 20px;
 
-    i {
-        font-size: 32px; 
-        width: 50px; 
-        height: 50px; 
-        display: flex; 
+    .social-icon-wrapper {
+        width: 50px;
+        height: 50px;
+        display: flex;
         justify-content: center;
         align-items: center;
         cursor: pointer;
         transition: transform 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease;
         border-radius: 50%;
-        border: 1px solid #ddd;
+        border: 1px solid #ddd; 
         background-color: white; 
-        color: #555; 
 
         &:hover {
             transform: translateY(-2px);
             box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
         }
 
-        &.google-icon {
-            color: #db4437;
-            border-color: #db4437;
+        i {
+            font-size: 32px;
         }
 
-        &.facebook-icon {
-            color: #3b5998;
-            border-color: #3b5998;
+        .google-icon {
+            color: #db4437; 
         }
-        &.fab.fa-google-plus-g.google-icon {
-            color: #db4437;
-            border-color: #db4437;
+
+        .facebook-icon {
+            color: #3b5998; 
         }
     }
 }

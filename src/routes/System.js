@@ -3,19 +3,28 @@ import { connect } from "react-redux";
 import { Redirect, Route, Switch } from "react-router-dom";
 import UserManage from "../containers/System/UserManage";
 import Header from "../containers/Header/Header";
+import "../styles/system.scss";
 
 class System extends Component {
   render() {
     const { systemMenuPath, isLoggedIn } = this.props;
-    console.log("check isLoggedIn ở fieldBooking.js:", isLoggedIn);
     if (!isLoggedIn) {
       return <Redirect to="/login" />;
     }
+
     return (
       <React.Fragment>
         <Header />
-        <div className="system-container" style={{ paddingTop: "80px" }}>
-          <div className="system-list">
+        <div className="system-layout">
+          <aside className="system-sidebar">
+            <ul>
+              <li>
+                <a href="/system/user-manage">Quản lý người dùng</a>
+              </li>
+              {/* Thêm các mục nav khác nếu có */}
+            </ul>
+          </aside>
+          <main className="system-main-content">
             <Switch>
               <Route path="/system/user-manage" component={UserManage} />
               <Route
@@ -24,8 +33,9 @@ class System extends Component {
                 }}
               />
             </Switch>
-          </div>
+          </main>
         </div>
+        <footer className="system-footer">Bản quyền &copy; 2025</footer>
       </React.Fragment>
     );
   }

@@ -2,6 +2,7 @@ import React, { Component } from "react";
 import { connect } from "react-redux";
 import { push } from "connected-react-router";
 import * as actions from "../../store/actions";
+import { toast } from "react-toastify";
 
 import "./Login.scss";
 import {
@@ -25,7 +26,7 @@ class Login extends Component {
       firstName: "",
       lastName: "",
       address: "",
-      gender: "M",
+      gender: "",
       phone: "",
       avatar: "",
       roleId: "3",
@@ -34,6 +35,61 @@ class Login extends Component {
       activeForm: "login",
       forgotPasswordEmail: "",
     };
+  }
+
+  componentDidMount() {
+    this.setState({ errMessage: "" });
+
+    const urlParams = new URLSearchParams(window.location.search);
+    const token = urlParams.get("token");
+    const user_id = urlParams.get("user_id");
+    const role_id = urlParams.get("role_id");
+    const first_name = urlParams.get("first_name");
+    const last_name = urlParams.get("last_name");
+    const avatar = urlParams.get("avatar");
+    const errorMessage = urlParams.get("message");
+    const loginStatus = urlParams.get("status");
+
+    if (token && user_id && role_id) {
+      const decodedFirstName = decodeURIComponent(first_name || "");
+      const decodedLastName = decodeURIComponent(last_name || "");
+      const decodedAvatar = decodeURIComponent(avatar || "");
+
+      localStorage.setItem("jwtToken", token);
+
+      const userInfo = {
+        user_id: user_id,
+        role_id: +role_id,
+        first_name: decodedFirstName,
+        last_name: decodedLastName,
+        avatar: decodedAvatar,
+      };
+      localStorage.setItem("userInfo", JSON.stringify(userInfo));
+
+      this.props.userLoginSuccess(userInfo);
+
+      toast.success("Đăng nhập Google thành công!");
+
+      if (role_id === "1") {
+        this.props.navigate("/system/user-manage");
+      } else {
+        this.props.navigate("/home");
+      }
+
+      window.history.replaceState({}, document.title, window.location.pathname);
+    } else if (loginStatus === "error" && errorMessage) {
+      const decodedErrorMessage = decodeURIComponent(errorMessage);
+      this.setState({ errMessage: decodedErrorMessage });
+      toast.error(decodedErrorMessage);
+      window.history.replaceState({}, document.title, window.location.pathname);
+    } else if (window.history.replaceState && window.location.search) {
+      const cleanUrl =
+        window.location.protocol +
+        "//" +
+        window.location.host +
+        window.location.pathname;
+      window.history.replaceState({ path: cleanUrl }, "", cleanUrl);
+    }
   }
 
   handleOnChangeEmail = (event) => {
@@ -156,8 +212,6 @@ class Login extends Component {
       !confirmPassword ||
       !firstName ||
       !lastName ||
-      !address ||
-      !gender ||
       !phone
     ) {
       this.setState({
@@ -189,8 +243,8 @@ class Login extends Component {
         password: regPassword,
         first_name: firstName,
         last_name: lastName,
-        address: address,
-        gender: gender === "M" ? "Nam" : gender === "F" ? "Nữ" : "Khác",
+        address: address || null,
+        gender: gender === "M" ? "Nam" : gender === "F" ? "Nữ" : null,
         phone: phone,
         role_id: +roleId,
         position_id: +positionId,
@@ -242,6 +296,15 @@ class Login extends Component {
 
   handleTabChange = (tab) => {
     this.setState({ activeTab: tab, activeForm: tab, errMessage: "" });
+  };
+
+  handleGoogleLoginRedirect = () => {
+    window.location.href = `${process.env.REACT_APP_BACKEND_URL}/auth/google`;
+  };
+
+  handleFacebookLogin = () => {
+    console.log("Clicked Facebook login (placeholder)");
+    alert("Tính năng đăng nhập Facebook đang được phát triển!");
   };
 
   render() {
@@ -319,8 +382,21 @@ class Login extends Component {
                 <div className="line"></div>
               </div>
               <div className="social-login">
-                <i className="fab fa-google-plus-g google-icon"></i>
-                <i className="fab fa-facebook-f facebook-icon"></i>
+                <div
+                  className="social-icon-wrapper google-icon-wrapper"
+                  onClick={this.handleGoogleLoginRedirect}
+                  style={{ cursor: "pointer" }}
+                >
+                  <i className="fab fa-google-plus-g google-icon"></i>
+                </div>
+
+                <div
+                  className="social-icon-wrapper facebook-icon-wrapper"
+                  onClick={this.handleFacebookLogin}
+                  style={{ cursor: "pointer" }}
+                >
+                  <i className="fab fa-facebook-f facebook-icon"></i>
+                </div>
               </div>
             </div>
           )}
@@ -397,7 +473,7 @@ class Login extends Component {
                   </div>
                 </div>
                 <div className="form-group">
-                  <label htmlFor="address">Địa chỉ:</label>
+                  <label htmlFor="address">Địa chỉ (không bắt buộc):</label>
                   <input
                     type="text"
                     id="address"
@@ -410,7 +486,7 @@ class Login extends Component {
                   />
                 </div>
                 <div className="form-group">
-                  <label htmlFor="gender">Giới tính:</label>
+                  <label htmlFor="gender">Giới tính (Không bắt buộc):</label>
                   <select
                     id="gender"
                     className="form-control"
@@ -421,7 +497,6 @@ class Login extends Component {
                   >
                     <option value="M">Nam</option>
                     <option value="F">Nữ</option>
-                    <option value="O">Khác</option>
                   </select>
                 </div>
                 <div className="form-group">
@@ -489,7 +564,6 @@ class Login extends Component {
 
 const mapStateToProps = (state) => {
   return {
-    language: state.app.language,
     isLoggedIn: state.user.isLoggedIn,
   };
 };

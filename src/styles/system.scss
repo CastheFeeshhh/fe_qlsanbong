@@ -1,0 +1,39 @@
+.system-layout {
+  display: flex;
+  min-height: 100vh;
+  padding-top: 80px; // để trừ phần header
+
+  .system-sidebar {
+    width: 220px;
+    background-color: #2f4050;
+    color: #fff;
+    padding: 20px;
+    ul {
+      list-style: none;
+      padding: 0;
+      li {
+        margin: 15px 0;
+        a {
+          color: #fff;
+          text-decoration: none;
+          &:hover {
+            text-decoration: underline;
+          }
+        }
+      }
+    }
+  }
+
+  .system-main-content {
+    flex: 1;
+    padding: 20px;
+    background-color: #f5f6fa;
+  }
+}
+
+.system-footer {
+  background-color: #2f4050;
+  color: white;
+  text-align: center;
+  padding: 10px 0;
+}

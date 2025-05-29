@@ -23,6 +23,7 @@
     "react-datepicker": "^8.3.0",
     "react-dom": "^17.0.2",
     "react-flatpickr": "^3.10.7",
+    "react-google-login": "^5.2.2",
     "react-intl": "^5.20.2",
     "react-redux": "^7.2.4",
     "react-router": "^5.2.0",
