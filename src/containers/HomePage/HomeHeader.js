@@ -3,6 +3,7 @@ import { connect } from "react-redux";
 import "../../styles/homeHeader.scss";
 import { withRouter } from "react-router-dom/cjs/react-router-dom.min";
 import { processLogout } from "../../store/actions";
+import defaultAvatar from "../../assets/images/default_avatar.jpg";
 
 class HomeHeader extends Component {
   handleGoHome = () => {
@@ -29,7 +30,6 @@ class HomeHeader extends Component {
   render() {
     const { activeTab, isLoggedIn, userInfo } = this.props;
 
-    const defaultAvatar = "https://via.placeholder.com/40?text=User";
     const userAvatarSrc =
       isLoggedIn && userInfo && userInfo.avatar
         ? userInfo.avatar

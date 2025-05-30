@@ -66,7 +66,6 @@ class App extends Component {
       const token = localStorage.getItem("token");
       if (token) {
         const userInfo = { token };
-        console.log("userInfo ở App.js (componentDidUpdate): ", userInfo);
         console.log("trạng thái đăng nhập: isLogin:", this.props.isLoggedIn);
       }
     }

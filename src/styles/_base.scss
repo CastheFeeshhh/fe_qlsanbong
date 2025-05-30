@@ -94,9 +94,9 @@
         }
         .btn-close {
           position: absolute;
-          color: $common-text-color;
           i {
-            line-height: 35px;
+            background-color: $colormain;
+            line-height: 25px;
             font-size: $base-size + 2px;
           }
         }

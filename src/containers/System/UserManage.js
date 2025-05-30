@@ -1,22 +1,25 @@
 import React, { Component } from "react";
-import { FormattedMessage } from "react-intl";
-import { connect } from "react-redux";
+import "../../styles/system.scss";
 import {
-  getAllUsers,
+  getAllCustomers,
   createNewUserService,
   deleteUserService,
   editUserService,
 } from "../../services/userService";
-import "./userManage.scss";
+
 import ModalUser from "./ModalUser";
-import { emitter } from "../../utils/emitter";
 import ModalEditUser from "./ModalEditUser";
+import { emitter } from "../../utils/emitter";
+import { toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 class UserManage extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      arrUsers: [],
+      customers: [],
+      loading: true,
+      error: null,
       isOpenModalUser: false,
       isOpenModalEditUser: false,
       userEdit: {},
@@ -24,15 +27,31 @@ class UserManage extends Component {
   }
 
   async componentDidMount() {
-    await this.getAllUsersFromReact();
+    await this.loadUsers();
   }
 
-  getAllUsersFromReact = async () => {
-    let response = await getAllUsers("ALL");
-    if (response && response.errCode === 0) {
+  loadUsers = async () => {
+    this.setState({ loading: true, error: null });
+
+    try {
+      const customerRes = await getAllCustomers();
+      const customersWithRole = customerRes.users.map((user) => ({
+        ...user,
+        role: "customer",
+      }));
+
       this.setState({
-        arrUsers: response.users,
+        customers: customersWithRole,
+        loading: false,
       });
+    } catch (err) {
+      console.error("Error loading customers:", err);
+      this.setState({
+        error:
+          "Failed to fetch customers. Please check your network and try again.",
+        loading: false,
+      });
+      toast.error("Tải dữ liệu khách hàng thất bại!");
     }
   };
 
@@ -48,81 +67,117 @@ class UserManage extends Component {
     });
   };
 
-  toggleUserEditModal = () => {
-    this.setState({
-      isOpenModalEditUser: !this.state.isOpenModalEditUser,
-    });
-  };
-
   createNewUser = async (data) => {
     try {
-      let response = await createNewUserService(data);
+      const { gender, ...userDataWithoutGender } = data;
+      const newUser = {
+        ...userDataWithoutGender,
+        role_id: "3",
+        position_id: "1",
+      };
+
+      let response = await createNewUserService(newUser);
       if (response && response.errCode !== 0) {
-        alert(response.errMessage);
+        toast.error(response.errMessage || "Thêm khách hàng thất bại!");
       } else {
-        await this.getAllUsersFromReact();
+        await this.loadUsers();
         this.setState({
           isOpenModalUser: false,
         });
-        emitter.emit("EVENT_CLEAR_MODAL_DATA", { id: "your id" });
+        emitter.emit("EVENT_CLEAR_MODAL_DATA");
+        toast.success("Thêm khách hàng mới thành công!");
       }
     } catch (e) {
-      console.log(e);
-    }
-  };
-
-  handleDeleteUser = async (user) => {
-    console.log("delete", user);
-    try {
-      let res = await deleteUserService(user.user_id);
-
-      if (res && res.errCode === 0) {
-        console.log("check:", user.user_id);
-        await this.getAllUsersFromReact();
-      } else {
-        alert(res.errMessage);
-      }
-      console.log(res);
-    } catch (e) {
-      console.log(e);
+      console.error("Error creating new customer:", e);
+      toast.error("Có lỗi xảy ra khi thêm khách hàng mới!");
     }
   };
 
   handleEditUser = (user) => {
-    console.log("check user", user);
     this.setState({
       isOpenModalEditUser: true,
       userEdit: user,
     });
   };
 
+  toggleUserEditModal = () => {
+    this.setState({
+      isOpenModalEditUser: !this.state.isOpenModalEditUser,
+    });
+  };
+
   doEditUser = async (user) => {
     try {
-      console.log("check2:", user);
-      let res = await editUserService(user);
+      const { gender, ...userDataWithoutGender } = user;
+      let res = await editUserService(userDataWithoutGender);
       if (res && res.errCode === 0) {
         this.setState({
           isOpenModalEditUser: false,
         });
-        this.getAllUsersFromReact();
+        await this.loadUsers();
+        toast.success("Cập nhật thông tin khách hàng thành công!");
       } else {
-        alert(res.errCode + res.errMessage);
+        toast.error(
+          res.errCode + " - " + res.errMessage || "Cập nhật thất bại!"
+        );
       }
     } catch (e) {
-      console.log(e);
+      console.error("Error editing customer:", e);
+      toast.error("Có lỗi xảy ra khi cập nhật khách hàng!");
+    }
+  };
+
+  handleDeleteUser = async (user) => {
+    try {
+      let res = await deleteUserService(user.id || user.user_id);
+
+      if (res && res.errCode === 0) {
+        await this.loadUsers();
+        toast.success("Xóa khách hàng thành công!");
+      } else {
+        toast.error(res.errMessage || "Xóa khách hàng thất bại!");
+      }
+    } catch (e) {
+      console.error("Error deleting customer:", e);
+      toast.error("Có lỗi xảy ra khi xóa khách hàng!");
     }
   };
 
   render() {
-    let arrUsers = this.state.arrUsers;
-    console.log("userInfo:", this.props.userInfo);
+    const { customers, loading, error } = this.state;
+
+    const userGroups = {
+      "Khách hàng": customers,
+    };
+
+    if (loading) {
+      return (
+        <div className="system-main-content">
+          <h1 className="title">QUẢN LÝ KHÁCH HÀNG</h1>
+          <div className="loading-state">Đang tải dữ liệu khách hàng...</div>
+        </div>
+      );
+    }
+
+    if (error) {
+      return (
+        <div className="system-main-content">
+          <h1 className="title">QUẢN LÝ KHÁCH HÀNG</h1>
+          <div className="error-state">{error}</div>
+        </div>
+      );
+    }
+
     return (
-      <div className="users-container">
+      <div className="system-main-content">
+        <h1 className="title">QUẢN LÝ KHÁCH HÀNG</h1>
+
         <ModalUser
           isOpen={this.state.isOpenModalUser}
           toggleFromParent={this.toggleUserModal}
           createNewUser={this.createNewUser}
         />
+
         {this.state.isOpenModalEditUser && (
           <ModalEditUser
             isOpen={this.state.isOpenModalEditUser}
@@ -131,67 +186,86 @@ class UserManage extends Component {
             editUser={this.doEditUser}
           />
         )}
-        <div className="title text-center">QUẢN LÝ NGƯỜI DÙNG</div>
-        <div className="mx-1">
-          <button
-            className="btn btn-primary px-3"
-            onClick={() => this.handleAddNewUser()}
-          >
-            <i className="fas fa-plus"></i> Add new users
-          </button>
-        </div>
-        <div className="users-table mt-3 mx-1">
-          <table id="customers">
-            <tr>
-              <th>Email</th>
-              <th>First name</th>
-              <th>Last name</th>
-              <th>Address</th>
-              <th>Gender</th>
-              <th>Actions</th>
-            </tr>
 
-            {arrUsers &&
-              arrUsers.map((item, index) => {
-                return (
-                  <tr>
-                    <td>{item.email}</td>
-                    <td>{item.first_name}</td>
-                    <td>{item.last_name}</td>
-                    <td>{item.address}</td>
-                    <td>{item.gender}</td>
-                    <td>
-                      <button
-                        className="btn-edit"
-                        onClick={() => this.handleEditUser(item)}
-                      >
-                        <i className="fas fa-edit"></i>
-                      </button>
-                      <button
-                        className="btn-delete"
-                        onClick={() => {
-                          this.handleDeleteUser(item);
-                        }}
-                      >
-                        <i className="fas fa-trash-alt"></i>
-                      </button>
-                    </td>
-                  </tr>
-                );
-              })}
-          </table>
+        <div className="admin-card">
+          <div className="card-header">
+            <h3>Danh sách khách hàng</h3>
+            <button className="btn btn-primary" onClick={this.handleAddNewUser}>
+              <i className="fas fa-plus"></i> Thêm khách hàng mới
+            </button>
+          </div>
+          <div className="card-body">
+            {Object.keys(userGroups).map((roleGroup) => (
+              <div key={roleGroup} className="user-role-group">
+                <h4 className="role-group-title">
+                  {roleGroup} - {userGroups[roleGroup].length}
+                </h4>
+                <div className="table-responsive">
+                  <table id="customers">
+                    <thead>
+                      <tr>
+                        <th>Email</th>
+                        <th>Họ đệm</th>
+                        <th>Tên</th>
+                        <th>Địa chỉ</th>
+                        <th>Số điện thoại</th>
+                        <th>Thao tác</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {userGroups[roleGroup].length > 0 ? (
+                        userGroups[roleGroup].map((user) => (
+                          <tr key={user.id || user.email || user.user_id}>
+                            <td data-label="Email">{user.email}</td>
+                            <td data-label="First Name">{user.first_name}</td>
+                            <td data-label="Last Name">{user.last_name}</td>
+                            <td data-label="Address">{user.address}</td>
+                            <td data-label="Phone Number">
+                              {user.phone_number || user.phone}
+                            </td>
+                            <td
+                              data-label="Actions"
+                              className="btn-action-group"
+                            >
+                              <button
+                                className="btn btn-edit"
+                                onClick={() => this.handleEditUser(user)}
+                              >
+                                <i className="fas fa-edit"></i>
+                              </button>
+                              <button
+                                className="btn btn-delete"
+                                onClick={() => this.handleDeleteUser(user)}
+                              >
+                                <i className="fas fa-trash-alt"></i>
+                              </button>
+                            </td>
+                          </tr>
+                        ))
+                      ) : (
+                        <tr>
+                          <td
+                            colSpan="6"
+                            style={{
+                              textAlign: "center",
+                              padding: "20px",
+                              color: "#666",
+                            }}
+                          >
+                            Không có khách hàng nào.
+                          </td>
+                        </tr>
+                      )}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            ))}
+          </div>
         </div>
       </div>
     );
   }
 }
 
-const mapStateToProps = (state) => {
-  return {};
-};
-
-const mapDispatchToProps = (dispatch) => {
-  return {};
-};
-
-export default connect(mapStateToProps, mapDispatchToProps)(UserManage);
+export default UserManage;

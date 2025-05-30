@@ -302,9 +302,8 @@ class Login extends Component {
     window.location.href = `${process.env.REACT_APP_BACKEND_URL}/auth/google`;
   };
 
-  handleFacebookLogin = () => {
-    console.log("Clicked Facebook login (placeholder)");
-    alert("Tính năng đăng nhập Facebook đang được phát triển!");
+  handleFacebookLoginRedirect = () => {
+    window.location.href = `${process.env.REACT_APP_BACKEND_URL}/auth/facebook`;
   };
 
   render() {
@@ -392,7 +391,7 @@ class Login extends Component {
 
                 <div
                   className="social-icon-wrapper facebook-icon-wrapper"
-                  onClick={this.handleFacebookLogin}
+                  onClick={this.handleFacebookLoginRedirect}
                   style={{ cursor: "pointer" }}
                 >
                   <i className="fab fa-facebook-f facebook-icon"></i>

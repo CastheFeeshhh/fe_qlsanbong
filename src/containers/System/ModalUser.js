@@ -13,6 +13,7 @@ class ModalUser extends Component {
       first_name: "",
       last_name: "",
       address: "",
+      phone: "",
     };
 
     this.listenToEmitter();
@@ -26,6 +27,7 @@ class ModalUser extends Component {
         first_name: "",
         last_name: "",
         address: "",
+        phone: "",
       });
     });
   }
@@ -54,7 +56,14 @@ class ModalUser extends Component {
 
   checkValidateInput = () => {
     let isValid = true;
-    let arrInput = ["email", "password", "first_name", "last_name", "address"];
+    let arrInput = [
+      "email",
+      "password",
+      "first_name",
+      "last_name",
+      "address",
+      "phone",
+    ];
     for (let i = 0; i < arrInput.length; i++) {
       if (!this.state[arrInput[i]]) {
         isValid = false;
@@ -91,7 +100,7 @@ class ModalUser extends Component {
             this.toggle();
           }}
         >
-          Create new user
+          Thêm người dùng
         </ModalHeader>
         <ModalBody>
           <div className="modal-user-body">
@@ -106,7 +115,7 @@ class ModalUser extends Component {
               />
             </div>
             <div className="input-container">
-              <label>Password</label>
+              <label>Mật khẩu</label>
               <input
                 type="password"
                 onChange={(event) => {
@@ -116,7 +125,7 @@ class ModalUser extends Component {
               />
             </div>
             <div className="input-container">
-              <label>First Name</label>
+              <label>Họ đệm</label>
               <input
                 type="text"
                 onChange={(event) => {
@@ -126,7 +135,7 @@ class ModalUser extends Component {
               />
             </div>
             <div className="input-container">
-              <label>Last Name</label>
+              <label>Tên</label>
               <input
                 type="text"
                 onChange={(event) => {
@@ -136,13 +145,23 @@ class ModalUser extends Component {
               />
             </div>
             <div className="input-container max-width-input">
-              <label>Address</label>
+              <label>Địa chỉ</label>
               <input
                 type="text"
                 onChange={(event) => {
                   this.handleOnChangeInput(event, "address");
                 }}
                 value={this.state.address}
+              />
+            </div>
+            <div className="input-container max-width-input">
+              <label>Số điện thoại</label>
+              <input
+                type="text"
+                onChange={(event) => {
+                  this.handleOnChangeInput(event, "phone");
+                }}
+                value={this.state.phone}
               />
             </div>
           </div>
@@ -155,7 +174,7 @@ class ModalUser extends Component {
               this.handleAddNewUser();
             }}
           >
-            Add new
+            Thêm mới
           </Button>{" "}
           <Button
             color="secondary"
@@ -164,7 +183,7 @@ class ModalUser extends Component {
               this.toggle();
             }}
           >
-            Close
+            Đóng
           </Button>
         </ModalFooter>
       </Modal>

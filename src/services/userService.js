@@ -19,6 +19,18 @@ const getAllUsers = (inputId) => {
   return axios.get(`/api/get-all-users?id=${inputId}`);
 };
 
+const getAllAdmins = () => {
+  return axios.get(`/api/get-all-admins`);
+};
+
+const getAllStaffs = () => {
+  return axios.get(`/api/get-all-staffs`);
+};
+
+const getAllCustomers = () => {
+  return axios.get(`/api/get-all-customers`);
+};
+
 const createNewUserService = (data) => {
   console.log("check data from service : ", data);
   return axios.post("/api/create-new-user", data);
@@ -40,6 +52,9 @@ export {
   handleRegisterApi,
   handleForgotPasswordApi,
   getAllUsers,
+  getAllAdmins,
+  getAllStaffs,
+  getAllCustomers,
   createNewUserService,
   deleteUserService,
   editUserService,
