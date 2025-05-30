@@ -3,6 +3,8 @@ import { connect } from "react-redux";
 import { Redirect, Route, Switch, NavLink } from "react-router-dom";
 import UserManage from "../containers/System/UserManage";
 import AdminManage from "../containers/System/AdminManage";
+import FieldManage from "../containers/System/FieldManage";
+
 import Header from "../containers/HomePage/HomeHeader";
 import Footer from "../containers/HomePage/HomeFooter";
 import "../styles/system.scss";
@@ -205,6 +207,7 @@ class System extends Component {
             <Switch>
               <Route path="/system/user-manage" component={UserManage} />
               <Route path="/system/admin-manage" component={AdminManage} />
+              <Route path="/system/field-manage" component={FieldManage} />
 
               <Route
                 component={() => {

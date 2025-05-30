@@ -10,6 +10,8 @@ export const path = {
   FIELDNEWS: "/field-news",
   CONTACT: "/contact",
   PAYMENT: "/payment",
+  VNPAY: "/vnpay_return",
+  PAYMENTRETURN: "/payment-return",
   LOGIN: "/login",
   LOG_OUT: "/logout",
   RESET_PASSWORD: "/reset-password",

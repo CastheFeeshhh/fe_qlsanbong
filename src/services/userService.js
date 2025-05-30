@@ -47,6 +47,72 @@ const editUserService = (inputData) => {
   return axios.put("/api/edit-user", inputData);
 };
 
+const createVnpayPayment = async (invoiceId, amount, orderInfo) => {
+  const url = `${process.env.REACT_APP_BACKEND_URL}/api/vnpay/create_payment_url`;
+
+  const payload = { invoiceId, amount, orderInfo };
+
+  try {
+    const response = await fetch(url, {
+      method: "POST",
+
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${localStorage.getItem("token")}`,
+      },
+
+      body: JSON.stringify(payload),
+    });
+
+    const responseText = await response.text();
+
+    let parsedData = undefined;
+
+    if (responseText) {
+      try {
+        parsedData = JSON.parse(responseText);
+      } catch (jsonParseError) {
+        console.error(
+          "FETCH TEST: ERROR parsing JSON from Fetch text:",
+          jsonParseError
+        );
+
+        console.error("Malformed JSON string from Fetch:", responseText);
+      }
+    } else {
+      console.log("FETCH TEST 9: Response text is empty or null.");
+    }
+
+    if (!response.ok) {
+      console.error("FETCH TEST 10: Fetch response not OK. Returning error.");
+
+      return {
+        errCode: response.status,
+        errMessage: parsedData?.errMessage || `Lỗi server: ${response.status}`,
+      };
+    }
+
+    return parsedData;
+  } catch (error) {
+    console.error(
+      "FETCH TEST 12: Error caught in createVnpayPayment (Fetch API):",
+      error
+    );
+
+    if (error.name === "TypeError" && error.message === "Failed to fetch") {
+      return {
+        errCode: -1,
+        errMessage: "Lỗi mạng hoặc server không phản hồi.",
+      };
+    }
+
+    return {
+      errCode: -1,
+      errMessage: `Lỗi kết nối hoặc không xác định: ${error.message}`,
+    };
+  } finally {
+  }
+};
 export {
   handleLoginApi,
   handleRegisterApi,
@@ -58,4 +124,5 @@ export {
   createNewUserService,
   deleteUserService,
   editUserService,
+  createVnpayPayment,
 };

@@ -23,6 +23,7 @@ import fieldSchedule from "../routes/fieldSchedule";
 import fieldNews from "../routes/fieldNews";
 import contact from "../routes/contact";
 import payment from "../routes/payment";
+import paymentReturn from "../routes/paymentReturn";
 
 class App extends Component {
   constructor(props) {
@@ -103,6 +104,8 @@ class App extends Component {
                 <Route path={path.FIELDNEWS} component={fieldNews} />
                 <Route path={path.CONTACT} component={contact} />
                 <Route path={path.PAYMENT} component={payment} />
+                <Route path={path.VNPAY} component={payment} />
+                <Route path={path.PAYMENTRETURN} component={paymentReturn} />
               </Switch>
             </span>
           </div>

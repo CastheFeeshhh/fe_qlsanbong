@@ -1,8 +1,7 @@
 import React, { Component } from "react";
 import "../../styles/system.scss";
 import {
-  getAllAdmins,
-  getAllStaffs,
+  getAllCustomers,
   createNewUserService,
   deleteUserService,
   editUserService,
@@ -14,12 +13,11 @@ import { emitter } from "../../utils/emitter";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
-class AdminManage extends Component {
+class FieldManage extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      admins: [],
-      staffs: [],
+      fields: [],
       loading: true,
       error: null,
       isOpenModalUser: false,
@@ -28,44 +26,32 @@ class AdminManage extends Component {
     };
   }
 
-  componentDidMount() {
-    this.loadUsers();
+  async componentDidMount() {
+    await this.loadUsers();
   }
 
   loadUsers = async () => {
     this.setState({ loading: true, error: null });
 
     try {
-      const adminRes = await getAllAdmins();
-      const staffRes = await getAllStaffs();
-
-      const adminsWithRole = adminRes.users.map((user, index) => {
-        return {
-          ...user,
-          role: "admin",
-        };
-      });
-      console.log("a1.5", adminsWithRole);
-
-      const staffsWithRole = staffRes.users.map((user, index) => {
-        return {
-          ...user,
-          role: "staff",
-        };
-      });
+      const customerRes = await getAllCustomers();
+      const customersWithRole = customerRes.users.map((user) => ({
+        ...user,
+        role: "customer",
+      }));
 
       this.setState({
-        admins: adminsWithRole,
-        staffs: staffsWithRole,
+        customers: customersWithRole,
         loading: false,
       });
     } catch (err) {
-      console.error("Error loading users:", err);
+      console.error("Error loading customers:", err);
       this.setState({
         error:
-          "Failed to fetch users. Please check your network and try again.",
+          "Failed to fetch customers. Please check your network and try again.",
         loading: false,
       });
+      toast.error("Tải dữ liệu khách hàng thất bại!");
     }
   };
 
@@ -99,7 +85,7 @@ class AdminManage extends Component {
         if (response.errMessage) {
           toast.error(response.errMessage);
         } else {
-          toast.error("Thêm nhân viên thất bại!");
+          toast.error("Thêm khách hàng thất bại!");
         }
       } else if (response && response.errCode === 0) {
         await this.loadUsers();
@@ -107,14 +93,14 @@ class AdminManage extends Component {
           isOpenModalUser: false,
         });
         emitter.emit("EVENT_CLEAR_MODAL_DATA");
-        toast.success("Thêm nhân viên mới thành công!");
+        toast.success("Thêm khách hàng mới thành công!");
       } else {
         toast.error(
           "Không nhận được phản hồi hợp lệ từ máy chủ. Vui lòng thử lại!"
         );
       }
     } catch (e) {
-      console.error("Lỗi khi tạo nhân viên mới:", e);
+      console.error("Lỗi khi tạo khách hàng mới:", e);
 
       if (e.response && e.response.data && e.response.data.errMessage) {
         toast.error(e.response.data.errMessage);
@@ -123,7 +109,7 @@ class AdminManage extends Component {
       } else if (e.message) {
         toast.error(`Lỗi kết nối: ${e.message}`);
       } else {
-        toast.error("Có lỗi xảy ra khi thêm nhân viên mới!");
+        toast.error("Có lỗi xảy ra khi thêm khách hàng mới!");
       }
     }
   };
@@ -150,7 +136,7 @@ class AdminManage extends Component {
           isOpenModalEditUser: false,
         });
         await this.loadUsers();
-        toast.success("Cập nhật thông tin nhân viên thành công!");
+        toast.success("Cập nhật thông tin khách hàng thành công!");
       } else {
         toast.error(
           res.errCode + " - " + res.errMessage || "Cập nhật thất bại!"
@@ -158,7 +144,7 @@ class AdminManage extends Component {
       }
     } catch (e) {
       console.error("Error editing customer:", e);
-      toast.error("Có lỗi xảy ra khi cập nhật nhân viên!");
+      toast.error("Có lỗi xảy ra khi cập nhật khách hàng!");
     }
   };
 
@@ -168,29 +154,28 @@ class AdminManage extends Component {
 
       if (res && res.errCode === 0) {
         await this.loadUsers();
-        toast.success("Xóa nhân viên thành công!");
+        toast.success("Xóa khách hàng thành công!");
       } else {
-        toast.error(res.errMessage || "Xóa nhân viên thất bại!");
+        toast.error(res.errMessage || "Xóa khách hàng thất bại!");
       }
     } catch (e) {
       console.error("Error deleting customer:", e);
-      toast.error("Có lỗi xảy ra khi xóa nhân viên!");
+      toast.error("Có lỗi xảy ra khi xóa khách hàng!");
     }
   };
 
   render() {
-    const { admins, staffs, loading, error } = this.state;
+    const { customers, loading, error } = this.state;
 
     const userGroups = {
-      Admin: admins,
-      "Nhân viên": staffs,
+      "Khách hàng": customers,
     };
 
     if (loading) {
       return (
         <div className="system-main-content">
-          <h1 className="title">QUẢN LÝ NHÂN VIÊN</h1>
-          <div className="loading-state">Đang tải dữ liệu người dùng...</div>
+          <h1 className="title">QUẢN LÝ KHÁCH HÀNG</h1>
+          <div className="loading-state">Đang tải dữ liệu khách hàng...</div>
         </div>
       );
     }
@@ -198,7 +183,7 @@ class AdminManage extends Component {
     if (error) {
       return (
         <div className="system-main-content">
-          <h1 className="title">QUẢN LÝ NHÂN VIÊN</h1>
+          <h1 className="title">QUẢN LÝ KHÁCH HÀNG</h1>
           <div className="error-state">{error}</div>
         </div>
       );
@@ -206,12 +191,12 @@ class AdminManage extends Component {
 
     return (
       <div className="system-main-content">
-        <h1 className="title">QUẢN LÝ NHÂN VIÊN</h1>
+        <h1 className="title">QUẢN LÝ KHÁCH HÀNG</h1>
 
         <ModalUser
           isOpen={this.state.isOpenModalUser}
           toggleFromParent={this.toggleUserModal}
-          roleIdToAssign={"2"}
+          roleIdToAssign={"3"}
           createNewUser={this.createNewUser}
         />
 
@@ -226,9 +211,9 @@ class AdminManage extends Component {
 
         <div className="admin-card">
           <div className="card-header">
-            <h3>Danh sách quản lý </h3>
+            <h3>Danh sách khách hàng</h3>
             <button className="btn btn-primary" onClick={this.handleAddNewUser}>
-              <i className="fas fa-plus"></i> Thêm nhân viên mới
+              <i className="fas fa-plus"></i> Thêm khách hàng mới
             </button>
           </div>
           <div className="card-body">
@@ -289,7 +274,7 @@ class AdminManage extends Component {
                               color: "#666",
                             }}
                           >
-                            Không có nh nào.
+                            Không có khách hàng nào.
                           </td>
                         </tr>
                       )}
@@ -305,4 +290,4 @@ class AdminManage extends Component {
   }
 }
 
-export default AdminManage;
+export default FieldManage;

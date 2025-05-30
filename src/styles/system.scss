@@ -560,6 +560,13 @@ body.modal-open {
     letter-spacing: 0.5px !important;
     font-size: 0.9rem !important;
     white-space: nowrap !important;
+
+    th:nth-child(1), td:nth-child(1) { width: 25%; } /* Email */
+    th:nth-child(2), td:nth-child(2) { width: 15%; } /* Họ đệm */
+    th:nth-child(3), td:nth-child(3) { width: 10%; } /* Tên */
+    th:nth-child(4), td:nth-child(4) { width: 25%; } /* Địa chỉ */
+    th:nth-child(5), td:nth-child(5) { width: 15%; } /* Số điện thoại */
+    th:nth-child(6), td:nth-child(6) { width: 10%; }
 }
 
 #customers tr {
@@ -594,23 +601,23 @@ body.modal-open {
 }
 
 #customers th:nth-child(1), #customers td:nth-child(1) {
-    width: 20% !important;
+    width: 40% !important;
     min-width: 180px !important;
 }
 #customers th:nth-child(2), #customers td:nth-child(2) {
-    width: 12% !important;
+    width: 15% !important;
     min-width: 100px !important;
 }
 #customers th:nth-child(3), #customers td:nth-child(3) {
-    width: 12% !important;
+    width: 5% !important;
     min-width: 100px !important;
 }
 #customers th:nth-child(4), #customers td:nth-child(4) {
-    width: 35% !important;
+    width: 70% !important;
     min-width: 300px !important;
 }
 #customers th:nth-child(5), #customers td:nth-child(5) {
-    width: 15% !important;
+    width: 10% !important;
     min-width: 120px !important;
 }
 #customers th:nth-child(6), #customers td:nth-child(6) {
@@ -801,3 +808,4 @@ body.modal-open {
 display: flex;
 gap: 10px; 
 }
+

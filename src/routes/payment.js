@@ -3,6 +3,7 @@ import HomeHeader from "../containers/HomePage/HomeHeader";
 import HomeFooter from "../containers/HomePage/HomeFooter";
 import { withRouter } from "react-router-dom";
 import "../styles/payment.scss";
+import { createVnpayPayment } from "../services/userService";
 
 class PaymentPage extends Component {
   constructor(props) {
@@ -12,10 +13,26 @@ class PaymentPage extends Component {
       loading: true,
       error: null,
       allServicesMap: {},
+      vnpayError: null,
+      paymentStatusMessage: null,
+      returnInvoiceId: null,
+      returnResultCode: null,
+      isProcessingPayment: false,
     };
   }
 
   componentDidMount() {
+    this.processOrderInfo();
+    this.processVnpayReturnParams();
+  }
+
+  componentDidUpdate(prevProps) {
+    if (this.props.location.search !== prevProps.location.search) {
+      this.processVnpayReturnParams();
+    }
+  }
+
+  processOrderInfo = () => {
     if (this.props.location.state && this.props.location.state.booking_id) {
       const servicesArray = this.props.location.state.services || [];
       const servicesMap = servicesArray.reduce((acc, service) => {
@@ -34,7 +51,36 @@ class PaymentPage extends Component {
         loading: false,
       });
     }
-  }
+  };
+
+  processVnpayReturnParams = () => {
+    const queryParams = new URLSearchParams(this.props.location.search);
+    const vnp_txn_ref = queryParams.get("vnp_txn_ref");
+    const paymentStatus = queryParams.get("paymentStatus");
+    const resultCode = queryParams.get("resultCode");
+
+    if (vnp_txn_ref && paymentStatus) {
+      this.setState({
+        returnInvoiceId: vnp_txn_ref.split("_")[0],
+        returnResultCode: resultCode,
+        paymentStatusMessage: this.getPaymentStatusMessage(paymentStatus),
+      });
+      this.props.history.replace({ search: "" });
+    }
+  };
+
+  getPaymentStatusMessage = (status) => {
+    switch (status) {
+      case "success":
+        return "Thanh toán thành công!";
+      case "failed":
+        return "Thanh toán thất bại. Vui lòng thử lại.";
+      case "pending_confirmation":
+        return "Giao dịch đang chờ xác nhận. Vui lòng kiểm tra lại sau ít phút.";
+      default:
+        return "Trạng thái thanh toán không xác định.";
+    }
+  };
 
   formatServices = (servicesObject) => {
     const { allServicesMap } = this.state;
@@ -60,9 +106,56 @@ class PaymentPage extends Component {
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
+  handleVnpayPayment = async () => {
+    const { orderInfo } = this.state;
+    if (!orderInfo || !orderInfo.booking_id || !orderInfo.final_total_price) {
+      this.setState({
+        vnpayError: "Không có thông tin đơn hàng hợp lệ để thanh toán.",
+      });
+      return;
+    }
+
+    this.setState({ isProcessingPayment: true, vnpayError: null });
+
+    try {
+      const invoiceId = orderInfo.booking_id;
+      const amount = orderInfo.final_total_price;
+      const orderDescription = `Thanh toan don hang #${invoiceId}`;
+
+      const response = await createVnpayPayment(
+        invoiceId,
+        amount,
+        orderDescription
+      );
+
+      if (response && response.errCode === 0 && response.payUrl) {
+        window.location.href = response.payUrl;
+      } else {
+        this.setState({
+          vnpayError:
+            response.errMessage ||
+            "Có lỗi xảy ra khi tạo URL thanh toán VNPAY.",
+        });
+      }
+    } catch (error) {
+      this.setState({ vnpayError: error.message || "Lỗi kết nối đến server." });
+    } finally {
+      this.setState({ isProcessingPayment: false });
+    }
+  };
+
   render() {
     this.scrollToTop();
-    const { orderInfo, loading, error } = this.state;
+    const {
+      orderInfo,
+      loading,
+      error,
+      vnpayError,
+      paymentStatusMessage,
+      returnInvoiceId,
+      returnResultCode,
+      isProcessingPayment,
+    } = this.state;
 
     if (loading) {
       return (
@@ -120,7 +213,7 @@ class PaymentPage extends Component {
           <h1 className="page-title">Trang Thanh Toán</h1>
           <div className="order-summary-box">
             <div className="summary-item">
-              <i class="fas fa-receipt info-icon"></i>
+              <i className="fas fa-receipt info-icon"></i>
               <p>
                 Mã hóa đơn: <span>#{orderInfo.booking_id}</span>
               </p>
@@ -157,7 +250,6 @@ class PaymentPage extends Component {
                 return (
                   <li key={index} className="booking-item">
                     <div className="item-row">
-                      {" "}
                       <i className="fas fa-futbol item-icon"></i>
                       <p>
                         Đội: <span>{item.teamName || orderInfo.teamName}</span>{" "}
@@ -206,7 +298,6 @@ class PaymentPage extends Component {
               Không có chi tiết đặt sân nào được tìm thấy.
             </p>
           )}
-          {/* Phần tổng tiền toàn bộ được chỉnh sửa */}
           <div className="grand-total-section">
             <p className="total-price-display">
               Tổng số tiền cần thanh toán:{" "}
@@ -218,8 +309,45 @@ class PaymentPage extends Component {
               </span>
             </p>
           </div>
+
+          {returnInvoiceId && (
+            <div className="vnpay-return-section">
+              <h3>Kết quả Thanh toán VNPAY:</h3>
+              <p>
+                Mã hóa đơn: <span>#{returnInvoiceId}</span>
+              </p>
+              <p>
+                Trạng thái:{" "}
+                <span
+                  className={
+                    paymentStatusMessage &&
+                    paymentStatusMessage.includes("thành công")
+                      ? "success-text"
+                      : "error-text"
+                  }
+                >
+                  {paymentStatusMessage}
+                </span>
+              </p>
+              <p>
+                Mã phản hồi VNPAY: <span>{returnResultCode}</span>
+              </p>
+            </div>
+          )}
+
+          {/* HIỂN THỊ LỖI KHI GỌI API VNPAY */}
+          {vnpayError && <p className="error-message">{vnpayError}</p>}
+
           <div className="payment-actions">
-            <button className="btn-primary btn-pay">Thanh toán ngay</button>
+            <button
+              className="btn-primary btn-pay"
+              onClick={this.handleVnpayPayment}
+              disabled={isProcessingPayment}
+            >
+              {isProcessingPayment
+                ? "Đang xử lý..."
+                : "Thanh toán ngay bằng VNPAY"}
+            </button>
             <button
               className="btn-secondary btn-back"
               onClick={() => this.props.history.push("/field-booking")}
