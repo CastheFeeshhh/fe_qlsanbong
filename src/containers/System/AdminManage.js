@@ -88,11 +88,26 @@ class AdminManage extends Component {
       <div className="system-main-content">
         <h1 className="title">QUẢN LÝ NHÂN VIÊN</h1>
 
+        {/* <ModalUser
+          isOpen={this.state.isOpenModalUser}
+          toggleFromParent={this.toggleUserModal}
+          createNewUser={this.createNewUser}
+        />
+
+        {this.state.isOpenModalEditUser && (
+          <ModalEditUser
+            isOpen={this.state.isOpenModalEditUser}
+            toggleFromParent={this.toggleUserEditModal}
+            currentUser={this.state.userEdit}
+            editUser={this.doEditUser}
+          />
+        )} */}
+
         <div className="admin-card">
           <div className="card-header">
-            <h3>Danh sách nhân viên</h3>
-            <button className="btn btn-primary">
-              <i className="fas fa-plus"></i> Thêm người dùng mới
+            <h3>Danh sách khách hàng</h3>
+            <button className="btn btn-primary" onClick={this.handleAddNewUser}>
+              <i className="fas fa-plus"></i> Thêm nhân viên mới
             </button>
           </div>
           <div className="card-body">
@@ -105,32 +120,39 @@ class AdminManage extends Component {
                   <table id="customers">
                     <thead>
                       <tr>
-                        <th>EMAIL</th>
-                        <th>FIRST NAME</th>
-                        <th>LAST NAME</th>
-                        <th>ADDRESS</th>
-                        <th>PHONE NUMBER</th>
-                        <th>ACTIONS</th>
+                        <th>Email</th>
+                        <th>Họ đệm</th>
+                        <th>Tên</th>
+                        <th>Địa chỉ</th>
+                        <th>Số điện thoại</th>
+                        <th>Thao tác</th>
                       </tr>
                     </thead>
                     <tbody>
                       {userGroups[roleGroup].length > 0 ? (
                         userGroups[roleGroup].map((user) => (
-                          <tr key={user.user_id || user.email}>
-                            {" "}
+                          <tr key={user.id || user.email || user.user_id}>
                             <td data-label="Email">{user.email}</td>
                             <td data-label="First Name">{user.first_name}</td>
                             <td data-label="Last Name">{user.last_name}</td>
                             <td data-label="Address">{user.address}</td>
-                            <td data-label="Phone Number">{user.phone}</td>
+                            <td data-label="Phone Number">
+                              {user.phone_number || user.phone}
+                            </td>
                             <td
                               data-label="Actions"
                               className="btn-action-group"
                             >
-                              <button className="btn btn-edit">
+                              <button
+                                className="btn btn-edit"
+                                onClick={() => this.handleEditUser(user)}
+                              >
                                 <i className="fas fa-edit"></i>
                               </button>
-                              <button className="btn btn-delete">
+                              <button
+                                className="btn btn-delete"
+                                onClick={() => this.handleDeleteUser(user)}
+                              >
                                 <i className="fas fa-trash-alt"></i>
                               </button>
                             </td>
@@ -139,14 +161,14 @@ class AdminManage extends Component {
                       ) : (
                         <tr>
                           <td
-                            colSpan="7"
+                            colSpan="6"
                             style={{
                               textAlign: "center",
                               padding: "20px",
                               color: "#666",
                             }}
                           >
-                            Không có người dùng nào thuộc nhóm này.
+                            Không có nh nào.
                           </td>
                         </tr>
                       )}

@@ -14,7 +14,7 @@ $header-bg: #ffffff;
 $header-border-color: #e0e6ed;
 
 $header-height: 60px;
-$sidebar-width: 255px;
+$sidebar-width: 260px;
 
 $border-color: #e0e6ed;
 $table-border-color: #e0e6ed;
@@ -787,11 +787,17 @@ body.modal-open {
 }
 
 .modal-user-container .modal-header .close {
+    background-color: #0b73ba !important;
     line-height: 1 !important; 
     padding: 0.5rem !important;
 }
 
 .modal-user-container .modal-header .close span {
-    font-size: 1.5rem !important; 
+    font-size: 1rem !important; 
     line-height: 1 !important;
+}
+
+.modal-footer {
+display: flex;
+gap: 10px; 
 }

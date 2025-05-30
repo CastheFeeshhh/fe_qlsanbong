@@ -64,20 +64,41 @@ class ModalUser extends Component {
       "address",
       "phone",
     ];
+
     for (let i = 0; i < arrInput.length; i++) {
       if (!this.state[arrInput[i]]) {
         isValid = false;
-        alert("Missing parameters: " + arrInput[i]);
-        break;
+        alert("Vui lòng điền đầy đủ thông tin: " + arrInput[i]);
+        return isValid;
       }
     }
+
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (this.state.email && !emailRegex.test(this.state.email)) {
+      isValid = false;
+      alert("Email không đúng định dạng. Vui lòng nhập lại!");
+      return isValid;
+    }
+
+    const phoneRegex = /^\d{10,11}$/;
+    if (this.state.phone && !phoneRegex.test(this.state.phone)) {
+      isValid = false;
+      alert("Số điện thoại không hợp lệ. Vui lòng nhập 10 hoặc 11 chữ số!");
+      return isValid;
+    }
+
     return isValid;
   };
 
   handleAddNewUser = () => {
     let isValid = this.checkValidateInput();
     if (isValid === true) {
-      this.props.createNewUser(this.state);
+      const roleId = this.props.roleIdToAssign || "3";
+      const dataToSend = {
+        ...this.state,
+        role_id: roleId,
+      };
+      this.props.createNewUser(dataToSend);
     }
     console.log("data", this.state);
   };

@@ -68,28 +68,49 @@ class UserManage extends Component {
   };
 
   createNewUser = async (data) => {
+    console.log("Dữ liệu nhận từ ModalUser:", data);
+
     try {
-      const { gender, ...userDataWithoutGender } = data;
       const newUser = {
-        ...userDataWithoutGender,
-        role_id: "3",
+        ...data,
         position_id: "1",
       };
 
+      console.log("Dữ liệu gửi đi cho createNewUserService:", newUser);
+
       let response = await createNewUserService(newUser);
+      console.log("Phản hồi từ createNewUserService:", response);
+
       if (response && response.errCode !== 0) {
-        toast.error(response.errMessage || "Thêm khách hàng thất bại!");
-      } else {
+        if (response.errMessage) {
+          toast.error(response.errMessage);
+        } else {
+          toast.error("Thêm khách hàng thất bại!");
+        }
+      } else if (response && response.errCode === 0) {
         await this.loadUsers();
         this.setState({
           isOpenModalUser: false,
         });
         emitter.emit("EVENT_CLEAR_MODAL_DATA");
         toast.success("Thêm khách hàng mới thành công!");
+      } else {
+        toast.error(
+          "Không nhận được phản hồi hợp lệ từ máy chủ. Vui lòng thử lại!"
+        );
       }
     } catch (e) {
-      console.error("Error creating new customer:", e);
-      toast.error("Có lỗi xảy ra khi thêm khách hàng mới!");
+      console.error("Lỗi khi tạo khách hàng mới:", e);
+
+      if (e.response && e.response.data && e.response.data.errMessage) {
+        toast.error(e.response.data.errMessage);
+      } else if (e.response && e.response.data && e.response.data.message) {
+        toast.error(e.response.data.message);
+      } else if (e.message) {
+        toast.error(`Lỗi kết nối: ${e.message}`);
+      } else {
+        toast.error("Có lỗi xảy ra khi thêm khách hàng mới!");
+      }
     }
   };
 
@@ -175,6 +196,7 @@ class UserManage extends Component {
         <ModalUser
           isOpen={this.state.isOpenModalUser}
           toggleFromParent={this.toggleUserModal}
+          roleIdToAssign={"3"}
           createNewUser={this.createNewUser}
         />
 
