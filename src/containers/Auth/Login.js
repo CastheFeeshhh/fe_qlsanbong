@@ -3,6 +3,7 @@ import { connect } from "react-redux";
 import { push } from "connected-react-router";
 import * as actions from "../../store/actions";
 import { toast } from "react-toastify";
+import { Redirect } from "react-router-dom";
 
 import "./Login.scss";
 import {
@@ -308,6 +309,18 @@ class Login extends Component {
 
   render() {
     const { activeForm, activeTab } = this.state;
+    const { userInfo, isLoggedIn } = this.props;
+
+    if (isLoggedIn) {
+      if (userInfo) {
+        if (userInfo.role_id === "1" || userInfo.role_id === "2") {
+          return <Redirect to={"/system/user-manage"} />;
+        } else if (userInfo.role_id === 3) {
+          return <Redirect to={"/home"} />;
+        }
+      }
+      return <Redirect to={"/home"} />;
+    }
 
     return (
       <div className="login-page-container">
@@ -329,6 +342,7 @@ class Login extends Component {
 
           {activeForm === "login" && (
             <div className="login-form-container">
+              <div className="login-logo"></div>
               <div className="login-form-header">Đăng nhập hệ thống</div>
               <div className="login-content">
                 <div className="form-group">
@@ -402,6 +416,7 @@ class Login extends Component {
 
           {activeForm === "register" && (
             <div className="register-form-container">
+              <div className="login-logo"></div>
               <div className="login-form-header">Đăng ký tài khoản</div>
               <div className="login-content">
                 <div className="form-group">
@@ -524,6 +539,7 @@ class Login extends Component {
 
           {activeForm === "forgotPassword" && (
             <div className="forgot-password-form-container">
+              <div className="login-logo"></div>
               <div className="login-form-header">Quên mật khẩu</div>
               <div className="login-content">
                 <div className="form-group">
@@ -564,6 +580,7 @@ class Login extends Component {
 const mapStateToProps = (state) => {
   return {
     isLoggedIn: state.user.isLoggedIn,
+    userInfo: state.user.userInfo,
   };
 };
 

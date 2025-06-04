@@ -85,8 +85,11 @@ class HomePage extends Component {
 
           <section className="section section3">
             <div className="guide-container">
-              <div className="image-frame"></div>
-              <div className="guide-left"></div>
+              <div className="guide-left">
+                <div className="image-frame">
+                  <div className="community-bg-image"></div>
+                </div>
+              </div>
               <div className="guide-right">
                 <p className="guide-subtitle">Các bước thực hiện</p>
                 <h2 className="guide-title">ĐĂNG KÍ THUÊ SÂN</h2>

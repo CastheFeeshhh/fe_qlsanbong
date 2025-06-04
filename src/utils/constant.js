@@ -10,12 +10,13 @@ export const path = {
   FIELDNEWS: "/field-news",
   CONTACT: "/contact",
   PAYMENT: "/payment",
-  VNPAY: "/vnpay_return",
+  VNPAY: "/vnpay-return",
   PAYMENTRETURN: "/payment-return",
   LOGIN: "/login",
   LOG_OUT: "/logout",
   RESET_PASSWORD: "/reset-password",
   SYSTEM: "/system",
+  ACCESS_DENIED: "/access-denied",
 };
 
 export const USER_ROLE = {

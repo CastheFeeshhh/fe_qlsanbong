@@ -35,8 +35,8 @@ class System extends Component {
     if (!isLoggedIn) {
       return <Redirect to="/login" />;
     }
-    if (userInfo && userInfo.role_id !== 1) {
-      return <Redirect to="/home" />; // Hoặc một trang "Bạn không có quyền truy cập"
+    if (userInfo && userInfo.role_id === 3) {
+      return <Redirect to="/access-denied" />;
     }
 
     return (

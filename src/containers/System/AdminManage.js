@@ -8,8 +8,8 @@ import {
   editUserService,
 } from "../../services/userService";
 
-import ModalUser from "./ModalUser";
-import ModalEditUser from "./ModalEditUser";
+import ModalUser from "../../component/ModalUser";
+import ModalEditUser from "../../component/ModalEditUser";
 import { emitter } from "../../utils/emitter";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";

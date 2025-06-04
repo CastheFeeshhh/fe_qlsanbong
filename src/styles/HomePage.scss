@@ -85,6 +85,7 @@ html, body {
   .section2 {
     display: flex;
     justify-content: space-between;
+    background-color: #ffffff;
 
     .intro-wrapper {
       max-width: 1200px;
@@ -197,13 +198,11 @@ html, body {
     
 
     .guide-left {
-      height: 400px;
+      height: 360px;
       display: flex;
-      background: url("../assets/images/field_booking.png") center center no-repeat;
+      background: url("../assets/images/mau_hd.png") center center no-repeat;
       background-size: cover;
       flex: 1;
-      width: 100%;
-      border: 2px solid red;
       }
 
     .guide-right {

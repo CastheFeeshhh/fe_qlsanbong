@@ -335,7 +335,6 @@ class PaymentPage extends Component {
             </div>
           )}
 
-          {/* HIỂN THỊ LỖI KHI GỌI API VNPAY */}
           {vnpayError && <p className="error-message">{vnpayError}</p>}
 
           <div className="payment-actions">

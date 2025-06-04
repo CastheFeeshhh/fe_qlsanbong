@@ -2,38 +2,35 @@ import React, { Component } from "react";
 import { FormattedMessage } from "react-intl";
 import { connect } from "react-redux";
 import { Button, Modal, ModalHeader, ModalBody, ModalFooter } from "reactstrap";
-import { emitter } from "../../utils/emitter";
+import { emitter } from "../utils/emitter";
+import _, { first, last } from "lodash";
+import { use } from "react";
 
-class ModalUser extends Component {
+class ModalEditUser extends Component {
   constructor(props) {
     super(props);
     this.state = {
+      user_id: "",
       email: "",
       password: "",
       first_name: "",
       last_name: "",
       address: "",
-      phone: "",
     };
-
-    this.listenToEmitter();
-  }
-
-  listenToEmitter() {
-    emitter.on("EVENT_CLEAR_MODAL_DATA", () => {
-      this.setState({
-        email: "",
-        password: "",
-        first_name: "",
-        last_name: "",
-        address: "",
-        phone: "",
-      });
-    });
   }
 
   componentDidMount() {
-    console.log("mounting");
+    let user = this.props.currentUser;
+    if (user && !_.isEmpty(user)) {
+      this.setState({
+        user_id: user.user_id,
+        email: user.email,
+        password: "12345",
+        first_name: user.first_name,
+        last_name: user.last_name,
+        address: user.address,
+      });
+    }
   }
 
   toggle = () => {
@@ -41,6 +38,8 @@ class ModalUser extends Component {
   };
 
   handleOnChangeInput = (event, id) => {
+    console.log(event.target.value);
+
     let copyState = { ...this.state };
     copyState[id] = event.target.value;
 
@@ -56,56 +55,25 @@ class ModalUser extends Component {
 
   checkValidateInput = () => {
     let isValid = true;
-    let arrInput = [
-      "email",
-      "password",
-      "first_name",
-      "last_name",
-      "address",
-      "phone",
-    ];
-
+    let arrInput = ["email", "password", "first_name", "last_name", "address"];
     for (let i = 0; i < arrInput.length; i++) {
       if (!this.state[arrInput[i]]) {
         isValid = false;
-        alert("Vui lòng điền đầy đủ thông tin: " + arrInput[i]);
-        return isValid;
+        alert("Missing parameters: " + arrInput[i]);
+        break;
       }
     }
-
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (this.state.email && !emailRegex.test(this.state.email)) {
-      isValid = false;
-      alert("Email không đúng định dạng. Vui lòng nhập lại!");
-      return isValid;
-    }
-
-    const phoneRegex = /^\d{10,11}$/;
-    if (this.state.phone && !phoneRegex.test(this.state.phone)) {
-      isValid = false;
-      alert("Số điện thoại không hợp lệ. Vui lòng nhập 10 hoặc 11 chữ số!");
-      return isValid;
-    }
-
     return isValid;
   };
 
-  handleAddNewUser = () => {
+  handleSaveUser = () => {
     let isValid = this.checkValidateInput();
     if (isValid === true) {
-      const roleId = this.props.roleIdToAssign || "3";
-      const dataToSend = {
-        ...this.state,
-        role_id: roleId,
-      };
-      this.props.createNewUser(dataToSend);
+      this.props.editUser(this.state);
     }
-    console.log("data", this.state);
   };
 
   render() {
-    console.log("check child prop", this.props);
-    console.log("check child open modal", this.props.isOpen);
     return (
       <Modal
         isOpen={this.props.isOpen}
@@ -121,7 +89,7 @@ class ModalUser extends Component {
             this.toggle();
           }}
         >
-          Thêm người dùng
+          Sửa thông tin người dùng
         </ModalHeader>
         <ModalBody>
           <div className="modal-user-body">
@@ -133,6 +101,7 @@ class ModalUser extends Component {
                   this.handleOnChangeInput(event, "email");
                 }}
                 value={this.state.email}
+                disabled
               />
             </div>
             <div className="input-container">
@@ -143,6 +112,7 @@ class ModalUser extends Component {
                   this.handleOnChangeInput(event, "password");
                 }}
                 value={this.state.password}
+                disabled
               />
             </div>
             <div className="input-container">
@@ -175,16 +145,6 @@ class ModalUser extends Component {
                 value={this.state.address}
               />
             </div>
-            <div className="input-container max-width-input">
-              <label>Số điện thoại</label>
-              <input
-                type="text"
-                onChange={(event) => {
-                  this.handleOnChangeInput(event, "phone");
-                }}
-                value={this.state.phone}
-              />
-            </div>
           </div>
         </ModalBody>
         <ModalFooter>
@@ -192,10 +152,10 @@ class ModalUser extends Component {
             color="primary"
             className="px-3"
             onClick={() => {
-              this.handleAddNewUser();
+              this.handleSaveUser();
             }}
           >
-            Thêm mới
+            Save changes
           </Button>{" "}
           <Button
             color="secondary"
@@ -204,7 +164,7 @@ class ModalUser extends Component {
               this.toggle();
             }}
           >
-            Đóng
+            Close
           </Button>
         </ModalFooter>
       </Modal>
@@ -220,4 +180,4 @@ const mapDispatchToProps = (dispatch) => {
   return {};
 };
 
-export default connect(mapStateToProps, mapDispatchToProps)(ModalUser);
+export default connect(mapStateToProps, mapDispatchToProps)(ModalEditUser);

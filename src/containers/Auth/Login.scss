@@ -376,3 +376,14 @@
         padding: 25px 30px; 
     }
 }
+
+.login-logo {
+    width: 300px;
+    height: 60px;
+    margin: 0 auto 20px auto;
+    background-image: url('../../assets/images/logo_sb.png');
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
+    animation: fadeInLogo 0.8s ease-out;
+}

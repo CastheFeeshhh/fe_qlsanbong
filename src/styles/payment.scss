@@ -22,7 +22,7 @@ body {
   min-height: calc(100vh - (var(--header-height, 80px) + var(--footer-height, 40px)));
   box-sizing: border-box;
   max-width: 850px;
-  margin: 60px auto 30px;
+  margin: 120px auto 30px;
   background-color: $white;
   border-radius: 12px;
   box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);

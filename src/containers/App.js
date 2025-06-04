@@ -12,6 +12,7 @@ import Home from "../routes/home";
 import Login from "./Auth/Login";
 import ResetPassword from "./Auth/ResetPassword";
 import System from "../routes/System";
+import AccessDeniedPage from "../routes/AccessDeniedPage";
 
 import HomePage from "./HomePage/homePage";
 import information from "../routes/information";
@@ -91,9 +92,10 @@ class App extends Component {
             <span className="content-container">
               <Switch>
                 <Route path={path.HOME} exact component={Home} />
-                <Route path={path.LOGIN} s component={Login} />
+                <Route path={path.LOGIN} component={Login} />
                 <Route path={path.RESET_PASSWORD} component={ResetPassword} />
                 <Route path={path.SYSTEM} component={System} />
+                <Route path={path.ACCESS_DENIED} component={AccessDeniedPage} />
                 <Route path={path.HOMEPAGE} component={HomePage} />
                 <Route path={path.INFORMATION} component={information} />
                 <Route path={path.FIELDLIST} component={fieldList} />

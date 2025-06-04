@@ -138,12 +138,15 @@ class HomeHeader extends Component {
                         <i className="fas fa-user"></i> Trang cá nhân
                       </a>
                       {userInfo?.role_id === 1 && (
-                        <a href="/admin" className="dropdown-item">
+                        <a
+                          href="/system/admin-manage"
+                          className="dropdown-item"
+                        >
                           <i className="fas fa-cogs"></i> Trang quản lý
                         </a>
                       )}
                       {userInfo?.role_id === 2 && (
-                        <a href="/staff" className="dropdown-item">
+                        <a href="/system/user-manage" className="dropdown-item">
                           <i className="fas fa-cogs"></i> Trang quản lý
                         </a>
                       )}
