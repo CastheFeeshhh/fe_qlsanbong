@@ -1,37 +1,45 @@
 import React, { Component } from "react";
 import { toast } from "react-toastify";
-import { getAllFieldsData } from "../../services/bookingService";
-import "../../styles/fieldManage.scss";
+import { getAllSuppliers } from "../../services/userService";
+import "../../styles/supplierManage.scss";
 
-class FieldManage extends Component {
+class SupplierManage extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      fields: [],
+      suppliers: [],
       isLoading: true,
       error: null,
     };
   }
 
   async componentDidMount() {
-    await this.loadFields();
+    await this.loadSuppliers();
   }
 
-  loadFields = async () => {
+  loadSuppliers = async () => {
     this.setState({ isLoading: true, error: null });
     try {
-      let response = await getAllFieldsData();
-      if (Array.isArray(response)) {
+      let response = await getAllSuppliers();
+      console.log(response);
+      if (response && response.errCode === 0) {
         this.setState({
-          fields: response,
+          suppliers: response.suppliers || [],
+          isLoading: false,
+        });
+      } else if (Array.isArray(response)) {
+        this.setState({
+          suppliers: response,
           isLoading: false,
         });
       } else {
-        throw new Error("Dữ liệu nhận được không phải là một mảng.");
+        throw new Error(
+          response.errMessage || "Dữ liệu nhận được không hợp lệ."
+        );
       }
     } catch (e) {
-      console.error("Lỗi khi tải danh sách sân bóng:", e);
-      let errorMessage = "Có lỗi xảy ra khi tải danh sách sân bóng.";
+      console.error("Lỗi khi tải danh sách nhà cung cấp:", e);
+      let errorMessage = "Có lỗi xảy ra khi tải danh sách nhà cung cấp.";
       if (e.response && e.response.data && e.response.data.errMessage) {
         errorMessage = e.response.data.errMessage;
       } else if (e.message) {
@@ -64,15 +72,15 @@ class FieldManage extends Component {
   };
 
   render() {
-    const { fields, isLoading, error } = this.state;
+    const { suppliers, isLoading, error } = this.state;
 
     if (isLoading) {
       return (
         <div className="system-main-content">
-          <h1 className="title">QUẢN LÝ SÂN BÓNG</h1>
+          <h1 className="title">QUẢN LÝ NHÀ CUNG CẤP</h1>
           <div className="loading-state">
             <i className="fas fa-spinner fa-spin"></i>
-            Đang tải danh sách sân bóng...
+            Đang tải dữ liệu...
           </div>
         </div>
       );
@@ -81,12 +89,12 @@ class FieldManage extends Component {
     if (error) {
       return (
         <div className="system-main-content">
-          <h1 className="title">QUẢN LÝ SÂN BÓNG</h1>
+          <h1 className="title">QUẢN LÝ NHÀ CUNG CẤP</h1>
           <div className="error-state">
             <i className="fas fa-exclamation-triangle"></i>
             {error}
           </div>
-          <button className="btn btn-primary" onClick={this.loadFields}>
+          <button className="btn btn-primary" onClick={this.loadSuppliers}>
             <i className="fas fa-sync-alt"></i>
             Thử lại
           </button>
@@ -96,84 +104,56 @@ class FieldManage extends Component {
 
     return (
       <div className="system-main-content">
-        <h1 className="title">QUẢN LÝ SÂN BÓNG</h1>
+        <h1 className="title">QUẢN LÝ NHÀ CUNG CẤP</h1>
         <div className="admin-card">
           <div className="card-header">
-            <h3>Danh sách sân bóng </h3>
+            <h3>Danh sách nhà cung cấp</h3>
             <button className="btn btn-primary">
               <i className="fas fa-plus"></i>
-              Thêm sân mới
+              Thêm nhà cung cấp
             </button>
           </div>
           <div className="card-body">
             <div className="user-role-group">
               <h4 className="role-group-title">
-                Sân hiện có - {fields.length}
+                Nhà cung cấp - {suppliers.length}
               </h4>
               <div className="table-responsive">
-                <table id="fields-table" className="table">
+                <table id="suppliers-table" className="table">
                   <thead>
                     <tr>
                       <th>ID</th>
-                      <th>Tên Sân</th>
-                      <th className="text-right">Giá/Phút</th>
-                      <th className="text-right">Giá/Giờ</th>
-                      <th>Loại Sân</th>
+                      <th>Tên Nhà Cung Cấp</th>
+                      <th>Số Điện Thoại</th>
+                      <th>Địa Chỉ</th>
                       <th>Mô Tả</th>
-                      <th>Trạng Thái</th>
-                      <th>Hình Ảnh</th>
                       <th>Ngày Tạo</th>
                       <th className="text-center">Thao Tác</th>
                     </tr>
                   </thead>
                   <tbody>
-                    {fields && fields.length > 0 ? (
-                      fields.map((field) => (
-                        <tr key={field.field_id}>
-                          <td data-label="ID">{field.field_id}</td>
-                          <td data-label="Tên Sân">{field.field_name}</td>
-                          <td data-label="Giá/Phút" className="text-right">
-                            {field.price_per_minute
-                              ? parseFloat(
-                                  field.price_per_minute
-                                ).toLocaleString("vi-VN")
-                              : "N/A"}
-                          </td>
-                          <td data-label="Giá/Giờ" className="text-right">
-                            {field.price_per_minute
-                              ? (
-                                  parseFloat(field.price_per_minute) * 60
-                                ).toLocaleString("vi-VN")
-                              : "N/A"}
-                          </td>
-                          <td data-label="Loại Sân">{field.type}</td>
-                          <td data-label="Mô Tả">{field.description}</td>
-                          <td data-label="Trạng Thái">{field.status}</td>
-                          <td data-label="Hình Ảnh">
-                            {field.image ? (
-                              <img
-                                src={field.image}
-                                alt={field.field_name}
-                                className="field-image"
-                              />
-                            ) : (
-                              "Chưa có"
-                            )}
-                          </td>
+                    {suppliers && suppliers.length > 0 ? (
+                      suppliers.map((supplier) => (
+                        <tr key={supplier.supplier_id}>
+                          <td data-label="ID">{supplier.supplier_id}</td>
+                          <td data-label="Tên NCC">{supplier.name}</td>
+                          <td data-label="Số Điện Thoại">{supplier.phone}</td>
+                          <td data-label="Địa Chỉ">{supplier.address}</td>
+                          <td data-label="Mô Tả">{supplier.description}</td>
                           <td data-label="Ngày Tạo">
-                            {this.formatDate(field.created_at)}
+                            {this.formatDate(supplier.created_at)}
                           </td>
                           <td data-label="Thao Tác">
                             <div className="btn-action-group">
                               <button
                                 className="btn btn-edit"
-                                title="Sửa thông tin sân"
+                                title="Sửa nhà cung cấp"
                               >
                                 <i className="fas fa-edit"></i>
                               </button>
                               <button
                                 className="btn btn-delete"
-                                title="Xóa sân"
+                                title="Xóa nhà cung cấp"
                               >
                                 <i className="fas fa-trash-alt"></i>
                               </button>
@@ -183,8 +163,8 @@ class FieldManage extends Component {
                       ))
                     ) : (
                       <tr>
-                        <td colSpan="10" className="text-center p-20">
-                          Không có sân bóng nào để hiển thị.
+                        <td colSpan="7" className="text-center p-20">
+                          Không có nhà cung cấp nào để hiển thị.
                         </td>
                       </tr>
                     )}
@@ -199,4 +179,4 @@ class FieldManage extends Component {
   }
 }
 
-export default FieldManage;
+export default SupplierManage;

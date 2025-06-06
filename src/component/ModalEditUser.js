@@ -155,7 +155,7 @@ class ModalEditUser extends Component {
               this.handleSaveUser();
             }}
           >
-            Save changes
+            Lưu
           </Button>{" "}
           <Button
             color="secondary"
@@ -164,7 +164,7 @@ class ModalEditUser extends Component {
               this.toggle();
             }}
           >
-            Close
+            Đóng
           </Button>
         </ModalFooter>
       </Modal>

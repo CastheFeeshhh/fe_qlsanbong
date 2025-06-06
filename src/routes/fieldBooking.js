@@ -752,6 +752,7 @@ class fieldBooking extends Component {
                     <option value="30">30</option>
                   </select>
                   <span>phút</span>
+                  <span>(Giá sân sau 16h00 sẽ tăng gấp đôi)</span>
                 </div>
               </div>
 

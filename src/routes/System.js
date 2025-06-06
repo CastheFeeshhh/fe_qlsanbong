@@ -4,6 +4,8 @@ import { Redirect, Route, Switch, NavLink } from "react-router-dom";
 import UserManage from "../containers/System/UserManage";
 import AdminManage from "../containers/System/AdminManage";
 import FieldManage from "../containers/System/FieldManage";
+import ServiceManage from "../containers/System/ServiceManage";
+import SupplierManage from "../containers/System/SupplierManage";
 
 import Header from "../containers/HomePage/HomeHeader";
 import Footer from "../containers/HomePage/HomeFooter";
@@ -150,6 +152,14 @@ class System extends Component {
                     </li>
                     <li>
                       <NavLink
+                        to="/system/service-manage"
+                        activeClassName="active"
+                      >
+                        Quản lý dịch vụ
+                      </NavLink>
+                    </li>
+                    <li>
+                      <NavLink
                         to="/system/booking-manage"
                         activeClassName="active"
                       >
@@ -170,14 +180,6 @@ class System extends Component {
                         activeClassName="active"
                       >
                         Quản lý phiếu đặt sân
-                      </NavLink>
-                    </li>
-                    <li>
-                      <NavLink
-                        to="/system/service-manage"
-                        activeClassName="active"
-                      >
-                        Quản lý dịch vụ
                       </NavLink>
                     </li>
                     <li>
@@ -208,6 +210,11 @@ class System extends Component {
               <Route path="/system/user-manage" component={UserManage} />
               <Route path="/system/admin-manage" component={AdminManage} />
               <Route path="/system/field-manage" component={FieldManage} />
+              <Route path="/system/service-manage" component={ServiceManage} />
+              <Route
+                path="/system/supplier-manage"
+                component={SupplierManage}
+              />
 
               <Route
                 component={() => {

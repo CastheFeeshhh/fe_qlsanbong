@@ -31,6 +31,10 @@ const getAllCustomers = () => {
   return axios.get(`/api/get-all-customers`);
 };
 
+const getAllSuppliers = () => {
+  return axios.get(`/api/get-all-suppliers`);
+};
+
 const createNewUserService = (data) => {
   console.log("check data from service : ", data);
   return axios.post("/api/create-new-user", data);
@@ -47,10 +51,10 @@ const editUserService = (inputData) => {
   return axios.put("/api/edit-user", inputData);
 };
 
-const createVnpayPayment = async (invoiceId, amount, orderInfo) => {
+const createVnpayPayment = async (bookingId, amount, orderInfo) => {
   const url = `${process.env.REACT_APP_BACKEND_URL}/api/vnpay/create_payment_url`;
 
-  const payload = { invoiceId, amount, orderInfo };
+  const payload = { bookingId, amount, orderInfo };
 
   try {
     const response = await fetch(url, {
@@ -121,6 +125,7 @@ export {
   getAllAdmins,
   getAllStaffs,
   getAllCustomers,
+  getAllSuppliers,
   createNewUserService,
   deleteUserService,
   editUserService,
