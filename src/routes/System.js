@@ -6,6 +6,7 @@ import AdminManage from "../containers/System/AdminManage";
 import FieldManage from "../containers/System/FieldManage";
 import ServiceManage from "../containers/System/ServiceManage";
 import SupplierManage from "../containers/System/SupplierManage";
+import AssetManage from "../containers/System/AssetManage";
 
 import Header from "../containers/HomePage/HomeHeader";
 import Footer from "../containers/HomePage/HomeFooter";
@@ -160,18 +161,18 @@ class System extends Component {
                     </li>
                     <li>
                       <NavLink
-                        to="/system/booking-manage"
+                        to="/system/asset-manage"
                         activeClassName="active"
                       >
-                        Quản lý đặt sân
+                        Quản lý tài sản thiết bị
                       </NavLink>
                     </li>
                     <li>
                       <NavLink
-                        to="/system/equipment-manage"
+                        to="/system/booking-manage"
                         activeClassName="active"
                       >
-                        Quản lý tài sản thiết bị
+                        Quản lý đặt sân
                       </NavLink>
                     </li>
                     <li>
@@ -211,6 +212,8 @@ class System extends Component {
               <Route path="/system/admin-manage" component={AdminManage} />
               <Route path="/system/field-manage" component={FieldManage} />
               <Route path="/system/service-manage" component={ServiceManage} />
+              <Route path="/system/service-manage" component={ServiceManage} />
+              <Route path="/system/asset-manage" component={AssetManage} />
               <Route
                 path="/system/supplier-manage"
                 component={SupplierManage}

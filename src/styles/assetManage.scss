@@ -1,0 +1,65 @@
+// AssetManage.scss
+
+$primary-color: #4A90E2;
+$table-border-color: #e0e6ed;
+$odd-row-bg: #fdfdfe;
+$even-row-bg: #ffffff;
+
+// Áp dụng style chung cho cả hai bảng
+#trackable-assets-table, #non-trackable-assets-table {
+    font-family: 'Segoe UI', sans-serif;
+    border-collapse: collapse;
+    border-spacing: 0;
+    width: 100%;
+    
+    th {
+        padding: 15px 20px;
+        background-color: $primary-color;
+        color: white;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        font-size: 0.9rem;
+        white-space: nowrap;
+        text-align: left;
+        vertical-align: middle;
+        border: none;
+    }
+
+    td {
+        padding: 12px 20px;
+        text-align: left;
+        vertical-align: middle;
+        font-size: 0.95rem;
+        color: #495057;
+        white-space: normal;
+        border-top: 1px solid $table-border-color;
+    }
+
+    tbody tr:first-child td {
+        border-top: none;
+    }
+
+    tbody tr:hover td {
+        background-color: lighten($primary-color, 30%) !important;   
+    }
+
+    th:nth-child(1), td:nth-child(1) { width: 5%; }   
+    th:nth-child(2), td:nth-child(2) { width: 20%; }  
+    th:nth-child(3), td:nth-child(3) { width: 30%; }  
+    th:nth-child(4), td:nth-child(4) { width: 10%; } 
+    th:nth-child(5), td:nth-child(5) { width: 10%; } 
+    th:nth-child(6), td:nth-child(6) { width: 10%; }  
+    th:nth-child(7), td:nth-child(7) { width: 5%; }   
+    th:nth-child(8), td:nth-child(8) { width: 10%; } 
+}
+
+.text-right {
+    text-align: right !important;
+}
+.text-center {
+    text-align: center !important;
+}
+.p-20 {
+    padding: 20px !important;
+}

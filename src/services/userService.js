@@ -35,6 +35,10 @@ const getAllSuppliers = () => {
   return axios.get(`/api/get-all-suppliers`);
 };
 
+const getAllAssetsData = () => {
+  return axios.get(`/api/get-all-assets`);
+};
+
 const createNewUserService = (data) => {
   console.log("check data from service : ", data);
   return axios.post("/api/create-new-user", data);
@@ -126,6 +130,7 @@ export {
   getAllStaffs,
   getAllCustomers,
   getAllSuppliers,
+  getAllAssetsData,
   createNewUserService,
   deleteUserService,
   editUserService,
