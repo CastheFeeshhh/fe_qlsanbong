@@ -28,9 +28,9 @@ export const restoreLogin = (userInfo) => ({
   userInfo: userInfo,
 });
 
-// export const updateUserInfoInRedux = (updatedUserInfo) => {
-//   return {
-//     type: "UPDATE_USER_INFO",
-//     payload: updatedUserInfo,
-//   };
-// };
+export const updateUserInfoInRedux = (updatedUserInfo) => {
+  return {
+    type: "UPDATE_USER_INFO",
+    userInfo: updatedUserInfo,
+  };
+};

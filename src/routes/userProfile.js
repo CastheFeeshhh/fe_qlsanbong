@@ -1,7 +1,9 @@
 import React, { Component } from "react";
 import { connect } from "react-redux";
 import { toast } from "react-toastify";
+import * as actions from "../store/actions";
 import { editUserService } from "../services/userService";
+import { updateUserInfoInRedux } from "../store/actions/userActions";
 import HomeHeader from "../containers/HomePage/HomeHeader";
 import HomeFooter from "../containers/HomePage/HomeFooter";
 import defaultAvatar from "../assets/images/default_avatar.jpg";
@@ -43,6 +45,15 @@ class UserProfile extends Component {
   }
 
   handleToggleEditMode = () => {
+    if (this.state.isEditMode) {
+      this.setState({
+        first_name: this.props.userInfo?.first_name || "",
+        last_name: this.props.userInfo?.last_name || "",
+        address: this.props.userInfo?.address || "",
+        phone: this.props.userInfo?.phone || "",
+        gender: this.props.userInfo?.gender || "Nam",
+      });
+    }
     this.setState((prevState) => ({
       isEditMode: !prevState.isEditMode,
     }));
@@ -65,14 +76,16 @@ class UserProfile extends Component {
         phone: this.state.phone,
         gender: this.state.gender,
       };
-      //   let response = await editUserService(dataToUpdate);
-      //   if (response && response.errCode === 0) {
-      //     toast.success("Cập nhật thông tin thành công!");
 
-      //     this.setState({ isEditMode: false });
-      //   } else {
-      //     toast.error(response.errMessage || "Cập nhật thất bại.");
-      //   }
+      let response = await editUserService(dataToUpdate);
+      if (response && response.errCode === 0) {
+        this.props.updateUserInfoInRedux(dataToUpdate);
+
+        toast.success("Cập nhật thông tin thành công!");
+        this.setState({ isEditMode: false });
+      } else {
+        toast.error(response.errMessage || "Cập nhật thất bại.");
+      }
     } catch (error) {
       toast.error("Có lỗi xảy ra khi cập nhật!");
       console.error(error);
@@ -91,7 +104,7 @@ class UserProfile extends Component {
       created_at,
       isEditMode,
     } = this.state;
-    const fullName = `${first_name || ""} ${last_name || ""}`.trim();
+    const fullName = `${last_name || ""} ${first_name || ""}`.trim();
     const roleId = this.props.userInfo?.role_id;
 
     return (
@@ -117,12 +130,12 @@ class UserProfile extends Component {
                 {isEditMode ? (
                   <input
                     type="text"
-                    name="first_name"
-                    value={first_name}
+                    name="last_name"
+                    value={last_name || ""}
                     onChange={this.handleInputChange}
                   />
                 ) : (
-                  <span>{first_name || "Chưa cập nhật"}</span>
+                  <span>{last_name || "Chưa cập nhật"}</span>
                 )}
               </div>
               <div className="info-item">
@@ -130,12 +143,12 @@ class UserProfile extends Component {
                 {isEditMode ? (
                   <input
                     type="text"
-                    name="last_name"
-                    value={last_name}
+                    name="first_name"
+                    value={first_name || ""}
                     onChange={this.handleInputChange}
                   />
                 ) : (
-                  <span>{last_name || "Chưa cập nhật"}</span>
+                  <span>{first_name || "Chưa cập nhật"}</span>
                 )}
               </div>
               <div className="info-item">
@@ -230,7 +243,9 @@ const mapStateToProps = (state) => {
 };
 
 const mapDispatchToProps = (dispatch) => {
-  return {};
+  return {
+    updateUserInfoInRedux: (data) => dispatch(updateUserInfoInRedux(data)),
+  };
 };
 
 export default connect(mapStateToProps, mapDispatchToProps)(UserProfile);
