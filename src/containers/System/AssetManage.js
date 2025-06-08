@@ -1,6 +1,6 @@
 import React, { Component } from "react";
 import { toast } from "react-toastify";
-import { getAllAssetsData } from "../../services/userService";
+import { getAllAssets } from "../../services/userService";
 import "../../styles/assetManage.scss";
 
 class AssetManage extends Component {
@@ -20,7 +20,7 @@ class AssetManage extends Component {
   loadAssets = async () => {
     this.setState({ isLoading: true, error: null });
     try {
-      let response = await getAllAssetsData();
+      let response = await getAllAssets();
       if (response && response.errCode === 0) {
         this.setState({
           allAssets: response.assets || [],
@@ -149,7 +149,7 @@ class AssetManage extends Component {
         <h1 className="title">QUẢN LÝ TÀI SẢN & VẬT TƯ</h1>
         <div className="admin-card">
           <div className="card-header">
-            <h3>Danh sách tài sản ({allAssets.length})</h3>
+            <h3>Danh sách tài sản </h3>
             <button className="btn btn-primary">
               <i className="fas fa-plus"></i>
               Thêm tài sản mới

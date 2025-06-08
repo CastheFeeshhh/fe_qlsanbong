@@ -187,7 +187,7 @@ class HomePage extends Component {
               <div className="community-left">
                 <div className="community-invite">
                   <h2>
-                    Hơn 500 đội bóng đã tin tưởng lựa chọn{" "}
+                    Hơn 100 đội bóng đã tin tưởng lựa chọn{" "}
                     <span className="txt-3">Old Trafford</span>
                   </h2>
                   <p>Gia nhập cộng đồng đam mê bóng đá ngay hôm nay!</p>

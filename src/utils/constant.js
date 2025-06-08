@@ -16,6 +16,7 @@ export const path = {
   LOG_OUT: "/logout",
   RESET_PASSWORD: "/reset-password",
   SYSTEM: "/system",
+  PROFILE: "/user-profile",
   ACCESS_DENIED: "/access-denied",
 };
 

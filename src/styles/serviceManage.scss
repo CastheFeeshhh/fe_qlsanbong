@@ -1,6 +1,4 @@
-// ServiceManage.scss
 
-// Các biến màu này được copy từ system.scss của bạn để đảm bảo tính nhất quán.
 $primary-color: #4A90E2;
 $table-border-color: #e0e6ed;
 $odd-row-bg: #fdfdfe;
@@ -65,7 +63,6 @@ $even-row-bg: #ffffff;
     }
 
 
-    // Định nghĩa chiều rộng cột và căn chỉnh cho #services-table
     th:nth-child(1), td:nth-child(1) { width: 5%; min-width: 50px; }
     th:nth-child(2), td:nth-child(2) { width: 25%; min-width: 150px; }
     th:nth-child(3), td:nth-child(3) { width: 15%; min-width: 100px; }
@@ -81,7 +78,6 @@ $even-row-bg: #ffffff;
     align-items: center;
 }
 
-// Style responsive cho bảng
 @media (max-width: 768px) {
     #services-table {
         display: block;

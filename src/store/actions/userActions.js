@@ -27,3 +27,10 @@ export const restoreLogin = (userInfo) => ({
   type: actionTypes.USER_LOGIN_SUCCESS,
   userInfo: userInfo,
 });
+
+// export const updateUserInfoInRedux = (updatedUserInfo) => {
+//   return {
+//     type: "UPDATE_USER_INFO",
+//     payload: updatedUserInfo,
+//   };
+// };

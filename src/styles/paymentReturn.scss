@@ -2,7 +2,7 @@
   display: flex;
   justify-content: center;
   align-items: center;
-  min-height: calc(100vh - 150px); // Giả sử header và footer có tổng chiều cao 150px
+  min-height: calc(100vh - 150px); 
   font-size: 1.2rem;
   color: #555;
 }
@@ -11,7 +11,7 @@
   display: flex;
   justify-content: center;
   align-items: center;
-  min-height: calc(100vh - 150px); // Giả sử header và footer có tổng chiều cao 150px
+  min-height: calc(100vh - 150px); 
   padding: 20px;
   box-sizing: border-box;
 }
@@ -29,8 +29,7 @@
     font-size: 4rem;
     margin-bottom: 20px;
 
-    .fas { // Style cho icon Font Awesome nếu bạn dùng
-      // Không cần style cụ thể ở đây nếu màu đã được inline trong JS
+    .fas { 
     }
   }
 

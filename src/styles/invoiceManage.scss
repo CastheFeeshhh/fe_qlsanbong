@@ -3,7 +3,7 @@ $table-border-color: #e0e6ed;
 $odd-row-bg: #fdfdfe;
 $even-row-bg: #ffffff;
 
-#trackable-assets-table, #non-trackable-assets-table {
+#invoices-table {
     font-family: 'Segoe UI', sans-serif;
     border-collapse: collapse;
     border-spacing: 0;
@@ -15,11 +15,8 @@ $even-row-bg: #ffffff;
         color: white;
         font-weight: 600;
         text-transform: uppercase;
-        letter-spacing: 0.5px;
         font-size: 0.9rem;
-        white-space: nowrap;
         text-align: left;
-        vertical-align: middle;
         border: none;
     }
 
@@ -38,17 +35,25 @@ $even-row-bg: #ffffff;
     }
 
     tbody tr:hover td {
-        background-color: lighten($primary-color, 30%) !important;   
+        background-color: lighten($primary-color, 40%);
     }
 
-    th:nth-child(1), td:nth-child(1) { width: 5%; }   
-    th:nth-child(2), td:nth-child(2) { width: 20%; }  
-    th:nth-child(3), td:nth-child(3) { width: 30%; }  
-    th:nth-child(4), td:nth-child(4) { width: 10%; } 
-    th:nth-child(5), td:nth-child(5) { width: 10%; } 
-    th:nth-child(6), td:nth-child(6) { width: 10%; }  
-    th:nth-child(7), td:nth-child(7) { width: 5%; }   
-    th:nth-child(8), td:nth-child(8) { width: 10%; } 
+    tbody tr:nth-child(odd) {
+        background-color: $odd-row-bg;
+    }
+
+    tbody tr:nth-child(even) {
+        background-color: $even-row-bg;
+    }
+
+    th:nth-child(1), td:nth-child(1) { width: 10%; }
+    th:nth-child(2), td:nth-child(2) { width: 10%; }
+    th:nth-child(3), td:nth-child(3) { width: 15%; }
+    th:nth-child(4), td:nth-child(4) { width: 20%; }
+    th:nth-child(5), td:nth-child(5) { width: 10%; }
+    th:nth-child(6), td:nth-child(6) { width: 15%; }
+    th:nth-child(7), td:nth-child(7) { width: 10%; }
+    th:nth-child(8), td:nth-child(8) { width: 15%; }
 }
 
 .text-right {

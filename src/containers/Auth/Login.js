@@ -52,24 +52,34 @@ class Login extends Component {
     const loginStatus = urlParams.get("status");
 
     if (token && user_id && role_id) {
-      const decodedFirstName = decodeURIComponent(first_name || "");
-      const decodedLastName = decodeURIComponent(last_name || "");
-      const decodedAvatar = decodeURIComponent(avatar || "");
+      const user_id = urlParams.get("user_id");
+      const role_id = urlParams.get("role_id");
+      const first_name = decodeURIComponent(urlParams.get("first_name") || "");
+      const last_name = decodeURIComponent(urlParams.get("last_name") || "");
+      const address = decodeURIComponent(urlParams.get("address") || "");
+      const phone = decodeURIComponent(urlParams.get("phone") || "");
+      const gender = decodeURIComponent(urlParams.get("gender") || "");
+      const avatar = decodeURIComponent(urlParams.get("avatar") || "");
+      const created_at = decodeURIComponent(urlParams.get("created_at") || "");
 
       localStorage.setItem("jwtToken", token);
 
       const userInfo = {
-        user_id: user_id,
+        user_id: +user_id,
         role_id: +role_id,
-        first_name: decodedFirstName,
-        last_name: decodedLastName,
-        avatar: decodedAvatar,
+        first_name: first_name,
+        last_name: last_name,
+        phone: phone,
+        gender: gender,
+        avatar: avatar,
+        address: address,
+        created_at: created_at,
       };
       localStorage.setItem("userInfo", JSON.stringify(userInfo));
 
       this.props.userLoginSuccess(userInfo);
 
-      toast.success("Đăng nhập Google thành công!");
+      toast.success("Đăng nhập thành công!");
 
       if (role_id === "1") {
         this.props.navigate("/system/user-manage");
@@ -171,6 +181,7 @@ class Login extends Component {
 
       if (data && data.errCode === 0) {
         const { user, token } = data;
+        console.log("data1:", data);
 
         localStorage.setItem("token", token);
         localStorage.setItem("user", JSON.stringify(user));

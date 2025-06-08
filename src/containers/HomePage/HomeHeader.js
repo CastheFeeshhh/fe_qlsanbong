@@ -134,7 +134,7 @@ class HomeHeader extends Component {
                       </div>
                     </div>
                     <div className="user-dropdown-menu">
-                      <a href="/profile" className="dropdown-item">
+                      <a href="/user-profile" className="dropdown-item">
                         <i className="fas fa-user"></i> Trang cá nhân
                       </a>
                       {userInfo?.role_id === 1 && (

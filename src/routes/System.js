@@ -7,6 +7,8 @@ import FieldManage from "../containers/System/FieldManage";
 import ServiceManage from "../containers/System/ServiceManage";
 import SupplierManage from "../containers/System/SupplierManage";
 import AssetManage from "../containers/System/AssetManage";
+import InvoiceManage from "../containers/System/InvoiceManage";
+import AssetInvoiceManage from "../containers/System/AssetInvoiceManage";
 
 import Header from "../containers/HomePage/HomeHeader";
 import Footer from "../containers/HomePage/HomeFooter";
@@ -118,14 +120,16 @@ class System extends Component {
                 </div>
                 {this.state.openMenus.quanLyNghiepVu && (
                   <ul className="submenu">
-                    <li>
-                      <NavLink
-                        to="/system/admin-manage"
-                        activeClassName="active"
-                      >
-                        Quản lý nhân viên
-                      </NavLink>
-                    </li>
+                    {userInfo && userInfo.role_id === 1 && (
+                      <li>
+                        <NavLink
+                          to="/system/admin-manage"
+                          activeClassName="active"
+                        >
+                          Quản lý nhân viên
+                        </NavLink>
+                      </li>
+                    )}
                     <li>
                       <NavLink
                         to="/system/user-manage"
@@ -134,15 +138,16 @@ class System extends Component {
                         Quản lý người dùng
                       </NavLink>
                     </li>
-
-                    <li>
-                      <NavLink
-                        to="/system/supplier-manage"
-                        activeClassName="active"
-                      >
-                        Quản lý nhà cung cấp
-                      </NavLink>
-                    </li>
+                    {userInfo && userInfo.role_id === 1 && (
+                      <li>
+                        <NavLink
+                          to="/system/supplier-manage"
+                          activeClassName="active"
+                        >
+                          Quản lý nhà cung cấp
+                        </NavLink>
+                      </li>
+                    )}
                     <li>
                       <NavLink
                         to="/system/field-manage"
@@ -169,26 +174,28 @@ class System extends Component {
                     </li>
                     <li>
                       <NavLink
-                        to="/system/booking-manage"
+                        to="/system/invoice-manage"
                         activeClassName="active"
                       >
-                        Quản lý đặt sân
+                        Quản lý hóa đơn đặt sân
                       </NavLink>
                     </li>
+                    {userInfo && userInfo.role_id === 1 && (
+                      <li>
+                        <NavLink
+                          to="/system/asset-invoice-manage"
+                          activeClassName="active"
+                        >
+                          Quản lý hóa đơn nhập hàng
+                        </NavLink>
+                      </li>
+                    )}
                     <li>
                       <NavLink
                         to="/system/receipt-manage"
                         activeClassName="active"
                       >
                         Quản lý phiếu đặt sân
-                      </NavLink>
-                    </li>
-                    <li>
-                      <NavLink
-                        to="/system/invoice-manage"
-                        activeClassName="active"
-                      >
-                        Quản lý hóa đơn dịch vụ
                       </NavLink>
                     </li>
                   </ul>
@@ -214,6 +221,11 @@ class System extends Component {
               <Route path="/system/service-manage" component={ServiceManage} />
               <Route path="/system/service-manage" component={ServiceManage} />
               <Route path="/system/asset-manage" component={AssetManage} />
+              <Route path="/system/invoice-manage" component={InvoiceManage} />
+              <Route
+                path="/system/asset-invoice-manage"
+                component={AssetInvoiceManage}
+              />
               <Route
                 path="/system/supplier-manage"
                 component={SupplierManage}

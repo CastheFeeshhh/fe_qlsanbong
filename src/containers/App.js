@@ -13,6 +13,7 @@ import Login from "./Auth/Login";
 import ResetPassword from "./Auth/ResetPassword";
 import System from "../routes/System";
 import AccessDeniedPage from "../routes/AccessDeniedPage";
+import UserProfile from "../routes/userProfile";
 
 import HomePage from "./HomePage/homePage";
 import information from "../routes/information";
@@ -87,14 +88,13 @@ class App extends Component {
       <Fragment>
         <Router history={history}>
           <div className="main-container">
-            {/* {this.props.isLoggedIn && <Header />} */}
-
             <span className="content-container">
               <Switch>
                 <Route path={path.HOME} exact component={Home} />
                 <Route path={path.LOGIN} component={Login} />
                 <Route path={path.RESET_PASSWORD} component={ResetPassword} />
                 <Route path={path.SYSTEM} component={System} />
+                <Route path={path.PROFILE} component={UserProfile} />
                 <Route path={path.ACCESS_DENIED} component={AccessDeniedPage} />
                 <Route path={path.HOMEPAGE} component={HomePage} />
                 <Route path={path.INFORMATION} component={information} />

@@ -397,7 +397,7 @@ class PaymentPage extends Component {
                 </a>
               </p>
               <p>
-                Hoặc gọi: <span>0556 182 391</span>
+                Hoặc gọi: <span>0559 025 896</span>
               </p>
             </div>
           </div>

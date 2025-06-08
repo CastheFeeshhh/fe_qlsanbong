@@ -35,8 +35,16 @@ const getAllSuppliers = () => {
   return axios.get(`/api/get-all-suppliers`);
 };
 
-const getAllAssetsData = () => {
+const getAllAssets = () => {
   return axios.get(`/api/get-all-assets`);
+};
+
+const getAllInvoices = () => {
+  return axios.get(`/api/get-all-invoices`);
+};
+
+const getAllAssetInvoices = () => {
+  return axios.get(`/api/get-all-asset-invoices`);
 };
 
 const createNewUserService = (data) => {
@@ -130,7 +138,9 @@ export {
   getAllStaffs,
   getAllCustomers,
   getAllSuppliers,
-  getAllAssetsData,
+  getAllAssets,
+  getAllInvoices,
+  getAllAssetInvoices,
   createNewUserService,
   deleteUserService,
   editUserService,
