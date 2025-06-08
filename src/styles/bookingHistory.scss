@@ -1,0 +1,133 @@
+$primary-color: #4A90E2;
+$success-color: #28a745;
+$warning-color: #ffc107;
+$danger-color: #dc3545;
+$card-bg: #ffffff;
+$text-color: #333;
+$border-color: #e0e6ed;
+
+.booking-history-container {
+  width: 100%;
+  
+  .booking-list {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+  }
+
+  .booking-card {
+    background-color: $card-bg;
+    border: 1px solid $border-color;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.04);
+    transition: all 0.3s ease;
+    overflow: hidden;
+  }
+
+  .booking-card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px 20px;
+    background-color: #f7f9fc;
+    border-bottom: 1px solid $border-color;
+    cursor: pointer;
+
+    .booking-info-summary {
+        display: flex;
+        flex-direction: column;
+        gap: 5px;
+    }
+
+    .booking-id {
+      font-weight: bold;
+      color: $primary-color;
+      font-size: 16px;
+    }
+    
+    .booking-date {
+        font-size: 13px;
+        color: #666;
+    }
+
+    .booking-status-toggle {
+        display: flex;
+        align-items: center;
+        gap: 15px;
+    }
+
+    i {
+        font-size: 14px;
+        color: black;
+        transition: transform 0.3s ease;
+    }
+  }
+  
+  .booking-card.expanded {
+    .booking-card-header {
+        background-color: #eef5ff;
+        i {
+            transform: rotate(180deg);
+        }
+    }
+  }
+
+  .booking-card-details {
+    padding: 20px;
+    animation: slide-down 0.4s ease-out;
+
+    p { margin: 0 0 10px 0; color: #555; }
+    hr { margin: 15px 0; border: 0; border-top: 1px solid $border-color; }
+    
+    .booking-detail-section {
+        &:not(:last-child) {
+            margin-bottom: 20px;
+            padding-bottom: 20px;
+            border-bottom: 1px dashed $border-color;
+        }
+    }
+
+    h5, h6 { font-weight: 600; color: $text-color; }
+    h5 { font-size: 16px; margin-bottom: 10px; }
+    h6 { font-size: 14px; margin-top: 15px; margin-bottom: 5px; }
+
+    .service-list {
+        list-style-type: disc;
+        padding-left: 25px;
+        margin: 0;
+        li { margin-bottom: 5px; color: #666; }
+    }
+  }
+  
+  @keyframes slide-down {
+      from {
+          opacity: 0;
+          transform: translateY(-10px);
+      }
+      to {
+          opacity: 1;
+          transform: translateY(0);
+      }
+  }
+
+  .booking-status {
+    padding: 5px 12px;
+    border-radius: 15px;
+    font-size: 12px;
+    font-weight: 600;
+    color: white;
+
+    &.status-đã-xác-nhận { background-color: $success-color; }
+    &.status-đang-chờ { background-color: $warning-color; color: #333; }
+    &.status-đã-hủy { background-color: $danger-color; }
+  }
+
+  .no-bookings, .loading-state, .error-state {
+    text-align: center;
+    padding: 50px;
+    border: 1px dashed $border-color;
+    border-radius: 8px;
+    color: #888;
+    font-size: 18px;
+  }
+}

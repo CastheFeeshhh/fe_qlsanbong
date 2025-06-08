@@ -63,6 +63,18 @@ const editUserService = (inputData) => {
   return axios.put("/api/edit-user", inputData);
 };
 
+const getBookingHistory = (userId) => {
+  return axios.get("/api/get-booking-history", {
+    params: {
+      userId: userId,
+    },
+  });
+};
+
+const changePasswordService = (data) => {
+  return axios.post("/api/change-password", data);
+};
+
 const createVnpayPayment = async (bookingId, amount, orderInfo) => {
   const url = `${process.env.REACT_APP_BACKEND_URL}/api/vnpay/create_payment_url`;
 
@@ -144,5 +156,7 @@ export {
   createNewUserService,
   deleteUserService,
   editUserService,
+  getBookingHistory,
   createVnpayPayment,
+  changePasswordService,
 };
