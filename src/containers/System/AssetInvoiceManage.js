@@ -1,6 +1,6 @@
 import React, { Component } from "react";
 import { toast } from "react-toastify";
-import { getAllAssetInvoices } from "../../services/userService";
+import { getAllAssetInvoices } from "../../services/manageService";
 import "../../styles/assetInvoiceManage.scss";
 
 class AssetInvoiceManage extends Component {

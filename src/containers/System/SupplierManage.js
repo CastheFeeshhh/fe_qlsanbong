@@ -1,7 +1,14 @@
 import React, { Component } from "react";
 import { toast } from "react-toastify";
-import { getAllSuppliers } from "../../services/userService";
+import {
+  getAllSuppliers,
+  createNewSupplierService,
+  deleteSupplierService,
+  editSupplierService,
+} from "../../services/manageService";
 import "../../styles/supplierManage.scss";
+import AddSupplierModal from "../../component/AddSupplierModal";
+import EditSupplierModal from "../../component/EditSupplierModal";
 
 class SupplierManage extends Component {
   constructor(props) {
@@ -10,6 +17,9 @@ class SupplierManage extends Component {
       suppliers: [],
       isLoading: true,
       error: null,
+      isOpenCreateModal: false,
+      isOpenEditModal: false,
+      supplierEdit: {},
     };
   }
 
@@ -21,66 +31,119 @@ class SupplierManage extends Component {
     this.setState({ isLoading: true, error: null });
     try {
       let response = await getAllSuppliers();
-      console.log(response);
       if (response && response.errCode === 0) {
         this.setState({
           suppliers: response.suppliers || [],
           isLoading: false,
         });
-      } else if (Array.isArray(response)) {
-        this.setState({
-          suppliers: response,
-          isLoading: false,
-        });
       } else {
-        throw new Error(
-          response.errMessage || "Dữ liệu nhận được không hợp lệ."
-        );
+        throw new Error(response?.errMessage || "Dữ liệu không hợp lệ.");
       }
     } catch (e) {
-      console.error("Lỗi khi tải danh sách nhà cung cấp:", e);
-      let errorMessage = "Có lỗi xảy ra khi tải danh sách nhà cung cấp.";
-      if (e.response && e.response.data && e.response.data.errMessage) {
-        errorMessage = e.response.data.errMessage;
-      } else if (e.message) {
-        errorMessage = e.message;
-      }
       this.setState({
-        error: errorMessage,
+        error: "Có lỗi xảy ra khi tải danh sách.",
         isLoading: false,
       });
-      toast.error(errorMessage);
+      toast.error("Có lỗi xảy ra khi tải danh sách!");
+    }
+  };
+
+  handleAddNewSupplier = () => {
+    this.setState({ isOpenCreateModal: true });
+  };
+
+  toggleCreateModal = () => {
+    this.setState({ isOpenCreateModal: !this.state.isOpenCreateModal });
+  };
+
+  createNewSupplier = async (data) => {
+    try {
+      let response = await createNewSupplierService(data);
+      if (response && response.errCode !== 0) {
+        toast.error(response.errMessage);
+      } else {
+        await this.loadSuppliers();
+        this.setState({ isOpenCreateModal: false });
+        toast.success("Thêm nhà cung cấp mới thành công!");
+      }
+    } catch (e) {
+      toast.error("Có lỗi xảy ra!");
+    }
+  };
+
+  handleDeleteSupplier = async (supplier) => {
+    if (window.confirm("Bạn có chắc chắn muốn xóa nhà cung cấp này?")) {
+      try {
+        let res = await deleteSupplierService(supplier.supplier_id);
+        if (res && res.errCode === 0) {
+          await this.loadSuppliers();
+          toast.success("Xóa nhà cung cấp thành công!");
+        } else {
+          toast.error(res.errMessage);
+        }
+      } catch (e) {
+        toast.error("Có lỗi xảy ra!");
+      }
+    }
+  };
+
+  handleEditSupplier = (supplier) => {
+    console.log("supplier:", supplier);
+    this.setState({
+      isOpenEditModal: true,
+      supplierEdit: supplier,
+    });
+  };
+
+  toggleEditModal = () => {
+    this.setState({ isOpenEditModal: !this.state.isOpenEditModal });
+  };
+
+  doEditSupplier = async (supplier) => {
+    try {
+      let res = await editSupplierService(supplier);
+      if (res && res.errCode === 0) {
+        this.setState({ isOpenEditModal: false });
+        await this.loadSuppliers();
+        toast.success("Cập nhật nhà cung cấp thành công!");
+      } else {
+        toast.error(res.errMessage);
+      }
+    } catch (e) {
+      toast.error("Có lỗi xảy ra!");
     }
   };
 
   formatDate = (dateString) => {
     if (!dateString) return "N/A";
-    try {
-      const options = {
-        year: "numeric",
-        month: "2-digit",
-        day: "2-digit",
-        hour: "2-digit",
-        minute: "2-digit",
-      };
-      return new Intl.DateTimeFormat("vi-VN", options).format(
-        new Date(dateString)
-      );
-    } catch (error) {
-      return dateString;
-    }
+    const options = {
+      year: "numeric",
+      month: "2-digit",
+      day: "2-digit",
+      hour: "2-digit",
+      minute: "2-digit",
+    };
+    return new Intl.DateTimeFormat("vi-VN", options).format(
+      new Date(dateString)
+    );
   };
 
   render() {
-    const { suppliers, isLoading, error } = this.state;
+    const {
+      suppliers,
+      isLoading,
+      error,
+      isOpenCreateModal,
+      isOpenEditModal,
+      supplierEdit,
+    } = this.state;
 
     if (isLoading) {
       return (
         <div className="system-main-content">
           <h1 className="title">QUẢN LÝ NHÀ CUNG CẤP</h1>
           <div className="loading-state">
-            <i className="fas fa-spinner fa-spin"></i>
-            Đang tải dữ liệu...
+            <i className="fas fa-spinner fa-spin"></i> Đang tải dữ liệu...
           </div>
         </div>
       );
@@ -91,12 +154,10 @@ class SupplierManage extends Component {
         <div className="system-main-content">
           <h1 className="title">QUẢN LÝ NHÀ CUNG CẤP</h1>
           <div className="error-state">
-            <i className="fas fa-exclamation-triangle"></i>
-            {error}
+            <i className="fas fa-exclamation-triangle"></i> {error}
           </div>
           <button className="btn btn-primary" onClick={this.loadSuppliers}>
-            <i className="fas fa-sync-alt"></i>
-            Thử lại
+            <i className="fas fa-sync-alt"></i> Thử lại
           </button>
         </div>
       );
@@ -105,12 +166,29 @@ class SupplierManage extends Component {
     return (
       <div className="system-main-content">
         <h1 className="title">QUẢN LÝ NHÀ CUNG CẤP</h1>
+        {isOpenCreateModal && (
+          <AddSupplierModal
+            isOpen={isOpenCreateModal}
+            toggleFromParent={this.toggleCreateModal}
+            createNewSupplier={this.createNewSupplier}
+          />
+        )}
+        {isOpenEditModal && (
+          <EditSupplierModal
+            isOpen={isOpenEditModal}
+            toggleFromParent={this.toggleEditModal}
+            currentSupplier={supplierEdit}
+            editSupplier={this.doEditSupplier}
+          />
+        )}
         <div className="admin-card">
           <div className="card-header">
             <h3>Danh sách nhà cung cấp</h3>
-            <button className="btn btn-primary">
-              <i className="fas fa-plus"></i>
-              Thêm nhà cung cấp
+            <button
+              className="btn btn-primary"
+              onClick={this.handleAddNewSupplier}
+            >
+              <i className="fas fa-plus"></i> Thêm nhà cung cấp
             </button>
           </div>
           <div className="card-body">
@@ -148,12 +226,18 @@ class SupplierManage extends Component {
                               <button
                                 className="btn btn-edit"
                                 title="Sửa nhà cung cấp"
+                                onClick={() =>
+                                  this.handleEditSupplier(supplier)
+                                }
                               >
                                 <i className="fas fa-edit"></i>
                               </button>
                               <button
                                 className="btn btn-delete"
                                 title="Xóa nhà cung cấp"
+                                onClick={() =>
+                                  this.handleDeleteSupplier(supplier)
+                                }
                               >
                                 <i className="fas fa-trash-alt"></i>
                               </button>

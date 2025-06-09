@@ -2,10 +2,8 @@ import React, { Component } from "react";
 import { connect } from "react-redux";
 import { toast } from "react-toastify";
 import * as actions from "../../store/actions/userActions";
-import { editUserService } from "../../services/userService";
+import { editUserService } from "../../services/manageService";
 import { updateUserInfoInRedux } from "../../store/actions/userActions";
-// import HomeHeader from "../containers/HomePage/HomeHeader";
-// import HomeFooter from "../containers/HomePage/HomeFooter";
 import defaultAvatar from "../../assets/images/default_avatar.jpg";
 import moment from "moment";
 
@@ -103,7 +101,7 @@ class UserProfile extends Component {
       created_at,
       isEditMode,
     } = this.state;
-    const fullName = `${last_name || ""} ${first_name || ""}`.trim();
+    const fullName = `${first_name || ""} ${last_name || ""}`.trim();
     const roleId = this.props.userInfo?.role_id;
 
     return (

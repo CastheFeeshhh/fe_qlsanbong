@@ -59,6 +59,20 @@ const addServiceBookingDetail = (id, serviceId, quantity) => {
   });
 };
 
+const createNewFieldService = (data) => {
+  return axios.post("/api/create-new-field", data);
+};
+
+const deleteFieldService = (fieldId) => {
+  return axios.delete("/api/delete-field", {
+    data: { id: fieldId },
+  });
+};
+
+const editFieldService = (inputData) => {
+  return axios.put("/api/edit-field", inputData);
+};
+
 export {
   getAllServicesData,
   getAllFieldsData,
@@ -67,4 +81,7 @@ export {
   addDetailBooking,
   addServiceBooking,
   addServiceBookingDetail,
+  createNewFieldService,
+  deleteFieldService,
+  editFieldService,
 };

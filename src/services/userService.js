@@ -15,54 +15,6 @@ const handleForgotPasswordApi = (email) => {
   return axios.post("/api/forgot-password", { email });
 };
 
-const getAllUsers = (inputId) => {
-  return axios.get(`/api/get-all-users?id=${inputId}`);
-};
-
-const getAllAdmins = () => {
-  return axios.get(`/api/get-all-admins`);
-};
-
-const getAllStaffs = () => {
-  return axios.get(`/api/get-all-staffs`);
-};
-
-const getAllCustomers = () => {
-  return axios.get(`/api/get-all-customers`);
-};
-
-const getAllSuppliers = () => {
-  return axios.get(`/api/get-all-suppliers`);
-};
-
-const getAllAssets = () => {
-  return axios.get(`/api/get-all-assets`);
-};
-
-const getAllInvoices = () => {
-  return axios.get(`/api/get-all-invoices`);
-};
-
-const getAllAssetInvoices = () => {
-  return axios.get(`/api/get-all-asset-invoices`);
-};
-
-const createNewUserService = (data) => {
-  console.log("check data from service : ", data);
-  return axios.post("/api/create-new-user", data);
-};
-
-const deleteUserService = (userId) => {
-  console.log("check:", userId);
-  return axios.delete("/api/delete-user", {
-    data: { user_id: userId },
-  });
-};
-
-const editUserService = (inputData) => {
-  return axios.put("/api/edit-user", inputData);
-};
-
 const getBookingHistory = (userId) => {
   return axios.get("/api/get-booking-history", {
     params: {
@@ -145,17 +97,6 @@ export {
   handleLoginApi,
   handleRegisterApi,
   handleForgotPasswordApi,
-  getAllUsers,
-  getAllAdmins,
-  getAllStaffs,
-  getAllCustomers,
-  getAllSuppliers,
-  getAllAssets,
-  getAllInvoices,
-  getAllAssetInvoices,
-  createNewUserService,
-  deleteUserService,
-  editUserService,
   getBookingHistory,
   createVnpayPayment,
   changePasswordService,

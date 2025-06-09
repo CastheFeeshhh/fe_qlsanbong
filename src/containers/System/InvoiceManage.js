@@ -1,7 +1,12 @@
 import React, { Component } from "react";
 import { toast } from "react-toastify";
-import { getAllInvoices } from "../../services/userService";
+import {
+  getAllInvoices,
+  getInvoiceDetailsById,
+} from "../../services/manageService";
+import InvoiceDetailModal from "../../component/InvoiceDetailModal";
 import "../../styles/invoiceManage.scss";
+import moment from "moment";
 
 class InvoiceManage extends Component {
   constructor(props) {
@@ -10,6 +15,8 @@ class InvoiceManage extends Component {
       invoices: [],
       isLoading: true,
       error: null,
+      isOpenDetailModal: false,
+      invoiceDetailData: null,
     };
   }
 
@@ -32,36 +39,44 @@ class InvoiceManage extends Component {
         );
       }
     } catch (e) {
-      console.error("Lỗi khi tải danh sách hóa đơn:", e);
-      let errorMessage = "Có lỗi xảy ra khi tải danh sách hóa đơn.";
-      if (e.response && e.response.data && e.response.data.errMessage) {
-        errorMessage = e.response.data.errMessage;
-      } else if (e.message) {
-        errorMessage = e.message;
-      }
       this.setState({
-        error: errorMessage,
+        error: "Có lỗi xảy ra khi tải danh sách hóa đơn.",
         isLoading: false,
       });
-      toast.error(errorMessage);
+      toast.error("Có lỗi xảy ra khi tải danh sách hóa đơn.");
     }
   };
 
   formatDate = (dateString) => {
     if (!dateString) return "Chưa thanh toán";
+    return moment(dateString).format("HH:mm [ngày] DD/MM/YYYY");
+  };
+
+  toggleDetailModal = () => {
+    this.setState({ isOpenDetailModal: !this.state.isOpenDetailModal });
+  };
+
+  handleViewDetails = async (invoice) => {
     try {
-      const options = {
-        year: "numeric",
-        month: "2-digit",
-        day: "2-digit",
-        hour: "2-digit",
-        minute: "2-digit",
-      };
-      return new Intl.DateTimeFormat("vi-VN", options).format(
-        new Date(dateString)
-      );
-    } catch (error) {
-      return dateString;
+      this.setState({ isLoading: true });
+      let response = await getInvoiceDetailsById(invoice.booking_id);
+      this.setState({ isLoading: false });
+
+      if (response && response.errCode === 0) {
+        const fullInvoiceData = {
+          ...invoice,
+          details: response.details,
+        };
+        this.setState({
+          invoiceDetailData: fullInvoiceData,
+          isOpenDetailModal: true,
+        });
+      } else {
+        toast.error("Không thể lấy chi tiết hóa đơn!");
+      }
+    } catch (e) {
+      this.setState({ isLoading: false });
+      toast.error("Có lỗi xảy ra khi lấy chi tiết hóa đơn!");
     }
   };
 
@@ -99,6 +114,13 @@ class InvoiceManage extends Component {
     return (
       <div className="system-main-content">
         <h1 className="title">QUẢN LÝ HÓA ĐƠN</h1>
+        {this.state.isOpenDetailModal && (
+          <InvoiceDetailModal
+            isOpen={this.state.isOpenDetailModal}
+            toggleFromParent={this.toggleDetailModal}
+            invoiceData={this.state.invoiceDetailData}
+          />
+        )}
         <div className="admin-card">
           <div className="card-header">
             <h3>Danh sách hóa đơn</h3>
@@ -126,32 +148,23 @@ class InvoiceManage extends Component {
                     {invoices && invoices.length > 0 ? (
                       invoices.map((invoice) => (
                         <tr key={invoice.invoice_id}>
-                          <td data-label="ID Hóa Đơn">{invoice.invoice_id}</td>
-                          <td data-label="ID Đơn Đặt">{invoice.booking_id}</td>
-                          <td data-label="Khách Hàng">
-                            {invoice.customer_name}
+                          <td>{invoice.invoice_id}</td>
+                          <td>{invoice.booking_id}</td>
+                          <td>{invoice.customer_name}</td>
+                          <td>{invoice.customer_email}</td>
+                          <td className="text-right">
+                            {parseFloat(invoice.total_price).toLocaleString(
+                              "vi-VN"
+                            ) + " VNĐ"}
                           </td>
-                          <td data-label="Email Khách Hàng">
-                            {invoice.customer_email}
-                          </td>
-                          <td data-label="Tổng Tiền" className="text-right">
-                            {invoice.total_price
-                              ? parseFloat(invoice.total_price).toLocaleString(
-                                  "vi-VN"
-                                ) + " VNĐ"
-                              : "N/A"}
-                          </td>
-                          <td data-label="Phương Thức TT">
-                            {invoice.payment_method}
-                          </td>
-                          <td data-label="Ngày Thanh Toán">
-                            {this.formatDate(invoice.paid_at)}
-                          </td>
-                          <td data-label="Thao Tác">
+                          <td>{invoice.payment_method}</td>
+                          <td>{this.formatDate(invoice.paid_at)}</td>
+                          <td>
                             <div className="btn-action-group">
                               <button
                                 className="btn btn-edit"
                                 title="Xem chi tiết hóa đơn"
+                                onClick={() => this.handleViewDetails(invoice)}
                               >
                                 <i className="fas fa-eye"></i>
                               </button>

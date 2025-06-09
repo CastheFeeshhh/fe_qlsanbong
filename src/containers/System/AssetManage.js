@@ -1,7 +1,14 @@
 import React, { Component } from "react";
 import { toast } from "react-toastify";
-import { getAllAssets } from "../../services/userService";
+import {
+  getAllAssets,
+  createNewAssetService,
+  deleteAssetService,
+  editAssetService,
+} from "../../services/manageService";
 import "../../styles/assetManage.scss";
+import AddAssetModal from "../../component/AddAssetModal";
+import EditAssetModal from "../../component/EditAssetModal";
 
 class AssetManage extends Component {
   constructor(props) {
@@ -10,6 +17,9 @@ class AssetManage extends Component {
       allAssets: [],
       isLoading: true,
       error: null,
+      isOpenCreateModal: false,
+      isOpenEditModal: false,
+      assetEdit: {},
     };
   }
 
@@ -27,23 +37,85 @@ class AssetManage extends Component {
           isLoading: false,
         });
       } else {
-        throw new Error(
-          response?.errMessage || "Dữ liệu nhận được không hợp lệ."
-        );
+        throw new Error(response?.errMessage || "Dữ liệu không hợp lệ.");
       }
     } catch (e) {
-      console.error("Lỗi khi tải danh sách tài sản:", e);
-      let errorMessage = "Có lỗi xảy ra khi tải danh sách tài sản.";
-      if (e.response && e.response.data && e.response.data.errMessage) {
-        errorMessage = e.response.data.errMessage;
-      } else if (e.message) {
-        errorMessage = e.message;
-      }
       this.setState({
-        error: errorMessage,
+        error: "Có lỗi xảy ra khi tải danh sách.",
         isLoading: false,
       });
-      toast.error(errorMessage);
+      toast.error("Có lỗi xảy ra khi tải danh sách!");
+    }
+  };
+
+  handleAddNewAsset = () => {
+    this.setState({
+      isOpenCreateModal: true,
+    });
+  };
+
+  toggleCreateModal = () => {
+    this.setState({
+      isOpenCreateModal: !this.state.isOpenCreateModal,
+    });
+  };
+
+  createNewAsset = async (data) => {
+    try {
+      let response = await createNewAssetService(data);
+      if (response && response.errCode !== 0) {
+        toast.error(response.errMessage);
+      } else {
+        await this.loadAssets();
+        this.setState({ isOpenCreateModal: false });
+        toast.success("Thêm tài sản mới thành công!");
+      }
+    } catch (e) {
+      toast.error("Có lỗi xảy ra!");
+    }
+  };
+
+  handleDeleteAsset = async (asset) => {
+    if (window.confirm("Bạn có chắc chắn muốn xóa tài sản này?")) {
+      try {
+        let res = await deleteAssetService(asset.asset_id);
+        if (res && res.errCode === 0) {
+          await this.loadAssets();
+          toast.success("Xóa tài sản thành công!");
+        } else {
+          toast.error(res.errMessage);
+        }
+      } catch (e) {
+        toast.error("Có lỗi xảy ra!");
+      }
+    }
+  };
+
+  handleEditAsset = (asset) => {
+    this.setState({
+      isOpenEditModal: true,
+      assetEdit: asset,
+    });
+  };
+
+  toggleEditModal = () => {
+    this.setState({
+      isOpenEditModal: !this.state.isOpenEditModal,
+    });
+  };
+
+  doEditAsset = async (asset) => {
+    try {
+      let res = await editAssetService(asset);
+      if (res && res.errCode === 0) {
+        this.setState({ isOpenEditModal: false });
+        await this.loadAssets();
+        toast.success("Cập nhật tài sản thành công!");
+      } else {
+        toast.error(res.errMessage);
+      }
+    } catch (e) {
+      toast.error("Có lỗi xảy ra!");
     }
   };
 
@@ -77,15 +149,26 @@ class AssetManage extends Component {
                       {asset.total_quantity}
                     </td>
                     <td data-label="SL Tồn Kho" className="text-center">
-                      {asset.current_quantity}
+                      {asset.current_quantity !== null &&
+                      asset.current_quantity !== undefined
+                        ? asset.current_quantity
+                        : "N/A"}
                     </td>
                     <td data-label="Trạng thái">{asset.status}</td>
                     <td data-label="Thao Tác">
                       <div className="btn-action-group">
-                        <button className="btn btn-edit" title="Sửa tài sản">
+                        <button
+                          className="btn btn-edit"
+                          title="Sửa tài sản"
+                          onClick={() => this.handleEditAsset(asset)}
+                        >
                           <i className="fas fa-edit"></i>
                         </button>
-                        <button className="btn btn-delete" title="Xóa tài sản">
+                        <button
+                          className="btn btn-delete"
+                          title="Xóa tài sản"
+                          onClick={() => this.handleDeleteAsset(asset)}
+                        >
                           <i className="fas fa-trash-alt"></i>
                         </button>
                       </div>
@@ -107,7 +190,14 @@ class AssetManage extends Component {
   };
 
   render() {
-    const { allAssets, isLoading, error } = this.state;
+    const {
+      allAssets,
+      isLoading,
+      error,
+      isOpenCreateModal,
+      isOpenEditModal,
+      assetEdit,
+    } = this.state;
 
     const trackableAssets = allAssets.filter(
       (asset) => asset.is_trackable === 1 || asset.is_trackable === true
@@ -133,8 +223,7 @@ class AssetManage extends Component {
         <div className="system-main-content">
           <h1 className="title">QUẢN LÝ TÀI SẢN & VẬT TƯ</h1>
           <div className="error-state">
-            <i className="fas fa-exclamation-triangle"></i>
-            {error}
+            <i className="fas fa-exclamation-triangle"></i> {error}
           </div>
           <button className="btn btn-primary" onClick={this.loadAssets}>
             <i className="fas fa-sync-alt"></i>
@@ -147,12 +236,29 @@ class AssetManage extends Component {
     return (
       <div className="system-main-content">
         <h1 className="title">QUẢN LÝ TÀI SẢN & VẬT TƯ</h1>
+        {isOpenCreateModal && (
+          <AddAssetModal
+            isOpen={isOpenCreateModal}
+            toggleFromParent={this.toggleCreateModal}
+            createNewAsset={this.createNewAsset}
+          />
+        )}
+        {isOpenEditModal && (
+          <EditAssetModal
+            isOpen={isOpenEditModal}
+            toggleFromParent={this.toggleEditModal}
+            currentAsset={assetEdit}
+            editAsset={this.doEditAsset}
+          />
+        )}
         <div className="admin-card">
           <div className="card-header">
-            <h3>Danh sách tài sản </h3>
-            <button className="btn btn-primary">
-              <i className="fas fa-plus"></i>
-              Thêm tài sản mới
+            <h3>Danh sách tài sản</h3>
+            <button
+              className="btn btn-primary"
+              onClick={this.handleAddNewAsset}
+            >
+              <i className="fas fa-plus"></i> Thêm tài sản mới
             </button>
           </div>
           <div className="card-body">

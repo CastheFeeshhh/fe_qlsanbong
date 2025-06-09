@@ -1,6 +1,14 @@
 import React, { Component } from "react";
 import { toast } from "react-toastify";
-import { getAllServicesData } from "../../services/bookingService";
+import {
+  getAllAssets,
+  createNewService,
+  updateServiceData,
+  deleteServiceData,
+} from "../../services/manageService.js";
+import { getAllServicesData } from "../../services/bookingService.js";
+import AddServiceModal from "../../component/AddServiceModal.js";
+import EditServiceModal from "../../component/EditServiceModal.js";
 import "../../styles/serviceManage.scss";
 
 class ServiceManage extends Component {
@@ -8,81 +16,159 @@ class ServiceManage extends Component {
     super(props);
     this.state = {
       services: [],
+      assets: [],
       isLoading: true,
       error: null,
+      isOpenAddModal: false,
+      isOpenEditModal: false,
+      serviceEdit: {},
     };
   }
 
   async componentDidMount() {
-    await this.loadServices();
+    await this.loadInitialData();
   }
 
-  loadServices = async () => {
+  loadInitialData = async () => {
     this.setState({ isLoading: true, error: null });
     try {
-      let response = await getAllServicesData();
-      if (Array.isArray(response)) {
-        this.setState({
-          services: response,
-          isLoading: false,
-        });
-      } else {
-        throw new Error("Dữ liệu nhận được không phải là một mảng.");
-      }
-    } catch (e) {
-      console.error("Lỗi khi tải danh sách dịch vụ:", e);
-      let errorMessage = "Có lỗi xảy ra khi tải danh sách dịch vụ.";
-      if (e.response && e.response.data && e.response.data.errMessage) {
-        errorMessage = e.response.data.errMessage;
-      } else if (e.message) {
-        errorMessage = e.message;
-      }
+      let [servicesRes, assetsRes] = await Promise.all([
+        getAllServicesData(),
+        getAllAssets(),
+      ]);
+      let servicesList = Array.isArray(servicesRes) ? servicesRes : [];
+      let assetsList =
+        assetsRes && assetsRes.errCode === 0 && Array.isArray(assetsRes.assets)
+          ? assetsRes.assets
+          : [];
       this.setState({
-        error: errorMessage,
+        services: servicesList,
+        assets: assetsList,
         isLoading: false,
       });
-      toast.error(errorMessage);
+    } catch (e) {
+      this.setState({
+        error: "Có lỗi xảy ra khi tải dữ liệu.",
+        isLoading: false,
+      });
+      toast.error("Có lỗi xảy ra khi tải dữ liệu!");
+    }
+  };
+
+  handleOpenAddModal = () => {
+    this.setState({ isOpenAddModal: true });
+  };
+
+  toggleAddModal = () => {
+    this.setState({ isOpenAddModal: !this.state.isOpenAddModal });
+  };
+
+  handleOpenEditModal = (service) => {
+    this.setState({ isOpenEditModal: true, serviceEdit: service });
+  };
+
+  toggleEditModal = () => {
+    this.setState({ isOpenEditModal: !this.state.isOpenEditModal });
+  };
+
+  doCreateNewService = async (data) => {
+    try {
+      let response = await createNewService(data);
+      if (response && response.errCode !== 0) {
+        toast.error(response.errMessage);
+      } else {
+        await this.loadInitialData();
+        this.setState({ isOpenAddModal: false });
+        toast.success("Thêm dịch vụ thành công!");
+      }
+    } catch (e) {
+      toast.error("Có lỗi xảy ra!");
+    }
+  };
+
+  doEditService = async (data) => {
+    try {
+      let response = await updateServiceData(data);
+      if (response && response.errCode !== 0) {
+        toast.error(response.errMessage);
+      } else {
+        await this.loadInitialData();
+        this.setState({ isOpenEditModal: false });
+        toast.success("Cập nhật dịch vụ thành công!");
+      }
+    } catch (e) {
+      toast.error("Có lỗi xảy ra!");
+    }
+  };
+
+  handleDeleteService = async (service) => {
+    if (window.confirm("Bạn có chắc chắn muốn xóa: " + service.name + "?")) {
+      try {
+        let response = await deleteServiceData(service.service_id);
+        if (response && response.errCode === 0) {
+          await this.loadInitialData();
+          toast.success("Xóa dịch vụ thành công!");
+        } else {
+          toast.error(response.errMessage);
+        }
+      } catch (e) {
+        toast.error("Có lỗi xảy ra!");
+      }
     }
   };
 
   render() {
-    const { services, isLoading, error } = this.state;
-
+    const { services, assets, isLoading, error } = this.state;
     if (isLoading) {
       return (
         <div className="system-main-content">
           <h1 className="title">QUẢN LÝ DỊCH VỤ</h1>
           <div className="loading-state">
-            <i className="fas fa-spinner fa-spin"></i>
-            Đang tải danh sách dịch vụ...
+            <i className="fas fa-spinner fa-spin"></i> Đang tải...
           </div>
         </div>
       );
     }
-
     if (error) {
       return (
         <div className="system-main-content">
           <h1 className="title">QUẢN LÝ DỊCH VỤ</h1>
           <div className="error-state">
-            <i className="fas fa-exclamation-triangle"></i>
-            {error}
+            <i className="fas fa-exclamation-triangle"></i> {error}
           </div>
-          <button className="btn btn-primary" onClick={this.loadServices}>
-            <i className="fas fa-sync-alt"></i>
-            Thử lại
+          <button className="btn btn-primary" onClick={this.loadInitialData}>
+            <i className="fas fa-sync-alt"></i> Thử lại
           </button>
         </div>
       );
     }
 
+    const trackableAssets = assets.filter((asset) => asset.is_trackable === 1);
+
     return (
       <div className="system-main-content">
         <h1 className="title">QUẢN LÝ DỊCH VỤ</h1>
+        <AddServiceModal
+          isOpen={this.state.isOpenAddModal}
+          toggleFromParent={this.toggleAddModal}
+          createNewService={this.doCreateNewService}
+          assets={trackableAssets}
+        />
+        <EditServiceModal
+          isOpen={this.state.isOpenEditModal}
+          toggleFromParent={this.toggleEditModal}
+          currentService={this.state.serviceEdit}
+          editService={this.doEditService}
+          assets={trackableAssets}
+        />
+
         <div className="admin-card">
           <div className="card-header">
             <h3>Danh sách dịch vụ</h3>
-            <button className="btn btn-primary">
+            <button
+              className="btn btn-primary"
+              onClick={this.handleOpenAddModal}
+            >
               <i className="fas fa-plus"></i>
               Thêm dịch vụ mới
             </button>
@@ -108,28 +194,30 @@ class ServiceManage extends Component {
                     {services && services.length > 0 ? (
                       services.map((service) => (
                         <tr key={service.service_id}>
-                          <td data-label="ID">{service.service_id}</td>
-                          <td data-label="Tên Dịch Vụ">{service.name}</td>
-                          <td data-label="Giá (VNĐ)" className="text-right">
-                            {service.price
-                              ? parseFloat(service.price).toLocaleString(
-                                  "vi-VN"
-                                )
-                              : "N/A"}
+                          <td>{service.service_id}</td>
+                          <td>{service.name}</td>
+                          <td className="text-right">
+                            {parseFloat(service.price).toLocaleString("vi-VN")}
                           </td>
-                          <td data-label="Mô Tả">{service.description}</td>
-                          <td data-label="Loại Hình">{service.type}</td>
-                          <td data-label="Thao Tác">
+                          <td>{service.description}</td>
+                          <td>{service.type}</td>
+                          <td>
                             <div className="btn-action-group">
                               <button
                                 className="btn btn-edit"
                                 title="Sửa dịch vụ"
+                                onClick={() =>
+                                  this.handleOpenEditModal(service)
+                                }
                               >
                                 <i className="fas fa-edit"></i>
                               </button>
                               <button
                                 className="btn btn-delete"
                                 title="Xóa dịch vụ"
+                                onClick={() =>
+                                  this.handleDeleteService(service)
+                                }
                               >
                                 <i className="fas fa-trash-alt"></i>
                               </button>

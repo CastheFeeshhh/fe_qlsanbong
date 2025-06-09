@@ -5,10 +5,10 @@ import {
   createNewUserService,
   deleteUserService,
   editUserService,
-} from "../../services/userService";
+} from "../../services/manageService";
 
-import ModalUser from "../../component/ModalUser";
-import ModalEditUser from "../../component/ModalEditUser";
+import ModalUser from "../../component/AddUserModal";
+import ModalEditUser from "../../component/EditUserModal";
 import { emitter } from "../../utils/emitter";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";

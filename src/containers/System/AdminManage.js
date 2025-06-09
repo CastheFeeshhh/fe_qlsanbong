@@ -6,10 +6,10 @@ import {
   createNewUserService,
   deleteUserService,
   editUserService,
-} from "../../services/userService";
+} from "../../services/manageService";
 
-import ModalUser from "../../component/ModalUser";
-import ModalEditUser from "../../component/ModalEditUser";
+import ModalUser from "../../component/AddUserModal";
+import ModalEditUser from "../../component/EditUserModal";
 import { emitter } from "../../utils/emitter";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
@@ -45,7 +45,6 @@ class AdminManage extends Component {
           role: "admin",
         };
       });
-      console.log("a1.5", adminsWithRole);
 
       const staffsWithRole = staffRes.users.map((user, index) => {
         return {
@@ -82,18 +81,13 @@ class AdminManage extends Component {
   };
 
   createNewUser = async (data) => {
-    console.log("Dữ liệu nhận từ ModalUser:", data);
-
     try {
       const newUser = {
         ...data,
         position_id: "1",
       };
 
-      console.log("Dữ liệu gửi đi cho createNewUserService:", newUser);
-
       let response = await createNewUserService(newUser);
-      console.log("Phản hồi từ createNewUserService:", response);
 
       if (response && response.errCode !== 0) {
         if (response.errMessage) {
