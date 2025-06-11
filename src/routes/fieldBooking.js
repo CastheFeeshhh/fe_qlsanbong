@@ -513,6 +513,26 @@ class fieldBooking extends Component {
     }
   };
 
+  // handleClick = async () => {
+  //   alert("23");
+  //   console.log("test:", this.props.userInfo);
+  //   let test_1 = this.props.userInfo;
+  //   this.setState({
+  //     currentBooking: {
+  //       teamName: "ABC",
+  //       captainName: test_1.first_name + " " + test_1.last_name,
+  //       phoneNumber: test_1.phone,
+  //       bookingDate: moment().format("YYYY-MM-DD"),
+  //       selectedField: "",
+  //       startTimeHour: "17",
+  //       startTimeMinute: "00",
+  //       endTimeHour: "18",
+  //       endTimeMinute: "30",
+  //       selectedServices: {},
+  //     },
+  //   });
+  // };
+
   async componentDidMount() {
     await this.props.fetchAllServices();
     await this.props.fetchAllFields();
@@ -605,6 +625,13 @@ class fieldBooking extends Component {
                     required
                   />
                 </div>
+                {/* <div>
+                  <button
+                    type="button"
+                    className="btn-test"
+                    onClick={this.handleClick}
+                  />
+                </div> */}
                 <div className="form-group-book">
                   <label htmlFor="captainName">Họ tên đội trưởng:</label>
                   <input

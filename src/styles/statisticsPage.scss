@@ -1,0 +1,143 @@
+.statistics-container {
+  background-color: #ffffff;
+  padding: 32px;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+
+  .filter-container {
+    padding-bottom: 24px;
+    margin-bottom: 32px;
+    border-bottom: 1px solid #e9ecef;
+  }
+}
+
+.quick-filters-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 24px;
+
+  .filter-tab {
+    padding: 8px 16px;
+    border-radius: 20px;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 500;
+    color: #495057;
+    background-color: #f0f2f5;
+    border: 1px solid transparent;
+    transition: all 0.2s ease-in-out;
+
+    &:hover {
+      border-color: #007bff;
+    }
+
+    &.active {
+      background-color: #007bff;
+      color: #ffffff;
+      border-color: #007bff;
+      box-shadow: 0 2px 4px rgba(0, 123, 255, 0.25);
+    }
+  }
+}
+
+.custom-date-filter {
+    display: flex;
+    align-items: flex-end;
+    gap: 24px;
+    width: 100%;
+
+    .filter-group {
+      display: flex;
+      flex-direction: column;
+
+      label {
+        font-size: 14px;
+        font-weight: 600;
+        margin-bottom: 8px;
+        color: #495057;
+      }
+
+      .react-datepicker-wrapper {
+        width: 100%;
+      }
+    }
+}
+
+.kpi-cards-container {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 24px;
+  margin-bottom: 32px;
+}
+
+.kpi-card {
+  background-color: #ffffff;
+  border-radius: 8px;
+  padding: 24px;
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  border: 1px solid #e9ecef;
+  transition: all 0.3s ease;
+
+  &:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 15px rgba(0, 0, 0, 0.1);
+  }
+
+  .card-icon {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 24px;
+    color: #ffffff;
+  }
+
+  .card-details {
+    display: flex;
+    flex-direction: column;
+
+    .card-title {
+      font-size: 15px;
+      color: #6c757d;
+      margin-bottom: 4px;
+    }
+
+    .card-value {
+      font-size: 28px;
+      font-weight: 700;
+      color: #343a40;
+    }
+  }
+
+  &.revenue {
+    .card-icon {
+      background-color: #ff9d00;
+    }
+  }
+
+  &.invoices {
+    .card-icon {
+      background-color: #28dd52;
+    }
+  }
+}
+
+.chart-container {
+  margin-top: 32px;
+  padding: 24px;
+  background-color: #ffffff;
+  border-radius: 8px;
+  border: 1px solid #e9ecef;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+}
+
+.loading-state-chart {
+    padding: 40px;
+    text-align: center;
+    color: #6c757d;
+}

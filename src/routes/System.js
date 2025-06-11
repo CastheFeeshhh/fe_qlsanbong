@@ -10,6 +10,8 @@ import AssetManage from "../containers/System/AssetManage";
 import InvoiceManage from "../containers/System/InvoiceManage";
 import AssetInvoiceManage from "../containers/System/AssetInvoiceManage";
 
+import StatisticsPage from "../containers/System/StatisticsPage";
+
 import Header from "../containers/HomePage/HomeHeader";
 import Footer from "../containers/HomePage/HomeFooter";
 import "../styles/system.scss";
@@ -20,7 +22,7 @@ class System extends Component {
     this.state = {
       openMenus: {
         thongKe: false,
-        quanLyNghiepVu: false,
+        workManage: false,
       },
     };
   }
@@ -78,10 +80,10 @@ class System extends Component {
                   <ul className="submenu">
                     <li>
                       <NavLink
-                        to="/system/stats-customer"
+                        to="/system/statistics-revenue"
                         activeClassName="active"
                       >
-                        Thống kê khách hàng
+                        Báo cáo doanh thu
                       </NavLink>
                     </li>
                     <li>
@@ -107,18 +109,18 @@ class System extends Component {
               <li className="menu-group">
                 <div
                   className="menu-title"
-                  onClick={() => this.toggleMenu("quanLyNghiepVu")}
+                  onClick={() => this.toggleMenu("workManage")}
                 >
                   <i className="fas fa-tasks"></i> Nghiệp vụ
                   <i
                     className={`fas ${
-                      this.state.openMenus.quanLyNghiepVu
+                      this.state.openMenus.workManage
                         ? "fa-angle-up"
                         : "fa-angle-down"
                     } menu-arrow`}
                   ></i>
                 </div>
-                {this.state.openMenus.quanLyNghiepVu && (
+                {this.state.openMenus.workManage && (
                   <ul className="submenu">
                     {userInfo && userInfo.role_id === 1 && (
                       <li>
@@ -215,6 +217,11 @@ class System extends Component {
           </aside>
           <main className="system-main-content">
             <Switch>
+              <Route
+                path="/system/statistics-revenue"
+                component={StatisticsPage}
+              />
+
               <Route path="/system/user-manage" component={UserManage} />
               <Route path="/system/admin-manage" component={AdminManage} />
               <Route path="/system/field-manage" component={FieldManage} />

@@ -1,6 +1,8 @@
 import axios from "axios";
 import _ from "lodash";
 import { path } from "./utils/constant";
+import { dispatch } from "./redux";
+import actionTypes from "./store/actions/actionTypes";
 
 const instance = axios.create({
   baseURL: process.env.REACT_APP_BACKEND_URL,
@@ -26,10 +28,9 @@ instance.interceptors.response.use(
       const status = error.response.status;
 
       if (status === 401) {
+        dispatch({ type: actionTypes.PROCESS_LOGOUT });
         localStorage.removeItem("token");
         localStorage.removeItem("user");
-        // Nếu bạn dùng Redux, hãy cân nhắc dispatch action logout tại đây
-        // hoặc đảm bảo App.js xử lý việc này khi không tìm thấy token/user.
         if (window.location.pathname !== path.LOGIN) {
           window.location.href = path.LOGIN;
         }
