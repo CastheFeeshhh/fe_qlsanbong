@@ -27,7 +27,7 @@ class Login extends Component {
       firstName: "",
       lastName: "",
       address: "",
-      gender: "",
+      gender: "M",
       phone: "",
       avatar: "",
       roleId: "3",
@@ -45,9 +45,6 @@ class Login extends Component {
     const token = urlParams.get("token");
     const user_id = urlParams.get("user_id");
     const role_id = urlParams.get("role_id");
-    const first_name = urlParams.get("first_name");
-    const last_name = urlParams.get("last_name");
-    const avatar = urlParams.get("avatar");
     const errorMessage = urlParams.get("message");
     const loginStatus = urlParams.get("status");
 

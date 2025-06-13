@@ -9,4 +9,13 @@ const getRevenueStatistics = (startDate, endDate) => {
   });
 };
 
-export { getRevenueStatistics };
+const getBookingsStatistics = (startDate, endDate) => {
+  return axios.get(`/api/statistics/bookings`, {
+    params: {
+      startDate,
+      endDate,
+    },
+  });
+};
+
+export { getRevenueStatistics, getBookingsStatistics };

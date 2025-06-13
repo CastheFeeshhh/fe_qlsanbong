@@ -114,30 +114,66 @@
     }
   }
 
-  &.revenue {
-    .card-icon {
-      background-color: #ff9d00;
-    }
+  &.revenue .card-icon {
+    background-color: #ff9d00;
   }
-
-  &.invoices {
-    .card-icon {
-      background-color: #28dd52;
-    }
+  &.invoices .card-icon {
+    background-color: #28dd52;
+  }
+  &.total-bookings .card-icon {
+    background-color: #17a2b8;
+  }
+  &.confirmed .card-icon {
+    background-color: #28a745;
+  }
+  &.canceled .card-icon {
+    background-color: #dc3545;
   }
 }
 
+.charts-grid-container {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 32px;
+    margin-top: 32px;
+}
+
 .chart-container {
-  margin-top: 32px;
-  padding: 24px;
-  background-color: #ffffff;
-  border-radius: 8px;
-  border: 1px solid #e9ecef;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+    padding: 24px;
+    background-color: #ffffff;
+    border-radius: 8px;
+    border: 1px solid #e9ecef;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+
+    h6 {
+        text-align: center;
+        margin-bottom: 24px;
+        font-size: 16px;
+        font-weight: 600;
+        color: #495057;
+    }
+}
+
+.pie-chart-container {
+    grid-column: span 1;
+    position: relative;
+    height: 400px;
+}
+
+.line-chart-container {
+    grid-column: span 2;
+    position: relative;
+    height: 400px;
 }
 
 .loading-state-chart {
     padding: 40px;
     text-align: center;
     color: #6c757d;
+}
+
+@media (max-width: 992px) {
+    .charts-grid-container {
+        grid-template-columns: 1fr;
+    }
 }

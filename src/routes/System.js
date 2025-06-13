@@ -15,6 +15,7 @@ import StatisticsPage from "../containers/System/StatisticsPage";
 import Header from "../containers/HomePage/HomeHeader";
 import Footer from "../containers/HomePage/HomeFooter";
 import "../styles/system.scss";
+import BookingStatsPage from "../containers/System/BookingStatsPage";
 
 class System extends Component {
   constructor(props) {
@@ -88,10 +89,10 @@ class System extends Component {
                     </li>
                     <li>
                       <NavLink
-                        to="/system/stats-staff"
+                        to="/system/statistics-booking"
                         activeClassName="active"
                       >
-                        Thống kê nhân viên
+                        Thống kê lượt đặt sân
                       </NavLink>
                     </li>
                     <li>
@@ -220,6 +221,10 @@ class System extends Component {
               <Route
                 path="/system/statistics-revenue"
                 component={StatisticsPage}
+              />
+              <Route
+                path="/system/statistics-booking"
+                component={BookingStatsPage}
               />
 
               <Route path="/system/user-manage" component={UserManage} />
