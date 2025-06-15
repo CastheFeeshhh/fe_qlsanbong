@@ -8,6 +8,7 @@ import { getBookingScheduleByDate } from "../services/bookingService";
 import { toast } from "react-toastify";
 import HomeHeader from "../containers/HomePage/HomeHeader";
 import HomeFooter from "../containers/HomePage/HomeFooter";
+import ReactTooltip from "react-tooltip";
 import "../styles/bookingSchedule.scss";
 import "moment/locale/vi";
 moment.locale("vi");
@@ -86,16 +87,14 @@ class BookingSchedule extends Component {
     const startTime = moment(item.start_time).format("HH:mm DD/MM/YYYY");
     const endTime = moment(item.end_time).format("HH:mm DD/MM/YYYY");
 
-    const tooltipText = `Đội: ${item.title}\nĐội trưởng: ${
+    const tooltipText = `Đội: ${item.title}<br/>Đội trưởng: ${
       item.captain_name || "N/A"
-    }\nTừ: ${startTime}\nĐến: ${endTime}`;
+    }<br/>Từ: ${startTime}<br/>Đến: ${endTime}`;
 
-    const itemProps = getItemProps({
-      title: tooltipText,
-    });
+    const itemProps = getItemProps();
 
     return (
-      <div {...itemProps}>
+      <div {...itemProps} data-tip={tooltipText}>
         <div className="rct-item-content">{item.title}</div>
       </div>
     );
@@ -169,22 +168,12 @@ class BookingSchedule extends Component {
                       itemRenderer={this.itemRenderer}
                     />
 
-                    {/* Div test tooltip */}
-                    <div
-                      title="Test tooltip hiển thị không?"
-                      style={{
-                        width: "150px",
-                        height: "50px",
-                        background: "red",
-                        marginTop: "20px",
-                        textAlign: "center",
-                        lineHeight: "50px",
-                        color: "white",
-                        cursor: "help",
-                      }}
-                    >
-                      Hover tôi
-                    </div>
+                    <ReactTooltip
+                      place="top"
+                      type="dark"
+                      effect="solid"
+                      multiline={true}
+                    />
                   </>
                 ) : (
                   <div className="loading-state-chart">
