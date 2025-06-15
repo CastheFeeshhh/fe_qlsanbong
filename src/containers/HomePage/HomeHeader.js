@@ -79,7 +79,7 @@ class HomeHeader extends Component {
                 </div>
                 <div className="dropdown-menu">
                   <a href="/field-booking">Đăng ký sân</a>
-                  <a href="/field-schedule">Lịch thuê sân</a>
+                  <a href="/booking-schedule">Lịch đặt sân</a>
                 </div>
               </div>
               <div

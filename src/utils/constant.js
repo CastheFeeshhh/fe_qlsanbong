@@ -6,7 +6,7 @@ export const path = {
   SERVICE: "/service",
   FIELDMAP: "/field-map",
   FIELDBOOKING: "/field-booking",
-  FIELDSCHEDULE: "/field-schedule",
+  SCHEDULE: "/booking-schedule",
   FIELDNEWS: "/field-news",
   CONTACT: "/contact",
   PAYMENT: "/payment",

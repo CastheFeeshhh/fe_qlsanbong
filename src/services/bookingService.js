@@ -23,6 +23,10 @@ const getSchedules = (data) => {
   });
 };
 
+const getBookingScheduleByDate = (date) => {
+  return axios.get(`/api/booking-schedule?date=${date}`);
+};
+
 const createNewBooking = (id, finalTotalPrice) => {
   return axios.post("/api/add-new-booking", {
     user_id: id,
@@ -77,6 +81,7 @@ export {
   getAllServicesData,
   getAllFieldsData,
   getSchedules,
+  getBookingScheduleByDate,
   createNewBooking,
   addDetailBooking,
   addServiceBooking,

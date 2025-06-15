@@ -21,7 +21,7 @@ import fieldList from "../routes/fieldList";
 import service from "../routes/service";
 import fieldMap from "../routes/fieldMap";
 import fieldBooking from "../routes/fieldBooking";
-import fieldSchedule from "../routes/fieldSchedule";
+import bookingSchedule from "../routes/bookingSchedule";
 import fieldNews from "../routes/fieldNews";
 import contact from "../routes/contact";
 import payment from "../routes/payment";
@@ -102,7 +102,7 @@ class App extends Component {
                 <Route path={path.SERVICE} component={service} />
                 <Route path={path.FIELDMAP} component={fieldMap} />
                 <Route path={path.FIELDBOOKING} component={fieldBooking} />
-                <Route path={path.FIELDSCHEDULE} component={fieldSchedule} />
+                <Route path={path.SCHEDULE} component={bookingSchedule} />
                 <Route path={path.FIELDNEWS} component={fieldNews} />
                 <Route path={path.CONTACT} component={contact} />
                 <Route path={path.PAYMENT} component={payment} />

@@ -21,6 +21,15 @@ class FieldManage extends Component {
       isOpenEditModal: false,
       fieldEdit: {},
     };
+
+    const options = {
+      year: "numeric",
+      month: "2-digit",
+      day: "2-digit",
+      hour: "2-digit",
+      minute: "2-digit",
+    };
+    this.dateFormatter = new Intl.DateTimeFormat("vi-VN", options);
   }
 
   async componentDidMount() {
@@ -115,16 +124,11 @@ class FieldManage extends Component {
 
   formatDate = (dateString) => {
     if (!dateString) return "N/A";
-    const options = {
-      year: "numeric",
-      month: "2-digit",
-      day: "2-digit",
-      hour: "2-digit",
-      minute: "2-digit",
-    };
-    return new Intl.DateTimeFormat("vi-VN", options).format(
-      new Date(dateString)
-    );
+    try {
+      return this.dateFormatter.format(new Date(dateString));
+    } catch (error) {
+      return dateString;
+    }
   };
 
   render() {
