@@ -23,6 +23,14 @@ const getBookingHistory = (userId) => {
   });
 };
 
+const getAllNews = () => {
+  return axios.get(`/api/get-all-news`);
+};
+
+const getNewsById = (newsId) => {
+  return axios.get(`/api/get-news-by-id?id=${newsId}`);
+};
+
 const changePasswordService = (data) => {
   return axios.post("/api/change-password", data);
 };
@@ -97,6 +105,8 @@ export {
   handleLoginApi,
   handleRegisterApi,
   handleForgotPasswordApi,
+  getAllNews,
+  getNewsById,
   getBookingHistory,
   createVnpayPayment,
   changePasswordService,

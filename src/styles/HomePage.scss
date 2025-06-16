@@ -72,7 +72,16 @@ html, body {
         }
 
         span {
-          padding-right: 16px;
+          padding-right: 10px;
+        }
+
+         i {
+            transition: transform 0.3s ease;
+            padding-top: 5px;
+        }
+
+        &:hover i {
+            transform: translateX(5px);
         }
       }
     }
@@ -174,10 +183,18 @@ html, body {
           padding-right: 12px;
         }
       
-
         &:hover {
           background-color: #1ee5bd;
           color: #ffffff;
+        }
+
+        i {
+            transition: transform 0.3s ease;
+            padding-top: 5px;
+        }
+
+        &:hover i {
+            transform: translateX(5px);
         }
       }
     }
@@ -332,6 +349,15 @@ html, body {
         &:hover {
           background-color: #9a091cec;
           color: white;
+        }
+
+        i {
+            transition: transform 0.3s ease;
+            padding-top: 5px;
+        }
+
+        &:hover i {
+            transform: translateX(5px);
         }
       }
 

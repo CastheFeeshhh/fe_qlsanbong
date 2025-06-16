@@ -13,6 +13,7 @@ import ModalEditUser from "../../component/EditUserModal";
 import { emitter } from "../../utils/emitter";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import { ToastContainer } from "react-toastify";
 
 class AdminManage extends Component {
   constructor(props) {
@@ -201,6 +202,23 @@ class AdminManage extends Component {
     return (
       <div className="system-main-content">
         <h1 className="title">QUẢN LÝ NHÂN VIÊN</h1>
+        <ToastContainer
+          position="top-right"
+          autoClose={3000}
+          hideProgressBar={false}
+          newestOnTop={false}
+          closeOnClick
+          rtl={false}
+          pauseOnFocusLoss
+          draggable
+          pauseOnHover
+          toastStyle={{
+            padding: "10px 40px",
+            backgroundColor: "#ffffff",
+            color: "#000000",
+            fontSize: "14px",
+          }}
+        />
 
         <ModalUser
           isOpen={this.state.isOpenModalUser}

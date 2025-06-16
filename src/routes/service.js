@@ -70,7 +70,7 @@ class service extends Component {
         imageClass: "img7-service",
       },
       {
-        title: "🤧 Khăn giấy",
+        title: "🧻 Khăn giấy",
         details: [
           "Khăn giấy ướt tiện lợi, 50 tờ đôi / gói.",
           "Mua: 16.000đ / gói",

@@ -20,16 +20,16 @@ const HomeFooter = () => {
           <h3>Liên kết nhanh</h3>
           <ul>
             <li>
-              <a href="/gioi-thieu">Giới thiệu</a>
+              <a href="/information">Giới thiệu</a>
             </li>
             <li>
-              <a href="/dat-san">Đặt sân</a>
+              <a href="/field-booking">Đặt sân</a>
             </li>
             <li>
-              <a href="/tin-tuc">Tin tức</a>
+              <a href="/field-news">Tin tức</a>
             </li>
             <li>
-              <a href="/lien-he">Liên hệ</a>
+              <a href="/contact">Liên hệ</a>
             </li>
           </ul>
         </div>

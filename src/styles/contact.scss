@@ -1,10 +1,8 @@
-
-
 .info-page-wrapper {
   display: flex;
   flex-direction: column;
   min-height: 100vh;
-  padding-top: 100px;
+  padding-top: 80px;
   background-color: #e6f7ff;
 }
 
@@ -20,17 +18,17 @@
   color: #333;
 
   @media (max-width: 1200px) {
-    max-width: 90%; /* Điều chỉnh theo tỷ lệ phần trăm trên màn hình lớn hơn */
+    max-width: 90%;
   }
 
   @media (max-width: 992px) {
-    max-width: 95%; /* Điều chỉnh cho màn hình tablet ngang */
+    max-width: 95%; 
   }
 
   @media (max-width: 768px) {
     padding: 20px;
     margin: 20px auto;
-    max-width: 95%; /* Vẫn giữ 95% trên màn hình tablet dọc */
+    max-width: 95%; 
   }
 
   @media (max-width: 480px) {
@@ -116,7 +114,7 @@
       select,
       textarea {
         width: 100%;
-        padding: 12px; /* Rút ngắn padding để input gọn hơn */
+        padding: 12px; 
         border: 1px solid #ddd;
         border-radius: 6px;
         font-size: 1em;
