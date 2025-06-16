@@ -12,6 +12,7 @@ export const path = {
   PAYMENT: "/payment",
   VNPAY: "/vnpay-return",
   PAYMENTRETURN: "/payment-return",
+  PRIVACYPOLICY: "/privacy-polity",
   LOGIN: "/login",
   LOG_OUT: "/logout",
   RESET_PASSWORD: "/reset-password",

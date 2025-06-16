@@ -793,10 +793,14 @@ body.modal-open {
     }
 }
 
-.modal-user-container .modal-header .close {
-    background-color: #0b73ba !important;
-    line-height: 1 !important; 
-    padding: 0.5rem !important;
+.modal-user-container .modal-header {
+    display: flex !important;
+    justify-content: space-between !important;
+    .close {
+        background-color: #0b73ba !important;
+        line-height: 1 !important; 
+        padding: 0.5rem !important;
+    }
 }
 
 .modal-user-container .modal-header .close span {

@@ -1,6 +1,6 @@
 import React, { Component } from "react";
 import { connect } from "react-redux";
-import { toast } from "react-toastify";
+import { toast, ToastContainer } from "react-toastify";
 import { changePasswordService } from "../../services/userService";
 import "../../styles/changePassword.scss";
 
@@ -58,7 +58,6 @@ class ChangePassword extends Component {
 
       if (response && response.errCode === 0) {
         toast.success("Đổi mật khẩu thành công!");
-        alert("Đổi mật khẩu thành công!");
         this.setState({
           oldPassword: "",
           newPassword: "",
@@ -76,6 +75,17 @@ class ChangePassword extends Component {
   render() {
     return (
       <div className="change-password-container">
+        <ToastContainer
+          position="top-right"
+          autoClose={3000}
+          hideProgressBar={false}
+          newestOnTop={false}
+          closeOnClick
+          rtl={false}
+          pauseOnFocusLoss
+          draggable
+          pauseOnHover
+        />
         <div className="change-password-card">
           <h3 className="section-title">Đổi Mật Khẩu</h3>
           <div className="form-group">

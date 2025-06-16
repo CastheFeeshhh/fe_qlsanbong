@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import { toast } from "react-toastify";
+import { toast, ToastContainer } from "react-toastify";
 import {
   getAllSuppliers,
   createNewSupplierService,
@@ -170,6 +170,17 @@ class SupplierManage extends Component {
     return (
       <div className="system-main-content">
         <h1 className="title">QUẢN LÝ NHÀ CUNG CẤP</h1>
+        <ToastContainer
+          position="top-right"
+          autoClose={3000}
+          hideProgressBar={false}
+          newestOnTop={false}
+          closeOnClick
+          rtl={false}
+          pauseOnFocusLoss
+          draggable
+          pauseOnHover
+        />
         {isOpenCreateModal && (
           <AddSupplierModal
             isOpen={isOpenCreateModal}

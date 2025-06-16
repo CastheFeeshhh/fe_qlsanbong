@@ -47,7 +47,7 @@ const HomeFooter = () => {
               <a href="/chinh-sach">Câu hỏi thường gặp</a>
             </li>
             <li>
-              <a href="/bao-mat">Chính sách bảo mật</a>
+              <a href="/privacy-polity">Chính sách bảo mật</a>
             </li>
           </ul>
         </div>

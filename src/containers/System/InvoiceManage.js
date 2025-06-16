@@ -49,7 +49,7 @@ class InvoiceManage extends Component {
 
   formatDate = (dateString) => {
     if (!dateString) return "Chưa thanh toán";
-    return moment(dateString).format("HH:mm [ngày] DD/MM/YYYY");
+    return moment(dateString).format("HH:mm DD/MM/YYYY");
   };
 
   toggleDetailModal = () => {
@@ -113,7 +113,7 @@ class InvoiceManage extends Component {
 
     return (
       <div className="system-main-content">
-        <h1 className="title">QUẢN LÝ HÓA ĐƠN</h1>
+        <h1 className="title">QUẢN LÝ HÓA ĐƠN ĐẶT SÂN</h1>
         {this.state.isOpenDetailModal && (
           <InvoiceDetailModal
             isOpen={this.state.isOpenDetailModal}
@@ -123,7 +123,7 @@ class InvoiceManage extends Component {
         )}
         <div className="admin-card">
           <div className="card-header">
-            <h3>Danh sách hóa đơn</h3>
+            <h3>Danh sách hóa đơn đặt sân</h3>
           </div>
           <div className="card-body">
             <div className="user-role-group">

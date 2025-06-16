@@ -387,3 +387,22 @@
     background-position: center;
     animation: fadeInLogo 0.8s ease-out;
 }
+
+.guest-login-option {
+    margin-top: 25px;
+    text-align: center; 
+    padding-bottom: 10px; 
+
+    a {
+        color: #7f0081; 
+        text-decoration: none; 
+        font-weight: 500; 
+        transition: color 0.3s ease;
+        text-decoration: underline; 
+
+        &:hover {
+            color: #0056b3; 
+            cursor: pointer; 
+        }
+    }
+}

@@ -10,7 +10,7 @@ import {
 import ModalUser from "../../component/AddUserModal";
 import ModalEditUser from "../../component/EditUserModal";
 import { emitter } from "../../utils/emitter";
-import { toast } from "react-toastify";
+import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
 class UserManage extends Component {
@@ -192,6 +192,17 @@ class UserManage extends Component {
     return (
       <div className="system-main-content">
         <h1 className="title">QUẢN LÝ KHÁCH HÀNG</h1>
+        <ToastContainer
+          position="top-right"
+          autoClose={3000}
+          hideProgressBar={false}
+          newestOnTop={false}
+          closeOnClick
+          rtl={false}
+          pauseOnFocusLoss
+          draggable
+          pauseOnHover
+        />
 
         <ModalUser
           isOpen={this.state.isOpenModalUser}

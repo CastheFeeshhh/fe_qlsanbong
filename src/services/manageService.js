@@ -90,6 +90,14 @@ const deleteServiceData = (serviceId) => {
   });
 };
 
+const createAssetInvoice = (data) => {
+  return axios.post("/api/create-asset-invoice", data);
+};
+
+const getAssetInvoiceById = (invoiceId) => {
+  return axios.get(`/api/get-asset-invoice-by-id?id=${invoiceId}`);
+};
+
 const getInvoiceDetailsById = (bookingId) => {
   return axios.get(`/api/get-invoice-details?id=${bookingId}`);
 };
@@ -116,4 +124,6 @@ export {
   updateServiceData,
   deleteServiceData,
   getInvoiceDetailsById,
+  createAssetInvoice,
+  getAssetInvoiceById,
 };

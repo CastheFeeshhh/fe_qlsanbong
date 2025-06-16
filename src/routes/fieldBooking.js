@@ -24,7 +24,7 @@ import { renderBookingItemRow } from "../helpers/bookingRendering";
 import * as appApiService from "../services/bookingService";
 import CalendarModal from "../component/CalendarModal";
 import { withRouter } from "react-router-dom";
-
+import { toast, ToastContainer } from "react-toastify";
 import { validateCalendarSelection } from "../helpers/validationUtils";
 
 class fieldBooking extends Component {
@@ -453,7 +453,7 @@ class fieldBooking extends Component {
         }),
         () => {
           this.validateAndSetFormState();
-          alert("Đã thêm hóa đơn đặt sân!");
+          toast.success("Đã thêm vào đơn đặt sân");
         }
       );
     } else {
@@ -484,15 +484,7 @@ class fieldBooking extends Component {
 
       if (response.success) {
         this.resetBookingForm();
-        alert(response.message);
-
-        console.log("Dữ liệu chuẩn bị gửi đến trang /payment:", {
-          userInfo: userInfo,
-          booking_id: response.booking_id,
-          final_total_price: response.final_total_price,
-          booking_details: response.booking_details,
-          services: this.props.services,
-        });
+        toast.success(response.message);
 
         history.push({
           pathname: "/payment",
@@ -505,7 +497,7 @@ class fieldBooking extends Component {
           },
         });
       } else {
-        console.error("Đặt sân thất bại:", response.message);
+        toast.error("Đặt sân thất bại:", response.message);
       }
     } catch (error) {
       console.error("Lỗi khi xác nhận đặt sân từ UI:", error);
@@ -567,8 +559,8 @@ class fieldBooking extends Component {
     console.log("check isLoggedIn ở fieldBooking.js:", isLoggedIn);
 
     if (!isLoggedIn) {
-      alert("đăng nhập để sử dụng tính năng");
-      return <Redirect to="/login" />;
+      alert("Đăng nhập để sử dụng tính năng");
+      return <Redirect to="/home" />;
     }
     const {
       currentBooking,
@@ -607,6 +599,17 @@ class fieldBooking extends Component {
       <React.Fragment>
         <HomeHeader activeTab="book" />
         <div className="booking-wrapper">
+          <ToastContainer
+            position="top-right"
+            autoClose={3000}
+            hideProgressBar={false}
+            newestOnTop={false}
+            closeOnClick
+            rtl={false}
+            pauseOnFocusLoss
+            draggable
+            pauseOnHover
+          />
           <div className="booking-container">
             <div className="booking-form">
               <div className="form-header">

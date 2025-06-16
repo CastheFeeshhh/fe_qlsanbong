@@ -9,13 +9,14 @@ import SupplierManage from "../containers/System/SupplierManage";
 import AssetManage from "../containers/System/AssetManage";
 import InvoiceManage from "../containers/System/InvoiceManage";
 import AssetInvoiceManage from "../containers/System/AssetInvoiceManage";
+import OperationalSchedule from "../containers/System/OperationalSchedule";
 
 import StatisticsPage from "../containers/System/StatisticsPage";
+import BookingStatsPage from "../containers/System/BookingStatsPage";
 
 import Header from "../containers/HomePage/HomeHeader";
 import Footer from "../containers/HomePage/HomeFooter";
 import "../styles/system.scss";
-import BookingStatsPage from "../containers/System/BookingStatsPage";
 
 class System extends Component {
   constructor(props) {
@@ -141,16 +142,6 @@ class System extends Component {
                         Quản lý người dùng
                       </NavLink>
                     </li>
-                    {userInfo && userInfo.role_id === 1 && (
-                      <li>
-                        <NavLink
-                          to="/system/supplier-manage"
-                          activeClassName="active"
-                        >
-                          Quản lý nhà cung cấp
-                        </NavLink>
-                      </li>
-                    )}
                     <li>
                       <NavLink
                         to="/system/field-manage"
@@ -175,6 +166,16 @@ class System extends Component {
                         Quản lý tài sản thiết bị
                       </NavLink>
                     </li>
+                    {userInfo && userInfo.role_id === 1 && (
+                      <li>
+                        <NavLink
+                          to="/system/supplier-manage"
+                          activeClassName="active"
+                        >
+                          Quản lý nhà cung cấp
+                        </NavLink>
+                      </li>
+                    )}
                     <li>
                       <NavLink
                         to="/system/invoice-manage"
@@ -195,10 +196,10 @@ class System extends Component {
                     )}
                     <li>
                       <NavLink
-                        to="/system/receipt-manage"
+                        to="/system/operation-schedule"
                         activeClassName="active"
                       >
-                        Quản lý phiếu đặt sân
+                        Quản lý lịch sân bóng
                       </NavLink>
                     </li>
                   </ul>
@@ -242,11 +243,15 @@ class System extends Component {
                 path="/system/supplier-manage"
                 component={SupplierManage}
               />
+              <Route
+                path="/system/operation-schedule"
+                component={OperationalSchedule}
+              />
 
               <Route
                 component={() => {
                   return (
-                    <Redirect to={systemMenuPath || "/system/dashboard"} />
+                    <Redirect to={systemMenuPath || "/system/user_manage"} />
                   );
                 }}
               />

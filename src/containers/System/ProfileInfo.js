@@ -1,6 +1,6 @@
 import React, { Component } from "react";
 import { connect } from "react-redux";
-import { toast } from "react-toastify";
+import { toast, ToastContainer } from "react-toastify";
 import * as actions from "../../store/actions/userActions";
 import { editUserService } from "../../services/manageService";
 import { updateUserInfoInRedux } from "../../store/actions/userActions";
@@ -106,6 +106,17 @@ class UserProfile extends Component {
 
     return (
       <div className="user-profile-container">
+        <ToastContainer
+          position="top-right"
+          autoClose={3000}
+          hideProgressBar={false}
+          newestOnTop={false}
+          closeOnClick
+          rtl={false}
+          pauseOnFocusLoss
+          draggable
+          pauseOnHover
+        />
         <div className="profile-card">
           <div className="profile-header">
             <div className="avatar-container">
@@ -126,12 +137,12 @@ class UserProfile extends Component {
                 {isEditMode ? (
                   <input
                     type="text"
-                    name="last_name"
-                    value={last_name || ""}
+                    name="first_name"
+                    value={first_name || ""}
                     onChange={this.handleInputChange}
                   />
                 ) : (
-                  <span>{last_name || "Chưa cập nhật"}</span>
+                  <span>{first_name || "Chưa cập nhật"}</span>
                 )}
               </div>
               <div className="info-item">
@@ -139,12 +150,12 @@ class UserProfile extends Component {
                 {isEditMode ? (
                   <input
                     type="text"
-                    name="first_name"
-                    value={first_name || ""}
+                    name="last_name"
+                    value={last_name || ""}
                     onChange={this.handleInputChange}
                   />
                 ) : (
-                  <span>{first_name || "Chưa cập nhật"}</span>
+                  <span>{last_name || "Chưa cập nhật"}</span>
                 )}
               </div>
               <div className="info-item">

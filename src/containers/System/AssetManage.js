@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import { toast } from "react-toastify";
+import { toast, ToastContainer } from "react-toastify";
 import {
   getAllAssets,
   createNewAssetService,
@@ -236,6 +236,17 @@ class AssetManage extends Component {
     return (
       <div className="system-main-content">
         <h1 className="title">QUẢN LÝ TÀI SẢN & VẬT TƯ</h1>
+        <ToastContainer
+          position="top-right"
+          autoClose={3000}
+          hideProgressBar={false}
+          newestOnTop={false}
+          closeOnClick
+          rtl={false}
+          pauseOnFocusLoss
+          draggable
+          pauseOnHover
+        />
         {isOpenCreateModal && (
           <AddAssetModal
             isOpen={isOpenCreateModal}

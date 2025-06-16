@@ -1,6 +1,12 @@
 import React, { Component } from "react";
 import { toast } from "react-toastify";
-import { getAllAssetInvoices } from "../../services/manageService";
+import {
+  getAllAssetInvoices,
+  createAssetInvoice,
+  getAssetInvoiceById,
+} from "../../services/manageService";
+import AddAssetInvoiceModal from "../../component/AddAssetInvoiceModal";
+import AssetInvoiceDetailModal from "../../component/AssetInvoiceDetailModal";
 import "../../styles/assetInvoiceManage.scss";
 
 class AssetInvoiceManage extends Component {
@@ -10,10 +16,17 @@ class AssetInvoiceManage extends Component {
       invoices: [],
       isLoading: true,
       error: null,
+      isOpenCreateModal: false,
+      isOpenDetailModal: false,
+      selectedInvoice: null,
     };
 
-    const options = { year: "numeric", month: "2-digit", day: "2-digit" };
-    this.dateFormatter = new Intl.DateTimeFormat("vi-VN", options);
+    this.dateFormatter = new Intl.DateTimeFormat("vi-VN", {
+      year: "numeric",
+      month: "2-digit",
+      day: "2-digit",
+    });
+    this.currencyFormatter = new Intl.NumberFormat("vi-VN");
   }
 
   async componentDidMount() {
@@ -39,6 +52,51 @@ class AssetInvoiceManage extends Component {
     }
   };
 
+  handleOpenCreateModal = () => {
+    this.setState({ isOpenCreateModal: true });
+  };
+
+  toggleCreateModal = () => {
+    this.setState({ isOpenCreateModal: !this.state.isOpenCreateModal });
+  };
+
+  doCreateInvoice = async (data) => {
+    try {
+      let response = await createAssetInvoice(data);
+      if (response && response.errCode === 0) {
+        toast.success("Tạo phiếu nhập hàng thành công!");
+        this.setState({ isOpenCreateModal: false });
+        await this.loadInvoices();
+      } else {
+        toast.error(response.errMessage || "Tạo phiếu nhập hàng thất bại!");
+      }
+    } catch (e) {
+      toast.error("Có lỗi xảy ra!");
+    }
+  };
+
+  handleViewDetails = async (invoice) => {
+    this.setState({ isLoading: true });
+    try {
+      let response = await getAssetInvoiceById(invoice.asset_invoice_id);
+      if (response && response.errCode === 0) {
+        this.setState({
+          selectedInvoice: response.data,
+          isOpenDetailModal: true,
+        });
+      } else {
+        toast.error("Không thể lấy chi tiết hóa đơn!");
+      }
+    } catch (e) {
+      toast.error("Có lỗi xảy ra khi lấy chi tiết hóa đơn!");
+    }
+    this.setState({ isLoading: false });
+  };
+
+  toggleDetailModal = () => {
+    this.setState({ isOpenDetailModal: !this.state.isOpenDetailModal });
+  };
+
   formatDate = (dateString) => {
     if (!dateString) return "N/A";
     try {
@@ -48,16 +106,27 @@ class AssetInvoiceManage extends Component {
     }
   };
 
+  formatCurrency = (amount) => {
+    if (amount === null || amount === undefined || isNaN(parseFloat(amount)))
+      return "N/A";
+    return this.currencyFormatter.format(parseFloat(amount)) + " VNĐ";
+  };
+
   render() {
-    const { invoices, isLoading, error } = this.state;
+    const {
+      invoices,
+      isLoading,
+      error,
+      isOpenCreateModal,
+      isOpenDetailModal,
+      selectedInvoice,
+    } = this.state;
 
     if (isLoading) {
       return (
         <div className="system-main-content">
           <h1 className="title">QUẢN LÝ HÓA ĐƠN NHẬP HÀNG</h1>
-          <div className="loading-state">
-            <i className="fas fa-spinner fa-spin"></i> Đang tải dữ liệu...
-          </div>
+          <div className="loading-state">{/*...*/}</div>
         </div>
       );
     }
@@ -66,12 +135,7 @@ class AssetInvoiceManage extends Component {
       return (
         <div className="system-main-content">
           <h1 className="title">QUẢN LÝ HÓA ĐƠN NHẬP HÀNG</h1>
-          <div className="error-state">
-            <i className="fas fa-exclamation-triangle"></i> {error}
-          </div>
-          <button className="btn btn-primary" onClick={this.loadInvoices}>
-            <i className="fas fa-sync-alt"></i> Thử lại
-          </button>
+          <div className="error-state">{/*...*/}</div>
         </div>
       );
     }
@@ -79,10 +143,26 @@ class AssetInvoiceManage extends Component {
     return (
       <div className="system-main-content">
         <h1 className="title">QUẢN LÝ HÓA ĐƠN NHẬP HÀNG</h1>
+
+        <AddAssetInvoiceModal
+          isOpen={isOpenCreateModal}
+          toggleFromParent={this.toggleCreateModal}
+          createInvoice={this.doCreateInvoice}
+        />
+
+        <AssetInvoiceDetailModal
+          isOpen={isOpenDetailModal}
+          toggleFromParent={this.toggleDetailModal}
+          invoiceData={selectedInvoice}
+        />
+
         <div className="admin-card">
           <div className="card-header">
             <h3>Danh sách hóa đơn nhập hàng</h3>
-            <button className="btn btn-primary">
+            <button
+              className="btn btn-primary"
+              onClick={this.handleOpenCreateModal}
+            >
               <i className="fas fa-plus"></i> Tạo phiếu nhập hàng
             </button>
           </div>
@@ -91,6 +171,7 @@ class AssetInvoiceManage extends Component {
               <h4 className="role-group-title">
                 Tất cả hóa đơn - {invoices.length}
               </h4>
+
               <div className="table-responsive">
                 <table id="asset-invoices-table" className="table table-hover">
                   <thead>
@@ -108,37 +189,22 @@ class AssetInvoiceManage extends Component {
                     {invoices && invoices.length > 0 ? (
                       invoices.map((invoice) => (
                         <tr key={invoice.asset_invoice_id}>
-                          <td data-label="ID HĐ">{invoice.asset_invoice_id}</td>
-                          <td data-label="Nhà Cung Cấp">
-                            {invoice.supplier_name}
+                          <td>{invoice.asset_invoice_id}</td>
+                          <td>{invoice.supplier_name}</td>
+                          <td>{this.formatDate(invoice.invoice_date)}</td>
+                          <td className="text-right">
+                            {this.formatCurrency(invoice.total_amount)}
                           </td>
-                          <td data-label="Ngày Nhập">
-                            {this.formatDate(invoice.invoice_date)}
-                          </td>
-                          <td data-label="Tổng Tiền" className="text-right">
-                            {invoice.total_amount
-                              ? parseFloat(invoice.total_amount).toLocaleString(
-                                  "vi-VN"
-                                ) + " VNĐ"
-                              : "N/A"}
-                          </td>
-                          <td data-label="Chi Tiết Hàng Hóa">
-                            {invoice.details}
-                          </td>
-                          <td data-label="Ghi Chú">{invoice.note || ""}</td>
-                          <td data-label="Thao Tác">
+                          <td>{invoice.details}</td>
+                          <td>{invoice.note || ""}</td>
+                          <td>
                             <div className="btn-action-group">
                               <button
                                 className="btn btn-edit"
                                 title="Xem chi tiết hóa đơn"
+                                onClick={() => this.handleViewDetails(invoice)}
                               >
                                 <i className="fas fa-eye"></i>
-                              </button>
-                              <button
-                                className="btn btn-delete"
-                                title="Xóa hóa đơn"
-                              >
-                                <i className="fas fa-trash-alt"></i>
                               </button>
                             </div>
                           </td>

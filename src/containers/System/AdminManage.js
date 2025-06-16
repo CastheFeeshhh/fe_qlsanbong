@@ -11,9 +11,8 @@ import {
 import ModalUser from "../../component/AddUserModal";
 import ModalEditUser from "../../component/EditUserModal";
 import { emitter } from "../../utils/emitter";
-import { toast } from "react-toastify";
+import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import { ToastContainer } from "react-toastify";
 
 class AdminManage extends Component {
   constructor(props) {
@@ -212,12 +211,6 @@ class AdminManage extends Component {
           pauseOnFocusLoss
           draggable
           pauseOnHover
-          toastStyle={{
-            padding: "10px 40px",
-            backgroundColor: "#ffffff",
-            color: "#000000",
-            fontSize: "14px",
-          }}
         />
 
         <ModalUser
@@ -282,12 +275,14 @@ class AdminManage extends Component {
                               >
                                 <i className="fas fa-edit"></i>
                               </button>
-                              <button
-                                className="btn btn-delete"
-                                onClick={() => this.handleDeleteUser(user)}
-                              >
-                                <i className="fas fa-trash-alt"></i>
-                              </button>
+                              {user.role_id === 2 && (
+                                <button
+                                  className="btn btn-delete"
+                                  onClick={() => this.handleDeleteUser(user)}
+                                >
+                                  <i className="fas fa-trash-alt"></i>
+                                </button>
+                              )}
                             </td>
                           </tr>
                         ))

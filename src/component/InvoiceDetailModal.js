@@ -31,16 +31,11 @@ class InvoiceDetailModal extends Component {
       <Modal
         isOpen={isOpen}
         toggle={this.toggle}
-        className={"modal-invoice-detail"}
+        className={"modal-user-container"}
         size="lg"
-        centered
       >
         <ModalHeader toggle={this.toggle}>
-          <i
-            className="fas fa-file-invoice-dollar"
-            style={{ marginRight: "10px" }}
-          ></i>
-          Chi tiết hóa đơn #{invoiceData?.invoice_id}
+          Chi tiết hóa đơn đặt sân #{invoiceData?.invoice_id}
         </ModalHeader>
         <ModalBody>
           <div className="invoice-document">

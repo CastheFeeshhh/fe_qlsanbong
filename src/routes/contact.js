@@ -2,7 +2,7 @@ import React, { Component } from "react";
 import { connect } from "react-redux";
 import HomeHeader from "../containers/HomePage/HomeHeader";
 import HomeFooter from "../containers/HomePage/HomeFooter";
-import "../styles/contact.scss"; // File SCSS cho ContactPage
+import "../styles/contact.scss";
 
 class ContactPage extends Component {
   constructor(props) {

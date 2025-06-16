@@ -315,6 +315,13 @@ class Login extends Component {
     window.location.href = `${process.env.REACT_APP_BACKEND_URL}/auth/facebook`;
   };
 
+  handleContinueAsGuest = () => {
+    localStorage.removeItem("jwtToken");
+    localStorage.removeItem("userInfo");
+
+    this.props.navigate("/home");
+  };
+
   render() {
     const { activeForm, activeTab } = this.state;
     const { userInfo, isLoggedIn } = this.props;
@@ -418,6 +425,11 @@ class Login extends Component {
                 >
                   <i className="fab fa-facebook-f facebook-icon"></i>
                 </div>
+              </div>
+              <div className="guest-login-option">
+                <a href="#" onClick={this.handleContinueAsGuest}>
+                  Đăng nhập với tư cách Khách
+                </a>
               </div>
             </div>
           )}

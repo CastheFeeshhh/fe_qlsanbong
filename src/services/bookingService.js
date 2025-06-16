@@ -77,6 +77,10 @@ const editFieldService = (inputData) => {
   return axios.put("/api/edit-field", inputData);
 };
 
+const getOperationalSchedule = (date) => {
+  return axios.get(`/api/operational-schedule?date=${date}`);
+};
+
 export {
   getAllServicesData,
   getAllFieldsData,
@@ -89,4 +93,5 @@ export {
   createNewFieldService,
   deleteFieldService,
   editFieldService,
+  getOperationalSchedule,
 };

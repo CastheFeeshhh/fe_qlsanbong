@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import { toast } from "react-toastify";
+import { toast, ToastContainer } from "react-toastify";
 import {
   getAllAssets,
   createNewService,
@@ -148,6 +148,17 @@ class ServiceManage extends Component {
     return (
       <div className="system-main-content">
         <h1 className="title">QUẢN LÝ DỊCH VỤ</h1>
+        <ToastContainer
+          position="top-right"
+          autoClose={3000}
+          hideProgressBar={false}
+          newestOnTop={false}
+          closeOnClick
+          rtl={false}
+          pauseOnFocusLoss
+          draggable
+          pauseOnHover
+        />
         <AddServiceModal
           isOpen={this.state.isOpenAddModal}
           toggleFromParent={this.toggleAddModal}

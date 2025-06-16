@@ -1,0 +1,76 @@
+.modal-user-container {
+    .modal-header {
+        background-color: #f0f2f5;
+        border-bottom: 1px solid #dee2e6;
+        color: #343a40;
+        font-weight: 600;
+    }
+
+    .modal-body {
+        padding: 24px 32px;
+        font-size: 16px;
+    }
+
+    .customer-info-section {
+        p {
+            margin-bottom: 8px;
+            strong {
+                min-width: 140px;
+                display: inline-block;
+            }
+        }
+    }
+
+    .items-section {
+        margin: 24px 0;
+        h6 {
+            font-weight: 600;
+            margin-bottom: 16px;
+            color: #495057;
+            text-transform: uppercase;
+            font-size: 15px;
+        }
+        .item-row {
+            display: flex;
+            gap: 8px;
+            padding: 8px 0;
+            span:first-child {
+                font-weight: 500;
+                color: #212529;
+            }
+            span:last-child {
+                color: #6c757d;
+            }
+        }
+    }
+    
+    .summary-section {
+        margin: 12px 0;
+        .total-amount {
+            text-align: right;
+            font-size: 20px;
+            font-weight: 500;
+
+            strong {
+                margin-left: 15px;
+                font-weight: 700;
+                color: #045c9f;
+            }
+        }
+    }
+
+    .thank-you-message {
+        text-align: center;
+        margin-top: 32px;
+        font-style: italic;
+        color: #6c757d;
+    }
+
+    .modal-footer {
+        border-top: 1px solid #dee2e6;
+        background-color: #f8f9fa;
+        .btn i {
+            margin-right: 5px;
+        }
+    }
+}
